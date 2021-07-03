@@ -127,6 +127,7 @@ class T5Summarizer:
         """ Encoding list of sentence or (sentence, label) """
         assert type(data) == list, data
         if cache_path is not None and os.path.exists(cache_path):
+            logging.info('loading preprocessed feature from {}'.format(cache_path))
             return pickle_load(cache_path)
         pool = Pool()
         out = pool.map(EncodePlus(**self.t5_encoder_config), data)
@@ -134,6 +135,7 @@ class T5Summarizer:
         if cache_path is not None:
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
             pickle_save(out, cache_path)
+            logging.info('preprocessed feature is saved at {}'.format(cache_path))
         return out
 
     def save(self, save_dir):
