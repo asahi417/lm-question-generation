@@ -33,6 +33,7 @@ setup(
         "tqdm",
         "requests",
         "pandas",
+        "gdown",
         "numpy",
         "transformers",
         "sentencepiece",
