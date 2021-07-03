@@ -15,7 +15,7 @@ class Trainer:
                  checkpoint_dir: str,
                  dataset: str = "cnn_dailymail",
                  dataset_argument: str = "3.0.0",
-                 task_prefix: str = 'summarize:',
+                 task_prefix: str = 'summarize',
                  model: str = 'google/mt5-small',
                  max_length: int = 512,
                  max_length_output: int = 128,

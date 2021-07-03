@@ -23,7 +23,7 @@ def pickle_load(path: str):
 class EncodePlus:
     """ Wrapper of encode_plus for multiprocessing. """
 
-    def __init__(self, tokenizer, max_length: int = 512, max_length_output: int = 128, task_prefix: str = 'summarize:'):
+    def __init__(self, tokenizer, max_length: int = 512, max_length_output: int = 128, task_prefix: str = 'summarize'):
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -36,7 +36,9 @@ class EncodePlus:
     def encode_plus(self, input_sequence: str, output_sequence: str = None):
         param_input = {'max_length': self.max_length, 'truncation': True, 'padding': 'max_length'}
         param_output = {'max_length': self.max_length_output, 'truncation': True, 'padding': 'max_length'}
-        encode = self.tokenizer.encode_plus(' '.join([self.task_prefix, input_sequence]), **param_input)
+        if self.task_prefix is not None:
+            input_sequence = ': '.join([self.task_prefix, input_sequence])
+        encode = self.tokenizer.encode_plus(input_sequence, **param_input)
         if output_sequence is not None:
             encode['labels'] = self.tokenizer.encode(output_sequence, **param_output)
         return encode
@@ -49,7 +51,7 @@ class T5Summarizer:
                  model: str,
                  max_length: int = 128,
                  max_length_output: int = 128,
-                 task_prefix: str = 'summarize:',
+                 task_prefix: str = 'summarize',
                  cache_dir: str = None):
         """ T5 summarization model. """
         self.model_name = model
