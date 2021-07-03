@@ -101,9 +101,8 @@ class Trainer:
 
         logging.info('dataset preprocessing')
         raw_input, raw_output = get_dataset(self.config.dataset, self.config.dataset_argument, split='train')
-        data = list(zip(raw_input, raw_output))
         loader = self.model.get_data_loader(
-            data, batch_size=self.config.batch, shuffle=True, drop_last=True, num_workers=num_workers)
+            raw_input, raw_output, batch_size=self.config.batch, shuffle=True, drop_last=True, num_workers=num_workers)
         self.model.train()
 
         logging.info('start model training')

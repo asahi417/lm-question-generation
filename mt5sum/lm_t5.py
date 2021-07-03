@@ -23,6 +23,9 @@ class EncodePlus:
         return self.encode_plus(*inputs)
 
     def encode_plus(self, input_sequence: str, output_sequence: str = None):
+        # print(input_sequence)
+        # print(output_sequence)
+        # input()
         param_input = {'max_length': self.max_length, 'truncation': True, 'padding': 'max_length'}
         param_output = {'max_length': self.max_length_output, 'truncation': True, 'padding': 'max_length'}
         encode = self.tokenizer.encode_plus(' '.join([self.task_prefix, input_sequence]), **param_input)
@@ -104,6 +107,8 @@ class T5Summarizer:
             data = list(zip(inputs, outputs))
         else:
             data = [(i,) for i in inputs]
+        # print(data[0])
+        # input()
         features = self.__preprocess(data)
         batch_size = len(features) if batch_size is None else batch_size
         return torch.utils.data.DataLoader(
