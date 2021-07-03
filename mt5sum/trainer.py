@@ -34,6 +34,7 @@ class Trainer:
 
         logging.info('initialize model trainer')
         # config
+        self.data_cache_dir = '{}/.data_cache'.format(checkpoint_dir)
         self.config = Config(
             checkpoint_dir=checkpoint_dir,
             dataset=dataset,
@@ -103,7 +104,8 @@ class Trainer:
         raw_input, raw_output = get_dataset(self.config.dataset, self.config.dataset_argument, split='train')
         loader = self.model.get_data_loader(
             raw_input, raw_output, batch_size=self.config.batch, shuffle=True, drop_last=True, num_workers=num_workers,
-            cache_path='{}/data.pkl'.format(self.config.checkpoint_dir))
+            cache_path='{}/data.{}.{}.{}.pkl'.format(
+                self.data_cache_dir, self.config.max_length, self.config.max_length_output, self.config.task_prefix))
         self.model.train()
 
         logging.info('start model training')
