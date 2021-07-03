@@ -43,7 +43,7 @@ class T5Summarizer:
         """  T5 summarization model. """
         self.model_name = model
         self.max_length = max_length
-        self.max_length_out = max_length_output
+        self.max_length_output = max_length_output
         self.task_prefix = task_prefix
         logging.info('initialize T5Summarizer with `{}`'.format(self.model_name))
         self.tokenizer, self.model, _ = load_language_model(self.model_name, cache_dir=cache_dir)
