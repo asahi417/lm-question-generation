@@ -117,8 +117,6 @@ class T5Summarizer:
         else:
             data = [(i,) for i in inputs]
         features = self.__preprocess(data, cache_path)
-        print(features)
-        input()
         batch_size = len(features) if batch_size is None else batch_size
         return torch.utils.data.DataLoader(
             Dataset(features), batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, drop_last=drop_last)
@@ -129,7 +127,7 @@ class T5Summarizer:
         if cache_path is not None and os.path.exists(cache_path):
             return pickle_load(cache_path)
         pool = Pool()
-        out = pool.map(EncodePlus(**self.t5_encoder_config), data[:10])
+        out = pool.map(EncodePlus(**self.t5_encoder_config), data)
         pool.close()
         if cache_path is not None:
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
