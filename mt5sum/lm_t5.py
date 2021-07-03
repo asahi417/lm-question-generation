@@ -100,7 +100,7 @@ class T5Summarizer:
 
     def __call__(self, encode: Dict):
         loss = self.model(**{k: v.to(self.device) for k, v in encode.items()})['loss']
-        return loss.mean() if self.model.parallel else loss
+        return loss.mean() if self.parallel else loss
 
     def get_data_loader(self,
                         inputs,
