@@ -23,7 +23,7 @@ def get_options():
     parser.add_argument('-b', '--batch', help='batch size', default=32, type=int)
     parser.add_argument('-g', '--gradient-accumulation-steps', help='', default=8, type=int)
     parser.add_argument('--max-length', default=512, type=int, help='max sequence length for input sequence')
-    parser.add_argument('--max-length-out', default=128, type=int, help='max sequence length for output sequence')
+    parser.add_argument('--max-length-output', default=128, type=int, help='max sequence length for output sequence')
     parser.add_argument('--weight-decay', help='weight decay', default=0, type=float)
     parser.add_argument('--debug', help='log mode', action='store_true')
     return parser.parse_args()
