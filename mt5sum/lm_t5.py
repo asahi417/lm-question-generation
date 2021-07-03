@@ -1,5 +1,6 @@
 import os
 import logging
+import pickle
 from typing import List, Dict
 from multiprocessing import Pool
 
@@ -7,6 +8,16 @@ import torch
 from .util import Dataset, load_language_model
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
+
+
+def pickle_save(obj, path: str):
+    with open(path, "wb") as fp:
+        pickle.dump(obj, fp)
+
+
+def pickle_load(path: str):
+    with open(path, "rb") as fp:  # Unpickling
+        return pickle.load(fp)
 
 
 class EncodePlus:
@@ -23,9 +34,6 @@ class EncodePlus:
         return self.encode_plus(*inputs)
 
     def encode_plus(self, input_sequence: str, output_sequence: str = None):
-        # print(input_sequence)
-        # print(output_sequence)
-        # input()
         param_input = {'max_length': self.max_length, 'truncation': True, 'padding': 'max_length'}
         param_output = {'max_length': self.max_length_output, 'truncation': True, 'padding': 'max_length'}
         encode = self.tokenizer.encode_plus(' '.join([self.task_prefix, input_sequence]), **param_input)
@@ -43,7 +51,7 @@ class T5Summarizer:
                  max_length_output: int = 128,
                  task_prefix: str = 'summarize:',
                  cache_dir: str = None):
-        """  T5 summarization model. """
+        """ T5 summarization model. """
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -100,26 +108,32 @@ class T5Summarizer:
                         batch_size: int = None,
                         num_workers: int = 0,
                         shuffle: bool = False,
-                        drop_last: bool = False):
+                        drop_last: bool = False,
+                        cache_path: str = None):
         """ Transform features (produced by BERTClassifier.preprocess method) to data loader. """
         if outputs is not None:
             assert len(outputs) == len(inputs), '{} != {}'.format(len(outputs), len(inputs))
             data = list(zip(inputs, outputs))
         else:
             data = [(i,) for i in inputs]
-        # print(data[0])
-        # input()
-        features = self.__preprocess(data)
+        features = self.__preprocess(data, cache_path)
+        print(features)
+        input()
         batch_size = len(features) if batch_size is None else batch_size
         return torch.utils.data.DataLoader(
             Dataset(features), batch_size=batch_size, shuffle=shuffle, num_workers=num_workers, drop_last=drop_last)
 
-    def __preprocess(self, data):
+    def __preprocess(self, data, cache_path: str = None):
         """ Encoding list of sentence or (sentence, label) """
         assert type(data) == list, data
+        if cache_path is not None and os.path.exists(cache_path):
+            return pickle_load(cache_path)
         pool = Pool()
-        out = pool.map(EncodePlus(**self.t5_encoder_config), data)
+        out = pool.map(EncodePlus(**self.t5_encoder_config), data[:10])
         pool.close()
+        if cache_path is not None:
+            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+            pickle_save(out, cache_path)
         return out
 
     def save(self, save_dir):
