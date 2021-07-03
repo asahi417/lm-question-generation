@@ -44,7 +44,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'mt5sum-train = mt5_cl.model_training:main'
+            'mt5sum-train = mt5sum_cl.model_training:main'
             # 'mt5sum-eval = cli.evaluate:main'
         ]
     }
