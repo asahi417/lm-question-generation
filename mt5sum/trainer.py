@@ -54,6 +54,14 @@ class Trainer:
             fp16=fp16,
             random_seed=random_seed,
             gradient_accumulation_steps=gradient_accumulation_steps)
+
+        # add file handler
+        logger = logging.getLogger()
+        file_handler = logging.FileHandler('{}/training.log'.format(self.config.checkpoint_dir))
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
+        logger.addHandler(file_handler)
+
         self.cache_dir = cache_dir
         self.model = T5Summarizer(model=self.config.model,
                                   max_length=self.config.max_length,
@@ -104,8 +112,8 @@ class Trainer:
         raw_input, raw_output = get_dataset(self.config.dataset, self.config.dataset_argument, split='train')
         loader = self.model.get_data_loader(
             raw_input, raw_output, batch_size=self.config.batch, shuffle=True, drop_last=True, num_workers=num_workers,
-            cache_path='{}/data.{}.{}.{}.{}.pkl'.format(self.config.model, self.data_cache_dir, self.config.max_length,
-                                                        self.config.max_length_output, self.config.task_prefix))
+            cache_path='{}/{}.{}.{}.{}.pkl'.format(self.data_cache_dir, self.config.model, self.config.max_length,
+                                                   self.config.max_length_output, self.config.task_prefix))
         self.model.train()
 
         logging.info('start model training')
