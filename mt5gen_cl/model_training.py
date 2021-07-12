@@ -15,7 +15,7 @@ def get_options():
     parser.add_argument('-b', '--batch', help='batch size', default=64, type=int)
     parser.add_argument('-g', '--gradient-accumulation-steps', help='', default=8, type=int)
     parser.add_argument('-l', '--lr', help='learning rate', default=1e-4, type=float)
-    parser.add_argument('--task-type', help='task type', default='an_ext,qa,qg', type=str)
+    parser.add_argument('--task-type', help='task type', default='ans_ext,qa,qg', type=str)
     parser.add_argument('--language', help='language', default='en', type=str)
     parser.add_argument('--fp16', help='fp16', action='store_true')
     parser.add_argument("--lr-warmup", help="linear warmup of lr", default=None, type=int)
