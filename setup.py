@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 with open('README.md', 'r') as f:
     readme = f.read()
 VERSION = '0.0.0'
-NAME = 'mt5sum'
+NAME = 'mt5gen'
 LICENSE = 'MIT'
 setup(
     name=NAME,
     packages=find_packages(exclude=['tests']),
     version=VERSION,
     license=LICENSE,
-    description='mT5 finetuning on summarization task and crosslingual mt5sum evaluation.',
+    description='mT5 finetuning.',
     url='https://github.com/asahi417/{}'.format(NAME),
     download_url="https://github.com/asahi417/{}/archive/v{}.tar.gz".format(NAME, VERSION),
     keywords=['nlp', 'language model', 'summarization', 'T5'],
@@ -40,13 +40,13 @@ setup(
         "tensorboard",
         "datasets",
         "nltk",
-        "rouge_score"
+        'langdetect'
+        # "rouge_score"
     ],
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'mt5sum-train = mt5sum_cl.model_training:main'
-            # 'mt5sum-eval = cli.evaluate:main'
+            'mt5gen-train = mt5gen_cl.model_training:main'
         ]
     }
 )
