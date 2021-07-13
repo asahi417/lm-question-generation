@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 with open('README.md', 'r') as f:
     readme = f.read()
 VERSION = '0.0.0'
-NAME = 'mt5gen'
-LICENSE = 'MIT'
+NAME = 't5qg'
+LICENSE = 'Creative Commons Attribution-NonCommercial 4.0 International'
 setup(
     name=NAME,
     packages=find_packages(exclude=['tests']),
@@ -13,7 +13,7 @@ setup(
     description='mT5 finetuning.',
     url='https://github.com/asahi417/{}'.format(NAME),
     download_url="https://github.com/asahi417/{}/archive/v{}.tar.gz".format(NAME, VERSION),
-    keywords=['nlp', 'language model', 'summarization', 'T5'],
+    keywords=['language model', 'question-answering', 'question-generation', 'T5'],
     long_description=readme,
     long_description_content_type="text/markdown",
     author='Asahi Ushio',
@@ -43,13 +43,11 @@ setup(
         'langdetect',
         'nlg-eval @ git+https://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval'
     ],
-    # dependency_links=['https://github.com/Maluuba/nlg-eval.git@master'],
     python_requires='>=3.6',
-    # install_requires = [],
     entry_points={
         'console_scripts': [
-            'mt5gen-train = mt5gen_cl.model_training:main',
-            'mt5gen-eval = mt5gen_cl.model_evaluation:main'
+            't5qg-train = t5qg_cl.model_training:main',
+            't5qg-eval = t5qg_cl.model_evaluation:main'
         ]
     }
 )

@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-from mt5gen import Trainer
+from t5qg import Trainer
 
 
 def get_options():

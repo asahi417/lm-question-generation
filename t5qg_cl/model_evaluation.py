@@ -1,7 +1,7 @@
 """ evaluate T5. """
 import argparse
 import logging
-from mt5gen import evaluate_qg
+from t5qg import evaluate_qg
 
 
 def get_options():

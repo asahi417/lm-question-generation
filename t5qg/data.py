@@ -16,7 +16,7 @@ from .lm_t5 import TASK_PREFIX, ADDITIONAL_SP_TOKENS
 from .sentence_split import SentSplit
 
 __all__ = 'get_dataset'
-DEFAULT_CACHE_DIR = '{}/.cache/mt5gen'.format(os.path.expanduser('~'))
+DEFAULT_CACHE_DIR = '{}/.cache/t5qg'.format(os.path.expanduser('~'))
 
 
 def get_dataset(name, split: str = 'train', task_type: List or str = 'qg', language: List or str = 'en', cache_dir: str = None):

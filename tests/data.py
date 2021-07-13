@@ -2,7 +2,7 @@ import logging
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
-from mt5gen.data import get_dataset
+from t5qg.data import get_dataset
 
 level = logging.DEBUG
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=level, datefmt='%Y-%m-%d %H:%M:%S')
