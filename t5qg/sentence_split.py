@@ -50,7 +50,7 @@ def setup_splitter(language):
     else:
         import nltk
         from nltk.tokenize import sent_tokenize
-        assert nltk.download('punkt')
+        nltk.download('punkt')
         return sent_tokenize
 
 
