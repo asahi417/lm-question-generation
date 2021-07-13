@@ -74,7 +74,7 @@ class SQuAD:
     """
 
     def __init__(self, cache_dir: str):
-        self.cache = '{}/data_squad/'.format(DEFAULT_CACHE_DIR) if cache_dir is None else cache_dir
+        self.cache = '{}/data_squad'.format(DEFAULT_CACHE_DIR) if cache_dir is None else cache_dir
         self.output_dir = '{}/processed'.format(self.cache)
         self.sent_splitter = SentSplit()
         self.sp_token_sep = ADDITIONAL_SP_TOKENS['sep']

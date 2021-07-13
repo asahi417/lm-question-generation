@@ -132,10 +132,15 @@ class T5:
     def eval(self):
         self.model.eval()
 
-    def get_prediction(self, list_input: List, batch_size: int = None, num_workers: int = 0, num_beams: int = 1):
+    def get_prediction(self,
+                       list_input: List,
+                       batch_size: int = None,
+                       num_beams: int = 4,
+                       num_workers: int = 0,
+                       cache_path: str = None):
         assert type(list_input) == list, list_input
         self.eval()
-        loader = self.get_data_loader(list_input, batch_size=batch_size, num_workers=num_workers)
+        loader = self.get_data_loader(list_input, batch_size=batch_size, num_workers=num_workers, cache_path=cache_path)
         outputs = []
 
         for encode in loader:
@@ -144,7 +149,10 @@ class T5:
                 encode['max_length'] = self.max_length_output
                 encode['num_beams'] = num_beams
                 tensor = self.model.module.generate(**encode) if self.parallel else self.model.generate(**encode)
-                outputs += self.tokenizer.batch_decode(tensor)
+                outputs += self.tokenizer.batch_decode(tensor, skip_special_tokens=True)
+                # print(self.tokenizer.decode(encode['input_ids'][0], skip_special_tokens=True))
+                # print(outputs[-1])
+                # print()
         return outputs
 
     def encode_to_loss(self, encode: Dict):

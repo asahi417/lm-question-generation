@@ -127,6 +127,10 @@ class Trainer:
             self.config.max_length,
             self.config.max_length_output
         )
+        if self.config.dataset == 'tydiqa':
+            self.data_cache_dir = self.data_cache_dir.replace('.pkl', '') \
+                                  + '.' + '_'.join(sorted(self.config.language)) + '.pkl'
+
         os.makedirs(os.path.dirname(self.data_cache_dir), exist_ok=True)
 
     def setup_optimizer(self, epoch: int = None):

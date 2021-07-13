@@ -41,12 +41,13 @@ setup(
         "datasets",
         "nltk",
         'langdetect'
-        # "rouge_score"
     ],
+    dependency_links=['https://github.com/Maluuba/nlg-eval.git@master'],
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'mt5gen-train = mt5gen_cl.model_training:main'
+            'mt5gen-train = mt5gen_cl.model_training:main',
+            'mt5gen-eval = mt5gen_cl.model_evaluation:main'
         ]
     }
 )

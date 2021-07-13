@@ -8,3 +8,5 @@ pip install mt5gen
 ```shell
 mt5gen-train -c mt5gen_outut/ckpt/test
 ```
+
+nlg-eval --hypothesis=ckpt/dev.gen.txt --references=ckpt/dev.gold.txt --no-skipthoughts --no-glove 
