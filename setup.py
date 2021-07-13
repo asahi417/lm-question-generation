@@ -41,7 +41,7 @@ setup(
         "datasets",
         "nltk",
         'langdetect',
-        'nlg-eval @ git+ssh://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval'
+        'nlg-eval @ git+https://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval'
     ],
     # dependency_links=['https://github.com/Maluuba/nlg-eval.git@master'],
     python_requires='>=3.6',
