@@ -40,10 +40,12 @@ setup(
         "tensorboard",
         "datasets",
         "nltk",
-        'langdetect'
+        'langdetect',
+        'nlg-eval @ git+ssh://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval'
     ],
-    dependency_links=['https://github.com/Maluuba/nlg-eval.git@master'],
+    # dependency_links=['https://github.com/Maluuba/nlg-eval.git@master'],
     python_requires='>=3.6',
+    # install_requires = [],
     entry_points={
         'console_scripts': [
             'mt5gen-train = mt5gen_cl.model_training:main',
