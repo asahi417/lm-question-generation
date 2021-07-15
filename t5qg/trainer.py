@@ -190,8 +190,7 @@ class Trainer:
             drop_last=True,
             num_workers=num_workers,
             cache_path=self.data_cache_dir,
-            drop_overflow_text=True
-        )
+            drop_overflow_text=True)
         self.model.train()
 
         logging.info('start model training')
@@ -239,17 +238,6 @@ class Trainer:
             if global_step % interval == 0:
                 logging.debug('\t * (global step {}: loss: {}, lr: {}'.format(
                     global_step, inst_loss, self.optimizer.param_groups[0]['lr']))
-
-                # if n == 0:
-                #     self.model.eval()
-                #     sentence = self.model.tokenizer.batch_decode(encode['input_ids'], skip_special_tokens=True)
-                #     label = self.model.tokenizer.batch_decode(encode['labels'], skip_special_tokens=True)
-                #     out, _, _, _ = self.model.get_prediction(sentence)
-                #     for _n, i in enumerate(zip(out, label, sentence)):
-                #         logging.debug('\t * {}'.format(i))
-                #         if _n > 5:
-                #             break
-                #     self.model.train()
 
         self.optimizer.zero_grad()
         return sum(total_loss)/len(total_loss), global_step

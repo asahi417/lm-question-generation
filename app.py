@@ -1,9 +1,14 @@
+import logging
+import traceback
+
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, BaseSettings
 
 from t5qg import T5
+
+logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
 
 # Initialization
@@ -21,15 +26,14 @@ qg_model = T5(settings.model, settings.max_length, settings.max_length_output)
 class ModelInput(BaseModel):
     input_text: str
     highlight: Optional[str] = None
-    question: Optional[str] = None
-    task: Optional[str] = 'qg'
+    task: str = 'qg'
+    num_beam: int = 4
 
 
 app = FastAPI()
 
 
 # Endpoint
-# qg_model.get_prediction()
 @app.get("/")
 def read_root():
     return {"What's this?": "Awesome question generation web App ever!"}
@@ -46,15 +50,15 @@ async def info():
 
 @app.post("/question_generation")
 async def process(model_input: ModelInput):
-    return model_input
+    try:
+        out = qg_model.get_prediction([model_input.input_text],
+                                      [model_input.highlight],
+                                      num_beams=model_input.num_beam,
+                                      task_prefix=model_input.task)
+        return out
+    except Exception:
+        logging.exception('Error')
+        raise HTTPException(status_code=404, detail=traceback.print_exc())
 
 
-@app.post("/answer_extraction")
-async def process(model_input: ModelInput):
-    return model_input
-
-
-@app.post("/question_answering")
-async def process(model_input: ModelInput):
-    return model_input
 

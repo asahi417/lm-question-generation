@@ -7,6 +7,7 @@ from multiprocessing import Pool
 
 import torch
 import transformers
+from .exceptions import ExceedMaxLengthError, HighlightNotFoundError
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
@@ -84,17 +85,28 @@ class EncodePlus:
                  tokenizer,
                  max_length: int = 512,
                  max_length_output: int = 34,
-                 drop_overflow_text: bool = True,
+                 drop_overflow_text: bool = False,
+                 skip_overflow_error: bool = False,
                  task_prefix: str = None,
                  padding: bool = True):
+        """ Wrapper of encode_plus for multiprocessing.
+
+        @param tokenizer: transforms.Tokenizer
+        @param max_length: Input max length.
+        @param max_length_output: Output max length.
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @param task_prefix: Either of `qg`, `ans_ext`, `qa`.
+        @param padding: Pad the sequence to the max length.
+        """
         assert task_prefix is None or task_prefix in TASK_PREFIX
         self.task_prefix = task_prefix
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.max_length_output = max_length_output
-
         # for model training, we should drop the exceeded input but not for the evaluation
         self.drop_overflow_text = drop_overflow_text
+        self.skip_overflow_error = skip_overflow_error
 
         # truncation should be true for the batch process, but not necessary to process single input
         self.param_in = {'truncation': True, 'max_length': self.max_length}
@@ -105,7 +117,6 @@ class EncodePlus:
             self.param_out['padding'] = 'max_length'
 
     def __call__(self, inputs):
-        """ encode_plus wrapper for multiprocessing """
         return self.encode_plus(*inputs)
 
     def encode_plus(self, input_sequence: str, output_sequence: str = None, input_highlight: str = None):
@@ -114,8 +125,7 @@ class EncodePlus:
         if input_highlight is not None:
             position = input_sequence.find(input_highlight)
             if position == -1:
-                # TODO: change to more specific error
-                raise ValueError('highlight not found: {} ({})'.format(input_sequence, input_highlight))
+                raise HighlightNotFoundError(input_highlight, input_sequence)
             input_sequence = '{0}{1} {2} {1}{3}'.format(
                 input_sequence[:position], ADDITIONAL_SP_TOKENS['hl'], input_highlight,
                 input_sequence[position+len(input_highlight):])
@@ -124,12 +134,16 @@ class EncodePlus:
             input_sequence = '{}: {}'.format(TASK_PREFIX[self.task_prefix], input_sequence)
 
         # remove sentence that exceeds the max_length
-        if self.drop_overflow_text:
+        if self.drop_overflow_text or not self.skip_overflow_error:
             if len(self.tokenizer.encode(input_sequence)) > self.max_length:
-                return None
-            if output_sequence is not None and len(self.tokenizer.encode(output_sequence)) > self.max_length_output:
-                return None
-
+                if self.drop_overflow_text:
+                    return None
+                raise ExceedMaxLengthError(self.max_length)
+            if output_sequence is not None:
+                if len(self.tokenizer.encode(output_sequence)) > self.max_length_output:
+                    if self.drop_overflow_text:
+                        return None
+                    raise ExceedMaxLengthError(self.max_length)
         encode = self.tokenizer.encode_plus(input_sequence, **self.param_in)
         if output_sequence is not None:
             encode['labels'] = self.tokenizer.encode(output_sequence, **self.param_out)
@@ -140,7 +154,13 @@ class T5:
     """ T5 model. """
 
     def __init__(self, model: str, max_length: int = 512, max_length_output: int = 32, cache_dir: str = None):
-        """ T5 model. """
+        """ T5 model.
+
+        @param model: path to the checkpoint or alias on huggingface modelhub.
+        @param max_length: Max sequence length for the input.
+        @param max_length_output: Max sequence length for the output.
+        @param cache_dir:
+        """
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -165,16 +185,33 @@ class T5:
     def get_prediction(self,
                        list_input: List,
                        list_highlight: List = None,
+                       drop_overflow_text: bool = False,
+                       skip_overflow_error: bool = False,
                        task_prefix: str = None,
                        batch_size: int = None,
                        num_beams: int = 4,
                        num_workers: int = 0,
                        cache_path: str = None):
+        """ Get model prediction
+
+        @param list_input: List of input sentences.
+        @param list_highlight: List of highlight phrases.
+        @param task_prefix: Either of `qg`, `ans_ext`, `qa`.
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @param batch_size: Batch size.
+        @param num_beams: Number of beam for model generation.
+        @param num_workers:
+        @param cache_path:
+        @return: List of generated sentences.
+        """
         assert type(list_input) == list, list_input
         self.eval()
         loader = self.get_data_loader(list_input,
                                       highlights=list_highlight,
                                       task_prefix=task_prefix,
+                                      drop_overflow_text=drop_overflow_text,
+                                      skip_overflow_error=skip_overflow_error,
                                       batch_size=batch_size,
                                       num_workers=num_workers,
                                       cache_path=cache_path)
@@ -203,17 +240,32 @@ class T5:
                         shuffle: bool = False,
                         drop_last: bool = False,
                         cache_path: str = None,
-                        drop_overflow_text: bool = False):
-        """ Transform features (produced by BERTClassifier.preprocess method) to data loader. """
+                        drop_overflow_text: bool = False,
+                        skip_overflow_error: bool = False):
+        """ Transform features (produced by BERTClassifier.preprocess method) to data loader.
+
+        @param inputs: List of input sentences.
+        @param outputs: List of output sentences.
+        @param highlights: List of highlight phrases.
+        @param task_prefix: Either of `qg`, `ans_ext`, `qa`.
+        @param batch_size: Batch size.
+        @param num_workers:
+        @param shuffle:
+        @param drop_last:
+        @param cache_path:
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @return: torch.utils.data.DataLoader
+        """
         if outputs is not None:
             assert len(outputs) == len(inputs), '{} != {}'.format(len(outputs), len(inputs))
             data = list(zip(inputs, outputs))
         else:
-            data = [(i,) for i in inputs]
+            data = [(i, None) for i in inputs]
 
         if highlights is not None:
             assert len(highlights) == len(inputs), '{} != {}'.format(len(highlights), len(inputs))
-            data = [(i, o, h) for (i, o), h in zip(data, highlights)]
+            data = [tuple(list(d) + [h]) for d, h in zip(data, highlights)]
 
         if cache_path is not None and os.path.exists(cache_path):
             logging.info('loading preprocessed feature from {}'.format(cache_path))
@@ -221,10 +273,9 @@ class T5:
 
         # process in parallel
         pool = Pool()
-        # TODO: remove max length if the input is only one
         config = {'tokenizer': self.tokenizer, 'max_length': self.max_length,
                   'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text,
-                  'task_prefix': task_prefix}
+                  'task_prefix': task_prefix, 'skip_overflow_error': skip_overflow_error}
         if len(data) == 1:
             config['padding'] = False
 
