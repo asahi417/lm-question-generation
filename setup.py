@@ -41,7 +41,10 @@ setup(
         "datasets",
         "nltk",
         'langdetect',
-        'nlg-eval @ git+https://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval'
+        'nlg-eval @ git+https://git@github.com/Maluuba/nlg-eval@master#egg=nlg-eval',
+        'fastapi',  # app
+        'uvicorn',
+        'pydantic'
     ],
     python_requires='>=3.6',
     entry_points={

@@ -10,8 +10,8 @@ import transformers
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
-    "ans_ext": "extract answers:",
-    "e2e_qg": "generate questions:",
+    "ans_ext": "extract answers",
+    "e2e_qg": "generate questions",
     "qa": "question",
     "qg": "generate question"
 }
@@ -80,18 +80,48 @@ class Dataset(torch.utils.data.Dataset):
 class EncodePlus:
     """ Wrapper of encode_plus for multiprocessing. """
 
-    def __init__(self, tokenizer, max_length: int = 512, max_length_output: int = 34, drop_overflow_text: bool = True):
+    def __init__(self,
+                 tokenizer,
+                 max_length: int = 512,
+                 max_length_output: int = 34,
+                 drop_overflow_text: bool = True,
+                 task_prefix: str = None,
+                 padding: bool = True):
+        assert task_prefix is None or task_prefix in TASK_PREFIX
+        self.task_prefix = task_prefix
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.max_length_output = max_length_output
+
+        # for model training, we should drop the exceeded input but not for the evaluation
         self.drop_overflow_text = drop_overflow_text
+
+        # truncation should be true for the batch process, but not necessary to process single input
+        self.param_in = {'truncation': True, 'max_length': self.max_length}
+        self.param_out = {'truncation': True, 'max_length': self.max_length_output}
+        self.padding = padding
+        if self.padding:
+            self.param_in['padding'] = 'max_length'
+            self.param_out['padding'] = 'max_length'
 
     def __call__(self, inputs):
         """ encode_plus wrapper for multiprocessing """
         return self.encode_plus(*inputs)
 
-    def encode_plus(self, input_sequence: str, output_sequence: str = None):
-        param = {'truncation': True, 'padding': 'max_length'}
+    def encode_plus(self, input_sequence: str, output_sequence: str = None, input_highlight: str = None):
+
+        # add highlight to the input
+        if input_highlight is not None:
+            position = input_sequence.find(input_highlight)
+            if position == -1:
+                # TODO: change to more specific error
+                raise ValueError('highlight not found: {} ({})'.format(input_sequence, input_highlight))
+            input_sequence = '{0}{1} {2} {1}{3}'.format(
+                input_sequence[:position], ADDITIONAL_SP_TOKENS['hl'], input_highlight,
+                input_sequence[position+len(input_highlight):])
+
+        if self.task_prefix is not None:
+            input_sequence = '{}: {}'.format(TASK_PREFIX[self.task_prefix], input_sequence)
 
         # remove sentence that exceeds the max_length
         if self.drop_overflow_text:
@@ -100,16 +130,16 @@ class EncodePlus:
             if output_sequence is not None and len(self.tokenizer.encode(output_sequence)) > self.max_length_output:
                 return None
 
-        encode = self.tokenizer.encode_plus(input_sequence, max_length=self.max_length, **param)
+        encode = self.tokenizer.encode_plus(input_sequence, **self.param_in)
         if output_sequence is not None:
-            encode['labels'] = self.tokenizer.encode(output_sequence, max_length=self.max_length_output, **param)
+            encode['labels'] = self.tokenizer.encode(output_sequence, **self.param_out)
         return encode
 
 
 class T5:
     """ T5 model. """
 
-    def __init__(self, model: str, max_length: int = 128, max_length_output: int = 128, cache_dir: str = None):
+    def __init__(self, model: str, max_length: int = 512, max_length_output: int = 32, cache_dir: str = None):
         """ T5 model. """
         self.model_name = model
         self.max_length = max_length
@@ -134,13 +164,20 @@ class T5:
 
     def get_prediction(self,
                        list_input: List,
+                       list_highlight: List = None,
+                       task_prefix: str = None,
                        batch_size: int = None,
                        num_beams: int = 4,
                        num_workers: int = 0,
                        cache_path: str = None):
         assert type(list_input) == list, list_input
         self.eval()
-        loader = self.get_data_loader(list_input, batch_size=batch_size, num_workers=num_workers, cache_path=cache_path)
+        loader = self.get_data_loader(list_input,
+                                      highlights=list_highlight,
+                                      task_prefix=task_prefix,
+                                      batch_size=batch_size,
+                                      num_workers=num_workers,
+                                      cache_path=cache_path)
         outputs = []
 
         for encode in loader:
@@ -150,9 +187,6 @@ class T5:
                 encode['num_beams'] = num_beams
                 tensor = self.model.module.generate(**encode) if self.parallel else self.model.generate(**encode)
                 outputs += self.tokenizer.batch_decode(tensor, skip_special_tokens=True)
-                # print(self.tokenizer.decode(encode['input_ids'][0], skip_special_tokens=True))
-                # print(outputs[-1])
-                # print()
         return outputs
 
     def encode_to_loss(self, encode: Dict):
@@ -162,6 +196,8 @@ class T5:
     def get_data_loader(self,
                         inputs,
                         outputs: List = None,
+                        highlights: List = None,
+                        task_prefix: str = None,
                         batch_size: int = None,
                         num_workers: int = 0,
                         shuffle: bool = False,
@@ -175,15 +211,23 @@ class T5:
         else:
             data = [(i,) for i in inputs]
 
-        assert type(data) == list, data
+        if highlights is not None:
+            assert len(highlights) == len(inputs), '{} != {}'.format(len(highlights), len(inputs))
+            data = [(i, o, h) for (i, o), h in zip(data, highlights)]
+
         if cache_path is not None and os.path.exists(cache_path):
             logging.info('loading preprocessed feature from {}'.format(cache_path))
             return pickle_load(cache_path)
 
         # process in parallel
         pool = Pool()
+        # TODO: remove max length if the input is only one
         config = {'tokenizer': self.tokenizer, 'max_length': self.max_length,
-                  'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text}
+                  'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text,
+                  'task_prefix': task_prefix}
+        if len(data) == 1:
+            config['padding'] = False
+
         out = pool.map(EncodePlus(**config), data)
         pool.close()
 

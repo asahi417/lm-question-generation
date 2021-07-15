@@ -166,7 +166,11 @@ class Trainer:
             torch.save({'optimizer_state_dict': self.optimizer.state_dict(),
                         'scheduler_state_dict': self.scheduler.state_dict()}, save_dir_opt)
 
-    def train(self, num_workers: int = 0, epoch_save: int = 1, interval: int = 50, activate_tensorboard: bool = False):
+    def train(self,
+              num_workers: int = 0,
+              epoch_save: int = 1,
+              interval: int = 50,
+              activate_tensorboard: bool = False):
         """ Train model.
 
         :param num_workers: Workers for DataLoader.
@@ -179,8 +183,15 @@ class Trainer:
         raw_input, raw_output = get_dataset(
             self.config.dataset, split='train', language=self.config.language, task_type=self.config.task_type)
         loader = self.model.get_data_loader(
-            raw_input, raw_output, batch_size=self.config.batch, shuffle=True, drop_last=True, num_workers=num_workers,
-            cache_path=self.data_cache_dir, drop_overflow_text=True)
+            raw_input,
+            raw_output,
+            batch_size=self.config.batch,
+            shuffle=True,
+            drop_last=True,
+            num_workers=num_workers,
+            cache_path=self.data_cache_dir,
+            drop_overflow_text=True
+        )
         self.model.train()
 
         logging.info('start model training')
@@ -229,16 +240,16 @@ class Trainer:
                 logging.debug('\t * (global step {}: loss: {}, lr: {}'.format(
                     global_step, inst_loss, self.optimizer.param_groups[0]['lr']))
 
-                if n == 0:
-                    self.model.eval()
-                    sentence = self.model.tokenizer.batch_decode(encode['input_ids'], skip_special_tokens=True)
-                    label = self.model.tokenizer.batch_decode(encode['labels'], skip_special_tokens=True)
-                    out, _, _, _ = self.model.get_prediction(sentence)
-                    for _n, i in enumerate(zip(out, label, sentence)):
-                        logging.debug('\t * {}'.format(i))
-                        if _n > 5:
-                            break
-                    self.model.train()
+                # if n == 0:
+                #     self.model.eval()
+                #     sentence = self.model.tokenizer.batch_decode(encode['input_ids'], skip_special_tokens=True)
+                #     label = self.model.tokenizer.batch_decode(encode['labels'], skip_special_tokens=True)
+                #     out, _, _, _ = self.model.get_prediction(sentence)
+                #     for _n, i in enumerate(zip(out, label, sentence)):
+                #         logging.debug('\t * {}'.format(i))
+                #         if _n > 5:
+                #             break
+                #     self.model.train()
 
         self.optimizer.zero_grad()
         return sum(total_loss)/len(total_loss), global_step
