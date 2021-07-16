@@ -75,6 +75,7 @@ class Dataset(torch.utils.data.Dataset):
         return torch.tensor(data, dtype=torch.long)
 
     def __getitem__(self, idx):
+        print({k: self.to_tensor(k, v) for k, v in self.data[idx].items()})
         return {k: self.to_tensor(k, v) for k, v in self.data[idx].items()}
 
 
