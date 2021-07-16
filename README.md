@@ -34,5 +34,6 @@ uvicorn app:app --reload
 
 - ***Run with Docker***
 ```shell
-docker build -t t5qg/app:1.0 .
+docker build -t t5qg/app:latest .
+docker run -p 80:80 t5qg/app:latest
 ```
