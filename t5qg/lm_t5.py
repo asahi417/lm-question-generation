@@ -75,7 +75,6 @@ class Dataset(torch.utils.data.Dataset):
         return torch.tensor(data, dtype=torch.long)
 
     def __getitem__(self, idx):
-        print({k: self.to_tensor(k, v) for k, v in self.data[idx].items()})
         return {k: self.to_tensor(k, v) for k, v in self.data[idx].items()}
 
 
@@ -270,29 +269,29 @@ class T5:
 
         if cache_path is not None and os.path.exists(cache_path):
             logging.info('loading preprocessed feature from {}'.format(cache_path))
-            return pickle_load(cache_path)
+            out = pickle_load(cache_path)
+        else:
+            # process in parallel
+            pool = Pool()
+            config = {'tokenizer': self.tokenizer, 'max_length': self.max_length,
+                      'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text,
+                      'task_prefix': task_prefix, 'skip_overflow_error': skip_overflow_error}
+            if len(data) == 1:
+                config['padding'] = False
 
-        # process in parallel
-        pool = Pool()
-        config = {'tokenizer': self.tokenizer, 'max_length': self.max_length,
-                  'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text,
-                  'task_prefix': task_prefix, 'skip_overflow_error': skip_overflow_error}
-        if len(data) == 1:
-            config['padding'] = False
+            out = pool.map(EncodePlus(**config), data)
+            pool.close()
 
-        out = pool.map(EncodePlus(**config), data)
-        pool.close()
+            # remove overflow text
+            logging.info('encode all the data       : {}'.format(len(out)))
+            out = list(filter(None, out))
+            logging.info('after remove the overflow : {}'.format(len(out)))
 
-        # remove overflow text
-        logging.info('encode all the data       : {}'.format(len(out)))
-        out = list(filter(None, out))
-        logging.info('after remove the overflow : {}'.format(len(out)))
-
-        # cache the encoded data
-        if cache_path is not None:
-            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-            pickle_save(out, cache_path)
-            logging.info('preprocessed feature is saved at {}'.format(cache_path))
+            # cache the encoded data
+            if cache_path is not None:
+                os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+                pickle_save(out, cache_path)
+                logging.info('preprocessed feature is saved at {}'.format(cache_path))
 
         batch_size = len(out) if batch_size is None else batch_size
         return torch.utils.data.DataLoader(
