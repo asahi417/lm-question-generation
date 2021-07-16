@@ -61,4 +61,3 @@ async def process(model_input: ModelInput):
         raise HTTPException(status_code=404, detail=traceback.print_exc())
 
 
-
