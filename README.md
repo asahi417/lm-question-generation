@@ -1,27 +1,38 @@
-# Question Generation with T5
+# T5 Question Generation
+We release `t5qg`, a python library to finetune [T5](https://arxiv.org/pdf/1910.10683.pdf) on question generation and provide API to host the model prediction.
+For the model training, we rely on the multitasking objective where the models are optimized 
+for the question answering and the answer extraction in addition to the question generation
+following [huggingface tutorial](https://github.com/patil-suraj/question_generation).
 
+We extend the library to cover recently released multilingual T5, namely [mT5](https://arxiv.org/pdf/2010.11934.pdf).
+
+### Get Started 🚀
 ```shell
-pip install t5qg
+git clone https://github.com/asahi417/t5-question-generation
+cd t5-question-generation
+pip install .
 ```
 
+## CLI
+- ***Model Training***: Finetune T5 model for question generation.
 ```shell
-t5qg-train -m t5-small -c t5qg_output/ckpt/t5_small -b 32 -g 16 
-t5qg-train -m t5-small -c t5qg_output/ckpt/t5_small -b 32 -g 16 
-t5qg-train -m t5-small -c t5qg_output/ckpt/t5_small -b 32 -g 16 
-t5qg-train -m t5-small -c t5qg_output/ckpt/t5_small -b 32 -g 16 
+t5qg-train -c ckpt/test -m google/mt5-small -d squad
 ```
- 
-```shell
-t5qg-eval -m ./t5qg_output/ckpt/t5_small/epoch_10/ -e t5qg_output/ckpt/t5_small/epoch_10/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_10/ -e t5qg_output/ckpt/t5_base/epoch_10/eval
-t5qg-eval -m ./t5qg_output/ckpt/mt5_small/epoch_10/ -e t5qg_output/ckpt/mt5_small/epoch_10/eval  
-```
+run `t5qg-train -h` to display all the options.
 
-
+- ***Model Evaluation***: Get metric with [nlg-eval](https://github.com/Maluuba/nlg-eval) to assess the model
 ```shell
-MODEL="./ckpt/epoch_8" uvicorn app:app --reload
+t5qg-eval -m ckpt/test/epoch_10/ -e ckpt/test/epoch_10/eval
 ```
 
-`http://127.0.0.1:8000/docs`
+## Rest API
+We provide a rest API which hosts the model inference.
+- ***From Command Line***
+```shell
+uvicorn app:app --reload
+```
 
-t5qg-train -m t5-large -c t5qg_output/ckpt/t5_large -b 8 -g 64
+- ***Run with Docker***
+```shell
+docker build -t t5qg/app:1.0 .
+```

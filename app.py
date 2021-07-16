@@ -13,7 +13,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 # Initialization
 class Settings(BaseSettings):
-    model: str
+    model: str = 'asahi417/question-generation-squad-t5-small'
     max_length: int = 512
     max_length_output: int = 32
 

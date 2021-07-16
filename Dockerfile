@@ -1,27 +1,16 @@
-FROM python:3.7
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
-#RUN apt-get update && \
-#  apt-get install -y --no-install-recommends \
-#  libpq-dev \
-#  git \
-#  gcc \
-#  python-dev \
-#  build-essential \
-#  openssh-server \
-#  libsndfile1 \
-#  google-perftools && \
-#  apt-get clean && \
-#  rm -rf /var/lib/apt/lists/*
-RUN pip3 install pip -U
-RUN pip3 install --no-cache-dir .
+WORKDIR /opt/app
+COPY . /opt/app
 
-ARG MODL
-ARG MAX_LENGTH
-ARG MAX_LENGTH_OUT
+RUN pip install pip -U
+RUN pip install --no-cache-dir .
+
+ARG MODEL='asahi417/question-generation-squad-t5-small'
+ARG MAX_LENGTH=512
+ARG MAX_LENGTH_OUTPUT=32
 
 EXPOSE 80
 
-COPY ./app /app
 
-CMD ["MODEL=${MODEL}", "MAX_LENGTH=${MAX_LENGTH}", "MAX_LENGTH_OUT=${MAX_LENGTH_OUT}",
-     "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["MODEL=${MODEL} MAX_LENGTH=${MAX_LENGTH} MAX_LENGTH_OUT=${MAX_LENGTH_OUTPUT} uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
