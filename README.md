@@ -1,5 +1,5 @@
 # T5 Question Generation
-We release `t5qg`, a python library to finetune [T5](https://arxiv.org/pdf/1910.10683.pdf) on question generation and provide API to host the model prediction.
+`t5qg` is a python library to finetune [T5](https://arxiv.org/pdf/1910.10683.pdf) on question generation and provide API to host the model prediction.
 For the model training, we rely on the multitasking objective where the models are optimized 
 for the question answering and the answer extraction in addition to the question generation
 following [huggingface tutorial](https://github.com/patil-suraj/question_generation).
