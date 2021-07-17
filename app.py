@@ -1,3 +1,4 @@
+import os
 import logging
 import traceback
 
@@ -12,14 +13,11 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 
 # Initialization
-class Settings(BaseSettings):
-    model: str = 'asahi417/question-generation-squad-t5-small'
-    max_length: int = 512
-    max_length_output: int = 32
+MODEL = os.getenv('MODEL', 'asahi417/question-generation-squad-t5-small')
+MAX_LENGTH = int(os.getenv('MAX_LENGTH', 512))
+MAX_LENGTH_OUTPUT = int(os.getenv('MAX_LENGTH_OUTPUT', 32))
 
-
-settings = Settings()
-qg_model = T5(settings.model, settings.max_length, settings.max_length_output)
+qg_model = T5(MODEL, MAX_LENGTH, MAX_LENGTH_OUTPUT)
 
 
 # Run app
@@ -42,9 +40,9 @@ def read_root():
 @app.get("/info")
 async def info():
     return {
-        "model": settings.model,
-        "max_length": settings.max_length,
-        "max_length_output": settings.max_length_output,
+        "model": MODEL,
+        "max_length": MAX_LENGTH,
+        "max_length_output": MAX_LENGTH_OUTPUT,
     }
 
 

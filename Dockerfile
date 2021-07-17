@@ -9,8 +9,10 @@ RUN pip install --no-cache-dir .
 ARG MODEL='asahi417/question-generation-squad-t5-small'
 ARG MAX_LENGTH=512
 ARG MAX_LENGTH_OUTPUT=32
+ENV MODEL=${MODEL} \
+    MAX_LENGTH=${MAX_LENGTH} \
+    MAX_LENGTH_OUTPUT=${MAX_LENGTH_OUTPUT}
 
 EXPOSE 80
 
-
-CMD ["MODEL=${MODEL} MAX_LENGTH=${MAX_LENGTH} MAX_LENGTH_OUT=${MAX_LENGTH_OUTPUT} uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]

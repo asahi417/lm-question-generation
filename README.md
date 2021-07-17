@@ -31,9 +31,11 @@ We provide a rest API which hosts the model inference.
 ```shell
 uvicorn app:app --reload
 ```
+go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
 
 - ***Run with Docker***
 ```shell
 docker build -t t5qg/app:latest .
 docker run -p 80:80 t5qg/app:latest
 ```
+go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
