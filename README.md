@@ -39,3 +39,9 @@ docker build -t t5qg/app:latest .
 docker run -p 80:80 t5qg/app:latest
 ```
 go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
+
+## QG Model Cards
+Following models are available via the transformers modelhub:
+- `asahi417/question-generation-squad-t5-small`: [T5 small trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-t5-small)
+- `asahi417/question-generation-squad-t5-base`: [T5 base trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-t5-base)
+- `asahi417/question-generation-squad-mt5-small`: [mT5 small trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-mt5-small)
