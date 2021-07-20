@@ -41,7 +41,8 @@ docker run -p 80:80 t5qg/app:latest
 go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
 
 ## QG Model Cards
-Following models are available via the transformers modelhub:
-- `asahi417/question-generation-squad-t5-small`: [T5 small trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-t5-small)
-- `asahi417/question-generation-squad-t5-base`: [T5 base trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-t5-base)
-- `asahi417/question-generation-squad-mt5-small`: [mT5 small trained on multitask loss (SQuAD)](https://huggingface.co/asahi417/question-generation-squad-mt5-small)
+Following models are available via the transformers modelhub. All models are trained over SQuAD for question generation where the data split follows
+[Du, et al 2017](https://arxiv.org/pdf/1805.05942.pdf) and [Du, et al 2018](https://arxiv.org/pdf/1705.00106.pdf). For each model, we add the link which includes BLEU-n, ROUGE, METEOR, and CIDEr produced by `t5qg-eval`.
+- `asahi417/question-generation-squad-t5-small`: [T5 small trained on multitask loss](https://huggingface.co/asahi417/question-generation-squad-t5-small), [metric](https://huggingface.co/asahi417/question-generation-squad-t5-small/raw/main/eval/metric.json)
+- `asahi417/question-generation-squad-t5-base`: [T5 base trained on multitask loss](https://huggingface.co/asahi417/question-generation-squad-t5-base), [metric](https://huggingface.co/asahi417/question-generation-squad-t5-base/raw/main/eval/metric.json)
+- `asahi417/question-generation-squad-mt5-small`: [mT5 small trained on multitask loss](https://huggingface.co/asahi417/question-generation-squad-mt5-small), [metric](https://huggingface.co/asahi417/question-generation-squad-mt5-small/raw/main/eval/metric.json)
