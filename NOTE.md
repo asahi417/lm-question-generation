@@ -28,13 +28,13 @@ t5qg-eval -m ./t5qg_output/ckpt/bart_large/epoch_10/ -e t5qg_output/ckpt/bart_la
 
 
 ```shell
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_1/ -e t5qg_output/ckpt/t5_base/epoch_1/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_2/ -e t5qg_output/ckpt/t5_base/epoch_2/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_3/ -e t5qg_output/ckpt/t5_base/epoch_3/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_4/ -e t5qg_output/ckpt/t5_base/epoch_4/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_5/ -e t5qg_output/ckpt/t5_base/epoch_5/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_6/ -e t5qg_output/ckpt/t5_base/epoch_6/eval
-t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_7/ -e t5qg_output/ckpt/t5_base/epoch_7/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_1/ -e t5qg_output/ckpt/t5_large/epoch_1/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_2/ -e t5qg_output/ckpt/t5_large/epoch_2/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_3/ -e t5qg_output/ckpt/t5_large/epoch_3/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_4/ -e t5qg_output/ckpt/t5_large/epoch_4/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_5/ -e t5qg_output/ckpt/t5_large/epoch_5/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_6/ -e t5qg_output/ckpt/t5_large/epoch_6/eval
+t5qg-eval -m ./t5qg_output/ckpt/t5_large/epoch_7/ -e t5qg_output/ckpt/t5_large/epoch_7/eval
 ```
 
 ## NOTE
