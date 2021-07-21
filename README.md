@@ -31,14 +31,14 @@ We provide a rest API which hosts the model inference.
 ```shell
 uvicorn app:app --reload
 ```
-go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
+go to [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs).
 
 - ***Run with Docker***
 ```shell
 docker build -t t5qg/app:latest .
 docker run -p 80:80 t5qg/app:latest
 ```
-go to [`http://127.0.0.1/docs`](http://127.0.0.1/docs).
+go to [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs).
 
 ## QG Model Cards
 Following models are available via the transformers modelhub. All models are trained over SQuAD for question generation where the data split follows
