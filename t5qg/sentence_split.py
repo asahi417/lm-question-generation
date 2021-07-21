@@ -5,6 +5,9 @@ TODO: Cover all the language in TYDIQA dataset.
 import re
 from typing import List
 from langdetect import detect
+import nltk
+from nltk.tokenize import sent_tokenize
+nltk.download('punkt')
 
 __all__ = 'SentSplit'
 
@@ -14,7 +17,7 @@ class JASplitter:
 
     PERIOD = "。"
     PERIOD_SPECIAL = "__PERIOD__"
-    PATTERNS = [re.compile(r"（.*?）"), re.compile(r"「.*?」"),]
+    PATTERNS = [re.compile(r"（.*?）"), re.compile(r"「.*?」")]
 
     @staticmethod
     def conv_period(item) -> str:
@@ -44,14 +47,18 @@ class JASplitter:
         return result
 
 
+class Splitter:
+
+    def __call__(self, document):
+        out = sent_tokenize(document)
+        return [re.sub(r'\s*\Z', ' ', i) for i in out[:-1]] + [out[-1]]
+
+
 def setup_splitter(language):
     if language in ['ja', 'jp']:
         return JASplitter()
     else:
-        import nltk
-        from nltk.tokenize import sent_tokenize
-        nltk.download('punkt')
-        return sent_tokenize
+        return Splitter()
 
 
 class SentSplit:

@@ -8,6 +8,7 @@ from multiprocessing import Pool
 import torch
 import transformers
 from .exceptions import ExceedMaxLengthError, HighlightNotFoundError
+from .sentence_split import SentSplit
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
@@ -182,6 +183,19 @@ class T5:
             self.model = torch.nn.DataParallel(self.model)
         self.model.to(self.device)
         logging.info('{} GPUs are in use'.format(torch.cuda.device_count()))
+
+        # for answer extraction model
+        self.sentence_splitter = SentSplit()
+
+    # def process_for_ans_ext(self, input_document: str):
+    #     sents = self.sentence_splitter(input_document)
+    #     output = []
+    #     for i in range(len(sents)):
+    #         before = ' '.o sents[:i]
+    #         after = sents[i+1:]
+    #         output +=
+    #     input_document
+    #     ADDITIONAL_SP_TOKENS['hl']
 
     def train(self):
         self.model.train()

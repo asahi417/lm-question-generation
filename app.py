@@ -49,6 +49,13 @@ async def info():
 @app.post("/question_generation")
 async def process(model_input: ModelInput):
     try:
+        if model_input.highlight is None:
+            out = qg_model.get_prediction([model_input.input_text],
+                                          task_prefix='ans_ext')
+            out = qg_model.get_prediction([model_input.input_text],
+                                          num_beams=model_input.num_beam,
+                                          task_prefix='ans_extraction')
+
         out = qg_model.get_prediction([model_input.input_text],
                                       [model_input.highlight],
                                       num_beams=model_input.num_beam,

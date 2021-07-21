@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import re
+
 import requests
 import tarfile
 import zipfile
@@ -159,10 +161,11 @@ class SQuAD:
             ans = list(set(ans))
             for j, sent in enumerate(sents):
                 if i == j:
-                    sent = "{0} {1} {0}".format(self.sp_token_hl, sent)
+                    sent = "{0} {1}{0} ".format(self.sp_token_hl, sent)
                 context = "{}{}".format(context, sent)
-                context = context.strip()
-            input_text = context
+            input_text = re.sub(r'\s*\Z', '', context)
+            input_text = re.sub(r'\s+', ' ', input_text)
+            # input_text = context
             sep = ' {} '.format(self.sp_token_sep)
             target_text = sep.join(ans) + " " + self.sp_token_sep
 
