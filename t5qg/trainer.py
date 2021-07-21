@@ -113,6 +113,7 @@ class Trainer:
             self.model = T5(model=self.config.model,
                             max_length=self.config.max_length,
                             max_length_output=self.config.max_length_output)
+
             self.optimizer, self.scheduler = self.setup_optimizer()
             self.current_epoch = 0
 
@@ -181,7 +182,11 @@ class Trainer:
 
         logging.info('dataset preprocessing')
         raw_input, raw_output = get_dataset(
-            self.config.dataset, split='train', language=self.config.language, task_type=self.config.task_type)
+            self.config.dataset,
+            split='train',
+            language=self.config.language,
+            task_type=self.config.task_type,
+            no_prefix=self.model.no_prefix)
         loader = self.model.get_data_loader(
             raw_input,
             raw_output,

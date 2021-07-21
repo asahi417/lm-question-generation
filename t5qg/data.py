@@ -19,12 +19,17 @@ __all__ = 'get_dataset'
 DEFAULT_CACHE_DIR = '{}/.cache/t5qg'.format(os.path.expanduser('~'))
 
 
-def get_dataset(name, split: str = 'train', task_type: List or str = 'qg', language: List or str = 'en', cache_dir: str = None):
+def get_dataset(name,
+                split: str = 'train',
+                task_type: List or str = 'qg',
+                language: List or str = 'en',
+                cache_dir: str = None,
+                no_prefix: bool = False):
     language = [language] if type(language) is str else language
     task_type = [task_type] if type(task_type) is str else task_type
     if name == 'squad':
         assert language == ['en'], language
-        data = SQuAD(cache_dir).get_data(split, task_type=task_type)
+        data = SQuAD(cache_dir, no_prefix=no_prefix).get_data(split, task_type=task_type)
     elif name == 'tydiqa':
         data = TydiQA(cache_dir).get_data(split, language=language, task_type=task_type)
     else:
@@ -73,12 +78,13 @@ class SQuAD:
     - ref https://github.com/microsoft/unilm/tree/master/unilm-v1#question-generation---squad
     """
 
-    def __init__(self, cache_dir: str):
+    def __init__(self, cache_dir: str, no_prefix: bool = False):
         self.cache = '{}/data_squad'.format(DEFAULT_CACHE_DIR) if cache_dir is None else cache_dir
         self.output_dir = '{}/processed'.format(self.cache)
         self.sent_splitter = SentSplit()
         self.sp_token_sep = ADDITIONAL_SP_TOKENS['sep']
         self.sp_token_hl = ADDITIONAL_SP_TOKENS['hl']
+        self.no_prefix = no_prefix
         logging.info('instantiate SQuAD data processor')
 
     def get_data(self, split: str = 'train', task_type: List = None):
@@ -144,14 +150,17 @@ class SQuAD:
         # build inputs and targets
         examples = []
         for i, ans in enumerate(sent_answers):
-            context = "{}:".format(TASK_PREFIX['ans_ext'])
+            if self.no_prefix:
+                context = ""
+            else:
+                context = "{}: ".format(TASK_PREFIX['ans_ext'])
             if len(ans) == 0:
                 continue
             ans = list(set(ans))
             for j, sent in enumerate(sents):
                 if i == j:
                     sent = "{0} {1} {0}".format(self.sp_token_hl, sent)
-                context = "{} {}".format(context, sent)
+                context = "{}{}".format(context, sent)
                 context = context.strip()
             input_text = context
             sep = ' {} '.format(self.sp_token_sep)
@@ -176,13 +185,21 @@ class SQuAD:
                 if 'e2e_qg' in TASK_PREFIX:
                     questions = [qas['question'].strip() for qas in paragraph['qas']]
                     target_text = ' {} '.format(self.sp_token_sep).join(questions) + ' ' + self.sp_token_sep
-                    examples.append({"source_text": "{}: {}".format(TASK_PREFIX['e2e_qg'], context),
+                    if self.no_prefix:
+                        source_text = context
+                    else:
+                        source_text = "{}: {}".format(TASK_PREFIX['e2e_qg'], context)
+                    examples.append({"source_text": source_text,
                                      "target_text": target_text,
                                      "task": "e2e_qg"})
                 for qa in paragraph["qas"]:
                     question = qa["question"].strip()
                     if 'qa' in TASK_PREFIX:
-                        examples.append({"source_text": "{}: {}  context: {}".format(TASK_PREFIX['qa'], question, context),
+                        if self.no_prefix:
+                            source_text = "{} {}".format(context, question)
+                        else:
+                            source_text = "{}: {}  context: {}".format(TASK_PREFIX['qa'], question, context)
+                        examples.append({"source_text": source_text,
                                          "target_text": qa["answers"][0]["text"].strip(),
                                          "task": "qa"})
                     if 'qg' in TASK_PREFIX:
@@ -190,7 +207,11 @@ class SQuAD:
                         start_pos, end_pos = self._get_correct_alignment(context, qa["answers"][0])
                         que_gen_input = "{0} {1} {2} {1} {3}".format(
                             context[:start_pos], self.sp_token_hl, answer_text, context[end_pos:])
-                        examples.append({"source_text": "{}: {}".format(TASK_PREFIX['qg'], que_gen_input),
+                        if self.no_prefix:
+                            source_text = que_gen_input
+                        else:
+                            source_text = "{}: {}".format(TASK_PREFIX['qg'], que_gen_input)
+                        examples.append({"source_text": source_text,
                                          "target_text": question,
                                          "task": "qg"})
         return examples

@@ -47,6 +47,10 @@ def load_language_model(model_name, cache_dir: str = None):
         model_class = transformers.T5ForConditionalGeneration.from_pretrained
     elif config.model_type == 'mt5':
         model_class = transformers.MT5ForConditionalGeneration.from_pretrained
+    elif config.model_type == 'bart':
+        model_class = transformers.BartForConditionalGeneration.from_pretrained
+    elif config.model_type == 'mbart':
+        model_class = transformers.MBartForConditionalGeneration.from_pretrained
     else:
         raise ValueError('unsupported model type: {}'.format(config.model_type))
     try:
@@ -165,7 +169,10 @@ class T5:
         self.max_length = max_length
         self.max_length_output = max_length_output
         logging.info('instantiate T5 model class with `{}`'.format(self.model_name))
-        self.tokenizer, self.model, _ = load_language_model(self.model_name, cache_dir=cache_dir)
+        self.tokenizer, self.model, config = load_language_model(self.model_name, cache_dir=cache_dir)
+        self.no_prefix = False
+        if config.model_type in ['mbart', 'bart']:
+            self.no_prefix = True
 
         # GPU setup
         self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
@@ -187,7 +194,7 @@ class T5:
                        list_highlight: List = None,
                        drop_overflow_text: bool = False,
                        skip_overflow_error: bool = False,
-                       task_prefix: str = None,
+                       task_prefix: str or None = 'qg',
                        batch_size: int = None,
                        num_beams: int = 4,
                        num_workers: int = 0,
@@ -266,6 +273,12 @@ class T5:
         if highlights is not None:
             assert len(highlights) == len(inputs), '{} != {}'.format(len(highlights), len(inputs))
             data = [tuple(list(d) + [h]) for d, h in zip(data, highlights)]
+
+        if self.no_prefix and task_prefix is not None:
+            if task_prefix == 'qg':
+                task_prefix = None
+            else:
+                raise ValueError('model is not trained with prefix')
 
         if cache_path is not None and os.path.exists(cache_path):
             logging.info('loading preprocessed feature from {}'.format(cache_path))

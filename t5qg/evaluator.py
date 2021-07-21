@@ -34,7 +34,11 @@ def evaluate_qg(model: str,
         path_hypothesis = '{}/samples.{}.hyp.txt'.format(export_dir, split)
         path_reference = '{}/samples.{}.ref.txt'.format(export_dir, split)
         if not os.path.exists(path_hypothesis) or not os.path.exists(path_reference):
-            raw_input, raw_output = get_dataset(dataset, split=split, language=language, task_type='qg')
+            raw_input, raw_output = get_dataset(dataset,
+                                                split=split,
+                                                language=language,
+                                                task_type='qg',
+                                                no_prefix=lm.no_prefix)
             output = lm.get_prediction(raw_input,
                                        batch_size=batch,
                                        num_beams=num_beams,
