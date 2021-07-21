@@ -11,11 +11,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=leve
 tokenizer = AutoTokenizer.from_pretrained('google/mt5-small')
 for data_name in ['squad']:
     print(data_name)
-    get_dataset(data_name, split='test')
-    get_dataset(data_name, split='dev')
-    data = get_dataset(data_name, split='train')
+    # get_dataset(data_name, split='test')
+    # get_dataset(data_name, split='dev')
+    data = get_dataset(data_name, split='train', task_type='qg', no_prefix=True)
     total_in, total_out = [], []
     for i in tqdm(data):
+        print(i)
+
         n_in = len(tokenizer.encode(i['source_text']))
         n_out = len(tokenizer.encode(i['target_text']))
         total_in.append(n_in)
