@@ -1,7 +1,9 @@
 """ T5 model. """
+import itertools
 import os
 import logging
 import pickle
+import re
 from typing import List, Dict
 from multiprocessing import Pool
 
@@ -187,37 +189,26 @@ class T5:
         # for answer extraction model
         self.sentence_splitter = SentSplit()
 
-    # def process_for_ans_ext(self, input_document: str):
-    #     sents = self.sentence_splitter(input_document)
-    #     output = []
-    #     for i in range(len(sents)):
-    #         before = ' '.o sents[:i]
-    #         after = sents[i+1:]
-    #         output +=
-    #     input_document
-    #     ADDITIONAL_SP_TOKENS['hl']
-
     def train(self):
         self.model.train()
 
     def eval(self):
         self.model.eval()
 
-    def get_prediction(self,
-                       list_input: List,
-                       list_highlight: List = None,
-                       drop_overflow_text: bool = False,
-                       skip_overflow_error: bool = False,
-                       task_prefix: str or None = 'qg',
-                       batch_size: int = None,
-                       num_beams: int = 4,
-                       num_workers: int = 0,
-                       cache_path: str = None):
-        """ Get model prediction
+    # def answer_question(self):
+    #     pass
 
-        @param list_input: List of input sentences.
-        @param list_highlight: List of highlight phrases.
-        @param task_prefix: Either of `qg`, `ans_ext`, `qa`.
+    def generate_qa(self,
+                    context: str,
+                    drop_overflow_text: bool = False,
+                    skip_overflow_error: bool = False,
+                    batch_size: int = None,
+                    num_beams: int = 4,
+                    num_workers: int = 0,
+                    cache_path: str = None):
+        """ Generate question given context.
+
+        @param context: Input context.
         @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
         @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
         @param batch_size: Batch size.
@@ -226,18 +217,129 @@ class T5:
         @param cache_path:
         @return: List of generated sentences.
         """
-        assert type(list_input) == list, list_input
+        logging.info('running model for `ans_ext`')
+        list_answer = self.generate_a(
+            context, drop_overflow_text=drop_overflow_text, batch_size=batch_size, num_beams=num_beams,
+            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path)
+        list_context = [context] * len(list_answer)
+
+        logging.info('running model for `qg`')
+        return self.generate_prediction(
+            list_context, list_highlight=list_answer, task_type='qg', drop_overflow_text=drop_overflow_text, batch_size=batch_size,
+            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
+            num_beams=num_beams)
+
+    def generate_a(self,
+                   context: str,
+                   drop_overflow_text: bool = False,
+                   skip_overflow_error: bool = False,
+                   batch_size: int = None,
+                   num_beams: int = 4,
+                   num_workers: int = 0,
+                   cache_path: str = None):
+        """ Generate answer candidate in each sentence.
+
+        @param context: Input document.
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @param batch_size: Batch size.
+        @param num_beams: Number of beam for model generation.
+        @param num_workers:
+        @param cache_path:
+        @return: List of generated answer.
+        """
+
+        def process_for_ans_ext(input_document: str):
+            sents = self.sentence_splitter(input_document)
+            output = []
+            for i in range(len(sents)):
+                _context = ''.join(sents[:i])
+                _context += '{0} {1}{0}'.format(ADDITIONAL_SP_TOKENS['hl'], sents[i])
+                if len(sents[i + 1:]) > 0:
+                    _context += ' ' + ''.join(sents[i + 1:])
+                output.append(_context)
+            return output
+
+        def clean(string):
+            string = re.sub(r'\A\s*', '', string)
+            string = re.sub(r'\s*\Z', '', string)
+            if len(string) > 0:
+                return string
+            return None
+
+        list_context = process_for_ans_ext(context)
+
+        out = self.generate_prediction(
+            list_context, task_type='ans_ext', drop_overflow_text=drop_overflow_text, batch_size=batch_size,
+            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
+            num_beams=num_beams)
+        out = list(itertools.chain(*[[clean(ii) for ii in i.split(ADDITIONAL_SP_TOKENS['sep'])] for i in out]))
+        out = list(filter(None, out))
+        return out
+
+    def generate_q(self,
+                   list_context: List,
+                   list_answer: List or None = None,
+                   drop_overflow_text: bool = False,
+                   skip_overflow_error: bool = False,
+                   batch_size: int = None,
+                   num_beams: int = 4,
+                   num_workers: int = 0,
+                   cache_path: str = None):
+        """ Generate question given context. Note that the answer should be either already highlighted in the context
+        eg) "I live in <hl> Tokyo <hl>."
+        or given by list_answer.
+
+        @param list_context: List of input sentences.
+        @param list_answer: List of answer if they are not highlighted in the context.
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @param batch_size: Batch size.
+        @param num_beams: Number of beam for model generation.
+        @param num_workers:
+        @param cache_path:
+        @return: List of generated sentences.
+        """
+        return self.generate_prediction(
+            list_context, list_highlight=list_answer, task_type='qg', drop_overflow_text=drop_overflow_text,
+            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
+            num_beams=num_beams, batch_size=batch_size)
+
+    def generate_prediction(self,
+                            list_context: List,
+                            list_highlight: List or None = None,
+                            task_type: List or str = 'qg',
+                            drop_overflow_text: bool = False,
+                            skip_overflow_error: bool = False,
+                            batch_size: int = None,
+                            num_beams: int = 4,
+                            num_workers: int = 0,
+                            cache_path: str = None):
+        """ General method to generate model prediction
+
+        @param list_context: List of input sentences.
+        @param list_highlight: List of highlight phrases.
+        @param task_type: Either of `qg`, `ans_ext`, `qa`.
+        @param drop_overflow_text: Return None if the input sentence exceeds the max token length.
+        @param skip_overflow_error: Raise error if the input sentence exceeds the max token length.
+        @param batch_size: Batch size.
+        @param num_beams: Number of beam for model generation.
+        @param num_workers:
+        @param cache_path:
+        @return: List of generated sentences.
+        """
         self.eval()
-        loader = self.get_data_loader(list_input,
+        assert type(list_context) == list, list_context
+        # if highlight is not given, run answer extraction to get it
+        loader = self.get_data_loader(list_context,
                                       highlights=list_highlight,
-                                      task_prefix=task_prefix,
+                                      task_prefix=task_type,
                                       drop_overflow_text=drop_overflow_text,
                                       skip_overflow_error=skip_overflow_error,
                                       batch_size=batch_size,
                                       num_workers=num_workers,
                                       cache_path=cache_path)
         outputs = []
-
         for encode in loader:
             with torch.no_grad():
                 encode = {k: v.to(self.device) for k, v in encode.items()}

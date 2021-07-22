@@ -174,10 +174,10 @@ class Trainer:
               activate_tensorboard: bool = False):
         """ Train model.
 
-        :param num_workers: Workers for DataLoader.
-        :param epoch_save: Save the model every this epoch.
-        :param interval:
-        :param activate_tensorboard:
+        @param num_workers: Workers for DataLoader.
+        @param epoch_save: Save the model every this epoch.
+        @param interval:
+        @param activate_tensorboard:
         """
 
         logging.info('dataset preprocessing')

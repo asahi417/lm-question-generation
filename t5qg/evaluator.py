@@ -39,11 +39,12 @@ def evaluate_qg(model: str,
                                                 language=language,
                                                 task_type='qg',
                                                 no_prefix=lm.no_prefix)
-            output = lm.get_prediction(raw_input,
-                                       batch_size=batch,
-                                       num_beams=num_beams,
-                                       drop_overflow_text=False,
-                                       skip_overflow_error=True)
+            output = lm.generate_q(
+                raw_input,
+                batch_size=batch,
+                num_beams=num_beams,
+                drop_overflow_text=False,
+                skip_overflow_error=True)
             with open(path_hypothesis, 'w') as f:
                 f.write('\n'.join(output))
             with open(path_reference, 'w') as f:

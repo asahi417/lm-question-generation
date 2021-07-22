@@ -91,7 +91,11 @@ class SQuAD:
 
     def get_data(self, split: str = 'train', task_type: List = None):
         assert split in ['train', 'dev', 'test'], split
-        output = '{}/{}.jsonl'.format(self.cache, split)
+        if self.no_prefix:
+            output = '{}/{}.no_prefix.jsonl'.format(self.cache, split)
+        else:
+            output = '{}/{}.jsonl'.format(self.cache, split)
+
         if os.path.exists(output):
             with open(output, 'r') as f:
                 examples = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
@@ -208,7 +212,7 @@ class SQuAD:
                     if 'qg' in TASK_PREFIX:
                         answer_text = qa["answers"][0]['text'].strip()
                         start_pos, end_pos = self._get_correct_alignment(context, qa["answers"][0])
-                        que_gen_input = "{0} {1} {2} {1} {3}".format(
+                        que_gen_input = "{0}{1} {2} {1}{3}".format(
                             context[:start_pos], self.sp_token_hl, answer_text, context[end_pos:])
                         if self.no_prefix:
                             source_text = que_gen_input
