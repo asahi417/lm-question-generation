@@ -13,6 +13,13 @@ class HighlightNotFoundError(Exception):
     """ Highlight is not in the sentence. """
 
     def __init__(self, highlight: str, input_sentence: str):
-        self.message = 'Highlight () not found in the input sentence ({})'.format(highlight, input_sentence)
+        self.message = 'Highlight `{}` not found in the input sentence `{}`'.format(highlight, input_sentence)
         super().__init__(self.message)
 
+
+class AnswerNotFoundError(Exception):
+    """ Answer cannot found in the context. """
+
+    def __init__(self, context: str):
+        self.message = 'Model cannot find any answer candidates in `{}`'.format(context)
+        super().__init__(self.message)

@@ -195,7 +195,8 @@ class Trainer:
             drop_last=True,
             num_workers=num_workers,
             cache_path=self.data_cache_dir,
-            drop_overflow_text=True)
+            drop_overflow_text=True,
+            parallel=True)
         self.model.train()
 
         logging.info('start model training')

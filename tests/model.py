@@ -21,10 +21,16 @@ squad_qg = "generate question: Architecturally, the school has a Catholic charac
            " arms upraised with the legend Venite Ad Me Omnes. Next to the Main Building is the Basilica of the Sacred Heart. " \
            "Immediately behind the basilica is the Grotto, a Marian place of prayer and reflection. It is a replica of the " \
            "grotto at Lourdes, France where the Virgin Mary reputedly appeared to  " \
-           "<hl> Saint Bernadette Soubirous <hl>  in 1858. At the end of the main drive (and in a direct line that connects through 3 statues and the Gold Dome), is a simple, modern stone statue of Mary.
+           "<hl> Saint Bernadette Soubirous <hl>  in 1858. At the end of the main drive (and in a direct line that connects through 3 statues and the Gold Dome), is a simple, modern stone statue of Mary."
 
-print(sample)
+print(qg_model.generate_qa(sample))
+print(qg_model.generate_q([squad_qg]*3))
+
 a = qg_model.generate_a(sample)
 print(a)
 
-qg_model.generate_q(sample)
+q = qg_model.generate_q([sample] * len(a), list_answer=a)
+print(q)
+
+
+

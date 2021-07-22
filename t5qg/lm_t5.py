@@ -9,8 +9,8 @@ from multiprocessing import Pool
 
 import torch
 import transformers
-from .exceptions import ExceedMaxLengthError, HighlightNotFoundError
-from .sentence_split import SentSplit
+from .exceptions import ExceedMaxLengthError, HighlightNotFoundError, AnswerNotFoundError
+from . import sentence_split
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
@@ -94,6 +94,7 @@ class EncodePlus:
                  max_length_output: int = 34,
                  drop_overflow_text: bool = False,
                  skip_overflow_error: bool = False,
+                 skip_highlight_error: bool = False,
                  task_prefix: str = None,
                  padding: bool = True):
         """ Wrapper of encode_plus for multiprocessing.
@@ -114,6 +115,7 @@ class EncodePlus:
         # for model training, we should drop the exceeded input but not for the evaluation
         self.drop_overflow_text = drop_overflow_text
         self.skip_overflow_error = skip_overflow_error
+        self.skip_highlight_error = skip_highlight_error
 
         # truncation should be true for the batch process, but not necessary to process single input
         self.param_in = {'truncation': True, 'max_length': self.max_length}
@@ -132,6 +134,8 @@ class EncodePlus:
         if input_highlight is not None:
             position = input_sequence.find(input_highlight)
             if position == -1:
+                if self.skip_highlight_error:
+                    return None
                 raise HighlightNotFoundError(input_highlight, input_sequence)
             input_sequence = '{0}{1} {2} {1}{3}'.format(
                 input_sequence[:position], ADDITIONAL_SP_TOKENS['hl'], input_highlight,
@@ -187,7 +191,7 @@ class T5:
         logging.info('{} GPUs are in use'.format(torch.cuda.device_count()))
 
         # for answer extraction model
-        self.sentence_splitter = SentSplit()
+        self.sentence_splitter = sentence_split.SentSplit()
 
     def train(self):
         self.model.train()
@@ -202,6 +206,7 @@ class T5:
                     context: str,
                     drop_overflow_text: bool = False,
                     skip_overflow_error: bool = False,
+                    parallel: bool = False,
                     batch_size: int = None,
                     num_beams: int = 4,
                     num_workers: int = 0,
@@ -220,19 +225,22 @@ class T5:
         logging.info('running model for `ans_ext`')
         list_answer = self.generate_a(
             context, drop_overflow_text=drop_overflow_text, batch_size=batch_size, num_beams=num_beams,
-            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path)
-        list_context = [context] * len(list_answer)
-
-        logging.info('running model for `qg`')
-        return self.generate_prediction(
-            list_context, list_highlight=list_answer, task_type='qg', drop_overflow_text=drop_overflow_text, batch_size=batch_size,
             skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
-            num_beams=num_beams)
+            parallel=parallel)
+        list_context = [context] * len(list_answer)
+        logging.info('running model for `qg`')
+        list_question = self.generate_q(
+            list_context, list_answer=list_answer, drop_overflow_text=drop_overflow_text, batch_size=batch_size,
+            skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
+            num_beams=num_beams, parallel=parallel)
+        assert len(list_answer) == len(list_question)
+        return list(zip(list_question, list_answer))
 
     def generate_a(self,
                    context: str,
                    drop_overflow_text: bool = False,
                    skip_overflow_error: bool = False,
+                   parallel: bool = False,
                    batch_size: int = None,
                    num_beams: int = 4,
                    num_workers: int = 0,
@@ -248,17 +256,7 @@ class T5:
         @param cache_path:
         @return: List of generated answer.
         """
-
-        def process_for_ans_ext(input_document: str):
-            sents = self.sentence_splitter(input_document)
-            output = []
-            for i in range(len(sents)):
-                _context = ''.join(sents[:i])
-                _context += '{0} {1}{0}'.format(ADDITIONAL_SP_TOKENS['hl'], sents[i])
-                if len(sents[i + 1:]) > 0:
-                    _context += ' ' + ''.join(sents[i + 1:])
-                output.append(_context)
-            return output
+        assert not self.no_prefix, 'model is not trained for answer extraction'
 
         def clean(string):
             string = re.sub(r'\A\s*', '', string)
@@ -267,14 +265,19 @@ class T5:
                 return string
             return None
 
-        list_context = process_for_ans_ext(context)
+        # list_context = process_for_ans_ext(context)
+        list_sentence = [clean(i) for i in self.sentence_splitter(context)]
+        list_context = [context] * len(list_sentence)
 
         out = self.generate_prediction(
-            list_context, task_type='ans_ext', drop_overflow_text=drop_overflow_text, batch_size=batch_size,
+            list_context, list_highlight=list_sentence, task_type='ans_ext', drop_overflow_text=drop_overflow_text,
             skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
-            num_beams=num_beams)
+            num_beams=num_beams, batch_size=batch_size, parallel=parallel)
         out = list(itertools.chain(*[[clean(ii) for ii in i.split(ADDITIONAL_SP_TOKENS['sep'])] for i in out]))
-        out = list(filter(None, out))
+        out = list(filter(None, out))  # remove None
+        out = list(filter(lambda x: x in context, out))  # remove answer out of context
+        if len(out) == 0:
+            raise AnswerNotFoundError(context)
         return out
 
     def generate_q(self,
@@ -282,6 +285,7 @@ class T5:
                    list_answer: List or None = None,
                    drop_overflow_text: bool = False,
                    skip_overflow_error: bool = False,
+                   parallel: bool = False,
                    batch_size: int = None,
                    num_beams: int = 4,
                    num_workers: int = 0,
@@ -303,7 +307,7 @@ class T5:
         return self.generate_prediction(
             list_context, list_highlight=list_answer, task_type='qg', drop_overflow_text=drop_overflow_text,
             skip_overflow_error=skip_overflow_error, num_workers=num_workers, cache_path=cache_path,
-            num_beams=num_beams, batch_size=batch_size)
+            num_beams=num_beams, batch_size=batch_size, parallel=parallel)
 
     def generate_prediction(self,
                             list_context: List,
@@ -311,6 +315,8 @@ class T5:
                             task_type: List or str = 'qg',
                             drop_overflow_text: bool = False,
                             skip_overflow_error: bool = False,
+                            skip_highlight_error: bool = False,
+                            parallel: bool = False,
                             batch_size: int = None,
                             num_beams: int = 4,
                             num_workers: int = 0,
@@ -338,7 +344,9 @@ class T5:
                                       skip_overflow_error=skip_overflow_error,
                                       batch_size=batch_size,
                                       num_workers=num_workers,
-                                      cache_path=cache_path)
+                                      cache_path=cache_path,
+                                      skip_highlight_error=skip_highlight_error,
+                                      parallel=parallel)
         outputs = []
         for encode in loader:
             with torch.no_grad():
@@ -364,7 +372,9 @@ class T5:
                         drop_last: bool = False,
                         cache_path: str = None,
                         drop_overflow_text: bool = False,
-                        skip_overflow_error: bool = False):
+                        skip_overflow_error: bool = False,
+                        skip_highlight_error: bool = False,
+                        parallel: bool = False):
         """ Transform features (produced by BERTClassifier.preprocess method) to data loader.
 
         @param inputs: List of input sentences.
@@ -401,15 +411,22 @@ class T5:
             out = pickle_load(cache_path)
         else:
             # process in parallel
-            pool = Pool()
             config = {'tokenizer': self.tokenizer, 'max_length': self.max_length,
                       'max_length_output': self.max_length_output, 'drop_overflow_text': drop_overflow_text,
-                      'task_prefix': task_prefix, 'skip_overflow_error': skip_overflow_error}
+                      'task_prefix': task_prefix, 'skip_overflow_error': skip_overflow_error,
+                      'skip_highlight_error': skip_highlight_error}
             if len(data) == 1:
                 config['padding'] = False
 
-            out = pool.map(EncodePlus(**config), data)
-            pool.close()
+            if parallel:
+                pool = Pool()
+                out = pool.map(EncodePlus(**config), data)
+                pool.close()
+            else:
+                f = EncodePlus(**config)
+                out = []
+                for i in data:
+                    out.append(f(i))
 
             # remove overflow text
             logging.info('encode all the data       : {}'.format(len(out)))

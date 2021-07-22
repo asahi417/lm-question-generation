@@ -7,7 +7,7 @@ from typing import List
 from langdetect import detect
 import nltk
 from nltk.tokenize import sent_tokenize
-nltk.download('punkt')
+
 
 __all__ = 'SentSplit'
 
@@ -48,6 +48,9 @@ class JASplitter:
 
 
 class Splitter:
+
+    def __init__(self):
+        nltk.download('punkt')
 
     def __call__(self, document):
         out = sent_tokenize(document)

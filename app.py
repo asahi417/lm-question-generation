@@ -5,7 +5,7 @@ import traceback
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
 
 from t5qg import T5
 
@@ -24,7 +24,6 @@ qg_model = T5(MODEL, MAX_LENGTH, MAX_LENGTH_OUTPUT)
 class ModelInput(BaseModel):
     input_text: str
     highlight: Optional[str] = None
-    task: str = 'qg'
     num_beam: int = 4
 
 
@@ -42,7 +41,7 @@ async def info():
     return {
         "model": MODEL,
         "max_length": MAX_LENGTH,
-        "max_length_output": MAX_LENGTH_OUTPUT,
+        "max_length_output": MAX_LENGTH_OUTPUT
     }
 
 
@@ -50,17 +49,14 @@ async def info():
 async def process(model_input: ModelInput):
     try:
         if model_input.highlight is None:
-            out = qg_model.get_prediction([model_input.input_text],
-                                          task_prefix='ans_ext')
-            out = qg_model.get_prediction([model_input.input_text],
-                                          num_beams=model_input.num_beam,
-                                          task_prefix='ans_extraction')
+            qa_list = qg_model.generate_qa(model_input.input_text, num_beams=model_input.num_beam)
+        else:
 
-        out = qg_model.get_prediction([model_input.input_text],
-                                      [model_input.highlight],
-                                      num_beams=model_input.num_beam,
-                                      task_prefix=model_input.task)
-        return out
+            out = qg_model.generate_q([model_input.input_text],
+                                      list_answer=[model_input.highlight],
+                                      num_beams=model_input.num_beam)
+            qa_list = [(out, model_input.highlight)]
+        return {'qa': qa_list}
     except Exception:
         logging.exception('Error')
         raise HTTPException(status_code=404, detail=traceback.print_exc())

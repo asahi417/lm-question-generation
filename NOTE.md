@@ -6,8 +6,9 @@ TODO: fix TydiQA
 ```shell
 t5qg-train -m t5-small -c t5qg_output/ckpt/t5_small -b 32 -g 16 
 t5qg-train -m t5-base -c t5qg_output/ckpt/t5_base -b 16 -g 32
-t5qg-train -m t5-large -c t5qg_output/ckpt/t5_large -b 16 -g 32
 t5qg-train -m google/mt5-small -c t5qg_output/ckpt/mt5_small -b 16 -g 32 
+
+t5qg-train -m t5-large -c t5qg_output/ckpt/t5_large -b 16 -g 32
 t5qg-train -m google/mt5-base -c t5qg_output/ckpt/mt5_base -b 8 -g 64
 ```
 
