@@ -5,6 +5,7 @@ from transformers import AutoTokenizer
 from t5qg.data import get_dataset
 from t5qg.sentence_split import SentSplit
 
+
 i, o = get_dataset('squad', split='test', task_type=['qa'])
 print(i[:2])
 i, o = get_dataset('squad', split='test', task_type=['qg'])
