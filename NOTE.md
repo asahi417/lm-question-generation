@@ -23,6 +23,9 @@ t5qg-train -m facebook/bart-large -c t5qg_output/ckpt/bart_large --task-type qg 
 t5qg-eval -m ./t5qg_output/ckpt/t5_small/epoch_10/ -e t5qg_output/ckpt/t5_small/epoch_10/eval
 t5qg-eval -m ./t5qg_output/ckpt/t5_base/epoch_10/ -e t5qg_output/ckpt/t5_base/epoch_10/eval
 t5qg-eval -m ./t5qg_output/ckpt/mt5_small/epoch_10/ -e t5qg_output/ckpt/mt5_small/epoch_10/eval
+
+t5qg-eval -m ./t5qg_output/ckpt/bart_large/epoch_10/ -e t5qg_output/ckpt/bart_large/epoch_10/eval
+
 t5qg-eval -m ./t5qg_output/ckpt/mt5_base/epoch_10/ -e t5qg_output/ckpt/mt5_base/epoch_10/eval
 t5qg-eval -m ./t5qg_output/ckpt/bart_base/epoch_10/ -e t5qg_output/ckpt/bart_base/epoch_10/eval
 t5qg-eval -m ./t5qg_output/ckpt/bart_large/epoch_10/ -e t5qg_output/ckpt/bart_large/epoch_10/eval
