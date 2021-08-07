@@ -29,16 +29,15 @@ t5qg-eval -m ckpt/test/epoch_10/ -e ckpt/test/epoch_10/eval
 We provide a rest API which hosts the model inference.
 - ***From Command Line***
 ```shell
-uvicorn app:app --reload
+uvicorn app:app --reload --port 80
 ```
-go to [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs).
-
 - ***Run with Docker***
 ```shell
 docker build -t t5qg/app:latest .
 docker run -p 80:80 t5qg/app:latest
 ```
-go to [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs).
+
+Swagger UI is available at [`http://127.0.0.1:80/docs`](http://127.0.0.1:80/docs).
 
 ## QG Model Cards
 Following models are available via the transformers modelhub. All models are trained over SQuAD for question generation where the data split follows
