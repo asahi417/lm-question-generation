@@ -1,0 +1,10 @@
+steps:
+# Build the container image on the artifact repository
+#- name: 'gcr.io/cloud-builders/docker'
+#  args: [ 'build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/t5qg/app', '.' ]
+# Deploy container image to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [ 'run', 'deploy', 'cloudrunservice', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/t5qg/app', '--region', 'us-central1', '--platform', 'managed', '--allow-unauthenticated', '--port', '80' ]
+images:
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/t5qg/app'
+
