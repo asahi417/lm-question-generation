@@ -112,6 +112,8 @@ class GridSearcher:
 
     def run(self):
 
+        self.initialize_searcher()
+
         ###########
         # 1st RUN #
         ###########
