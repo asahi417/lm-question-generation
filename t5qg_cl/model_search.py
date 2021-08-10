@@ -15,6 +15,7 @@ def get_options():
     parser.add_argument('-g', '--gradient-accumulation-steps', help='', default=4, type=int)
     parser.add_argument('--task-type', help='task type', default='qg', type=str)
     parser.add_argument('--language', help='language', default='en', type=str)
+    parser.add_argument('-b', '--batch', help='batch size', default=128, type=int)
     parser.add_argument('--fp16', help='fp16', action='store_true')
     parser.add_argument("--lr-warmup", help="linear warmup of lr", default=None, type=int)
 
@@ -26,7 +27,6 @@ def get_options():
     parser.add_argument('--batch-eval', help='', default=128, type=int)
     parser.add_argument('--metric', default='dev/BLeu_4', type=str)
     parser.add_argument('--n-max-config', help='', default=5, type=int)
-    parser.add_argument('-b', '--batch', help='batch size', default='128', type=str)
     parser.add_argument('--epoch-partial', help='epoch', default=2, type=int)
     parser.add_argument('--max-length', default='512', type=str, help='max sequence length for input sequence')
     parser.add_argument('--max-length-output', default='32', type=str, help='max sequence length for output sequence')
@@ -53,7 +53,7 @@ def main():
         metric=opt.metric,
         epoch_partial=opt.epoch_partial,
         gradient_accumulation_steps=opt.gradient_accumulation_steps,
-        batch=[int(i) for i in opt.batch.split(',')],
+        batch=opt.batch,
         max_length=[int(i) for i in opt.max_length.split(',')],
         max_length_output=[int(i) for i in opt.max_length_output.split(',')],
         n_max_config=opt.n_max_config,

@@ -34,9 +34,6 @@ class GridSearcher:
                  random_seed: List or int = 42,
                  metric: str = 'dev/Bleu_4'):
 
-        # initialize searcher
-        assert not os.path.exists(checkpoint_dir), 'work directory `{}` is not empty'.format(checkpoint_dir)
-
         # static configs
         self.static_config = {
             # 'checkpoint_dir': checkpoint_dir,
@@ -120,7 +117,7 @@ class GridSearcher:
 
         checkpoints = []
         for n, dynamic_config in enumerate(self.all_dynamic_configs):
-            logging.info('## 1st RUN: Configuration {}/{} ##'.format(n, len(dynamic_config)))
+            logging.info('## 1st RUN: Configuration {}/{} ##'.format(n, len(self.all_dynamic_configs)))
             config = self.static_config.copy()
             config.update({
                 'max_length': dynamic_config[0], 'max_length_output': dynamic_config[1], 'batch': dynamic_config[2],
@@ -146,7 +143,7 @@ class GridSearcher:
         metric = sorted(metric.items(), key=lambda x: x[1], reverse=True)
         logging.info('1st RUN RESULTS ({}/{})'.format(self.split, self.metric))
         for n, (k, v) in enumerate(metric):
-            logging.info(' rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
+            logging.info('\t * rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
         with open('{}/metric.1st.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(metric, f)
 
@@ -182,7 +179,7 @@ class GridSearcher:
         metric = sorted(metric.items(), key=lambda x: x[1], reverse=True)
         logging.info('2nd RUN RESULTS: \n{}'.format(str(metric)))
         for n, (k, v) in enumerate(metric):
-            logging.info(' rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
+            logging.info('\t * rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
 
         with open('{}/metric.2nd.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(metric, f)
