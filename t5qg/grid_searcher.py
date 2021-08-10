@@ -86,19 +86,19 @@ class GridSearcher:
     def initialize_searcher(self):
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
-        if os.path.exists('{}/config_static.json'):
-            with open('{}/config_static.json') as f:
+        if os.path.exists('{}/config_static.json'.format(self.checkpoint_dir)):
+            with open('{}/config_static.json'.format(self.checkpoint_dir)) as f:
                 tmp = json.load(f)
             assert tmp == self.static_config
 
-        if os.path.exists('{}/config_dynamic.json'):
-            with open('{}/config_dynamic.json') as f:
+        if os.path.exists('{}/config_dynamic.json'.format(self.checkpoint_dir)):
+            with open('{}/config_dynamic.json'.format(self.checkpoint_dir)) as f:
                 tmp = json.load(f)
             assert tmp == self.dynamic_config
 
-        with open('{}/config_static.json', 'w') as f:
+        with open('{}/config_static.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(self.static_config, f)
-        with open('{}/config_dynamic.json', 'w') as f:
+        with open('{}/config_dynamic.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(self.dynamic_config, f)
 
         # add file handler
@@ -147,7 +147,7 @@ class GridSearcher:
         logging.info('1st RUN RESULTS ({}/{})'.format(self.split, self.metric))
         for n, (k, v) in enumerate(metric):
             logging.info(' rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
-        with open('{}/metric.1st.json', 'w') as f:
+        with open('{}/metric.1st.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(metric, f)
 
         ###########
@@ -184,6 +184,6 @@ class GridSearcher:
         for n, (k, v) in enumerate(metric):
             logging.info(' rank: {} | metric: {} | model: {} |'.format(n, round(v, 3), k))
 
-        with open('{}/metric.2nd.json', 'w') as f:
+        with open('{}/metric.2nd.json'.format(self.checkpoint_dir), 'w') as f:
             json.dump(metric, f)
 
