@@ -8,9 +8,12 @@ from typing import List, Dict
 from multiprocessing import Pool
 
 import torch
+from torch.nn import CrossEntropyLoss, functional
 import transformers
 from .exceptions import ExceedMaxLengthError, HighlightNotFoundError, AnswerNotFoundError
 from . import sentence_split
+
+CE_IGNORE_INDEX = -100
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
@@ -64,6 +67,30 @@ def load_language_model(model_name, cache_dir: str = None):
     tokenizer.add_special_tokens({'additional_special_tokens': list(ADDITIONAL_SP_TOKENS.values())})
     model.resize_token_embeddings(len(tokenizer))
     return tokenizer, model, config
+
+
+def label_smoothed_loss(logits, labels, epsilon):
+    """ https://github.com/huggingface/transformers/blob/55bb4c06f7be141c6d895dbe1f11018dc8580b2d/src/transformers/trainer_pt_utils.py#L430 """
+    log_probs = - functional.log_softmax(logits, dim=-1)
+    if labels.dim() == log_probs.dim() - 1:
+        labels = labels.unsqueeze(-1)
+
+    padding_mask = labels.eq(CE_IGNORE_INDEX)
+    # In case the ignore_index is -100, the gather will fail, so we replace labels by 0. The padding_mask
+    # will ignore them in any case.
+    labels.clamp_min_(0)
+    nll_loss = log_probs.gather(dim=-1, index=labels)
+    # works for fp16 input tensor too, by internally upcasting it to fp32
+    smoothed_loss = log_probs.sum(dim=-1, keepdim=True, dtype=torch.float32)
+
+    nll_loss.masked_fill_(padding_mask, 0.0)
+    smoothed_loss.masked_fill_(padding_mask, 0.0)
+
+    # Take the mean over the label dimensions, then divide by the number of active elements (i.e. not-padded):
+    num_active_elements = padding_mask.numel() - padding_mask.long().sum()
+    nll_loss = nll_loss.sum() / num_active_elements
+    smoothed_loss = smoothed_loss.sum() / (num_active_elements * log_probs.shape[-1])
+    return (1 - epsilon) * nll_loss + epsilon * smoothed_loss
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -164,7 +191,8 @@ class EncodePlus:
 class T5:
     """ T5 model. """
 
-    def __init__(self, model: str, max_length: int = 512, max_length_output: int = 32, cache_dir: str = None):
+    def __init__(self, model: str, max_length: int = 512, max_length_output: int = 32, cache_dir: str = None,
+                 label_smoothing: float = None):
         """ T5 model.
 
         @param model: path to the checkpoint or alias on huggingface modelhub.
@@ -175,6 +203,7 @@ class T5:
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
+        self.label_smoothing = label_smoothing
         logging.info('instantiate T5 model class with `{}`'.format(self.model_name))
         self.tokenizer, self.model, config = load_language_model(self.model_name, cache_dir=cache_dir)
         self.no_prefix = False
@@ -198,9 +227,6 @@ class T5:
 
     def eval(self):
         self.model.eval()
-
-    # def answer_question(self):
-    #     pass
 
     def generate_qa(self,
                     context: str,
@@ -358,8 +384,12 @@ class T5:
         return outputs
 
     def encode_to_loss(self, encode: Dict):
-        loss = self.model(**{k: v.to(self.device) for k, v in encode.items()})['loss']
-        return loss.mean() if self.parallel else loss
+        assert 'labels' in encode
+        output = self.model(**{k: v.to(self.device) for k, v in encode.items()})
+        if self.label_smoothing is None or self.label_smoothing == 0.0:
+            return output['loss'].mean() if self.parallel else output['loss']
+        else:
+            return label_smoothed_loss(output['logits'], encode['labels'], self.label_smoothing)
 
     def get_data_loader(self,
                         inputs,
@@ -449,4 +479,3 @@ class T5:
         else:
             self.model.save_pretrained(save_dir)
         self.tokenizer.save_pretrained(save_dir)
-

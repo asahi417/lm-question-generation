@@ -67,7 +67,9 @@ class Trainer:
                  lr_warmup: int = 100,
                  fp16: bool = False,
                  random_seed: int = 42,
-                 gradient_accumulation_steps: int = 4):
+                 gradient_accumulation_steps: int = 4,
+                 label_smoothing: float = None,
+                 disable_log: bool = False):
 
         logging.info('initialize model trainer')
         # config
@@ -85,16 +87,18 @@ class Trainer:
             lr=lr,
             fp16=fp16,
             random_seed=random_seed,
-            gradient_accumulation_steps=gradient_accumulation_steps)
+            gradient_accumulation_steps=gradient_accumulation_steps,
+            label_smoothing=label_smoothing)
 
-        # add file handler
         random.seed(self.config.random_seed)
         torch.manual_seed(self.config.random_seed)
-        logger = logging.getLogger()
-        file_handler = logging.FileHandler('{}/training.log'.format(self.config.checkpoint_dir))
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
-        logger.addHandler(file_handler)
+        if not disable_log:
+            # add file handler
+            logger = logging.getLogger()
+            file_handler = logging.FileHandler('{}/training.log'.format(self.config.checkpoint_dir))
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
+            logger.addHandler(file_handler)
 
         # load model
         ckpts = glob('{}/epoch_*'.format(self.config.checkpoint_dir))
@@ -104,7 +108,8 @@ class Trainer:
             logging.info('load checkpoint from {}'.format(path))
             self.model = T5(model=path,
                             max_length=self.config.max_length,
-                            max_length_output=self.config.max_length_output)
+                            max_length_output=self.config.max_length_output,
+                            label_smoothing=self.config.label_smoothing)
             self.optimizer, self.scheduler = self.setup_optimizer(epoch)
             self.current_epoch = epoch
             assert self.current_epoch <= self.config.epoch, 'model training is done'
@@ -169,9 +174,10 @@ class Trainer:
 
     def train(self,
               num_workers: int = 0,
-              epoch_save: int = 1,
+              epoch_save: None or int = 1,
               interval: int = 50,
-              activate_tensorboard: bool = False):
+              activate_tensorboard: bool = False,
+              epoch_partial: int = None):
         """ Train model.
 
         @param num_workers: Workers for DataLoader.
@@ -211,8 +217,11 @@ class Trainer:
                 mean_loss, global_step = self.train_single_epoch(loader, global_step, writer, interval)
                 logging.info('[epoch {}/{}] average loss: {}, lr: {}'.format(
                     e, self.config.epoch, round(mean_loss, 3), self.optimizer.param_groups[0]['lr']))
-                if (e + 1) % epoch_save == 0 and (e + 1) != 0:
+                if epoch_save is not None and (e + 1) % epoch_save == 0 and (e + 1) != 0:
                     self.save(e)
+                if epoch_partial is not None and (e + 1) == epoch_partial:
+                    break
+
         if writer is not None:
             writer.close()
         self.save(e)

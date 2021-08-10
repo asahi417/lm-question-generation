@@ -45,13 +45,13 @@ setup(
         'fastapi',  # app
         'uvicorn',
         'pydantic'
-        # 'google-cloud-storage'
     ],
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             't5qg-train = t5qg_cl.model_training:main',
-            't5qg-eval = t5qg_cl.model_evaluation:main'
+            't5qg-eval = t5qg_cl.model_evaluation:main',
+            't5qg-search = t5qg_cl.model_search:main',
         ]
     }
 )

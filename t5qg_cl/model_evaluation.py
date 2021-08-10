@@ -8,7 +8,7 @@ def get_options():
     parser = argparse.ArgumentParser(description='evaluate T5.')
     # model training configuration
     parser.add_argument('-d', '--dataset', help='dataset', default='squad', type=str)
-    parser.add_argument('-m', '--model', help='pretrained language model', default='./ckpt/epoch_8', type=str)
+    parser.add_argument('-m', '--model', help='pretrained language model', required=True, type=str)
     parser.add_argument('-b', '--batch', help='batch size', default=32, type=int)
     parser.add_argument('-e', '--export-dir', help='export dir', required=True, type=str)
     parser.add_argument('--num-beams', help='n  beams', default=4, type=int)
