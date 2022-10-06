@@ -174,7 +174,10 @@ def evaluate(export_dir: str = '.',
              bleu_only: bool = False,
              overwrite: bool = False,
              use_auth_token: bool = False,
-             language: str = 'en'):
+             language: str = 'en',
+             test_split: str = 'test',
+             validation_split: str = 'validation'
+             ):
     """ Evaluate question-generation model """
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
@@ -212,11 +215,11 @@ def evaluate(export_dir: str = '.',
             return path_hypothesis
 
         try:
-            hypothesis_file_test = get_model_prediction_file('test')
+            hypothesis_file_test = get_model_prediction_file(test_split)
         except ValueError:
             hypothesis_file_test = None
         try:
-            hypothesis_file_dev = get_model_prediction_file('validation')
+            hypothesis_file_dev = get_model_prediction_file(validation_split)
         except ValueError:
             hypothesis_file_dev = None
     assert hypothesis_file_dev is not None or hypothesis_file_test is not None,\
@@ -240,7 +243,7 @@ def evaluate(export_dir: str = '.',
         )
         return __metric
 
-    for _hypothesis_file, _split in zip([hypothesis_file_dev, hypothesis_file_test], ['validation', 'test']):
+    for _hypothesis_file, _split in zip([hypothesis_file_dev, hypothesis_file_test], [validation_split, test_split]):
         if _hypothesis_file is None:
             continue
         # print(_split, metric)

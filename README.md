@@ -49,15 +49,19 @@ pip install lmqg
 ```
 
 ### Model Evaluation
-***TBA***
-
 The evaluation tool reports `BLEU4`, `ROUGE-L`, `METEOR`, `BERTScore`, and `MoverScore` following [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
-
+From command line, run following command 
 ```shell
-lmqg-eval -m ckpt/test/epoch_10/ -e ckpt/test/epoch_10/eval
+lmqg-eval -m "lmqg/t5-large-squad" -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
 ```
+where `-m` is a model alias on huggingface or path to local checkpoint, `-e` is the directly to export the metric file, `-d` is the dataset to evaluate, and `-l` is the language of the test set.
+Instead of running model prediction, you can provide a prediction file instead to avoid computing it each time.
+```shell
+lmqg-eval --hyp-test '{your prediction file}' -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
+```
+The prediction file should be a text file of model generation in each line in the order of `test` split in the target dataset
+([sample](https://huggingface.co/lmqg/t5-large-squad/raw/main/eval/samples.validation.hyp.paragraph_sentence.question.lmqg_qg_squad.default.txt)).
 Check `lmqg-eval -h` to display all the options.
-
 
 ### Model Training
 <p align="center">

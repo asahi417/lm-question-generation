@@ -1,26 +1,31 @@
-"""
-TODO: Update paper & citation info
-"""
 import os
 import json
 import re
 from os.path import join as pj
-from typing import Dict
 from glob import glob
 from lmqg.language_model import TASK_PREFIX
 from datasets import load_dataset
 
 bib = """
-TBA
+@inproceedings{ushio-etal-2022-generative,
+    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration: {A} {U}nified {B}enchmark and {E}valuation",
+    author = "Ushio, Asahi  and
+        Alva-Manchego, Fernando and
+        Camacho-Collados, Jose",
+    booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, U.A.E.",
+    publisher = "Association for Computational Linguistics",
+}
 """
-
+paper_link = "[TBA](TBA)"
 version_description = {
     'default': "This model is fine-tuned without parameter search (default configuration is taken from [ERNIE-GEN](https://arxiv.org/abs/2001.11314)).",
     'no-answer': "This model is fine-tuned without answer information, i.e. generate a question only given a paragraph (note that normal model is fine-tuned to generate a question given a pargraph and an associated answer in the paragraph).",
     'no-paragraph': "This model is fine-tuned without pargraph information but only the sentence that contains the answer.",
     'multitask': "This model is fine-tuned on the answer extraction task as well as the question generation."
 }
-
 sample_qg_dict = {
     "en": [
         "<hl> Beyonce <hl> further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records.",
@@ -63,7 +68,6 @@ sample_qg_dict = {
         "il <hl> Giappone <hl> è stato il paese più dipendente dal petrolio arabo."
     ]
 }
-
 sample_qa_dict = {
     "en": [
         "<hl> Beyonce further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records. <hl> Her performance in the film received praise from critics, and she garnered several nominations for her portrayal of James, including a Satellite Award nomination for Best Supporting Actress, and a NAACP Image Award nomination for Outstanding Supporting Actress.",
@@ -98,7 +102,6 @@ sample_qa_dict = {
         "<hl> Furono introdotti autocarri compatti, come la Toyota Hilux e il Datsun Truck, seguiti dal camion Mazda (venduto come il Ford Courier), e l' Isuzu costruito Chevrolet LUV. <hl> Mitsubishi rebranded il suo Forte come Dodge D-50 pochi anni dopo la crisi petrolifera. Mazda, Mitsubishi e Isuzu avevano partnership congiunte rispettivamente con Ford, Chrysler e GM. In seguito i produttori americani introdussero le loro sostituzioni nazionali (Ford Ranger, Dodge Dakota e la Chevrolet S10/GMC S-15), ponendo fine alla loro politica di importazione vincolata."
     ]
 }
-
 language_dict = {
     "qg_squad": 'en',
     "qg_frquad": 'fr',
@@ -137,18 +140,29 @@ def format_metric(dataset, dataset_type, metric):
 
 
 def format_usage(model_name, sample_qg, sample_qa):
-    qg_usage = f"""
+    if len(sample_qa) > 0:
+        qg_usage = f"""
+from transformers import pipeline
+
+model_path = '{model_name}'
+pipe = pipeline("text2text-generation", model_path)
+
+# Answer Extraction
+answer = pipe('{sample_qa[0]}')
+
+# Question Generation
+question = pipe('{sample_qg[0]}')
+"""
+    else:
+        qg_usage = f"""
 from transformers import pipeline
 
 model_path = '{model_name}'
 pipe = pipeline("text2text-generation", model_path)
 
 # Question Generation
-question = pipe('{sample_qg[0]}')"""
-    if len(sample_qa) > 0:
-        qg_usage += f"""
-# Answer Extraction
-answer = pipe('{sample_qa[0]}')"""
+question = pipe('{sample_qg[0]}')
+"""
     return qg_usage
 
 
@@ -278,10 +292,16 @@ model-index:
 {metrics}
 ---
 
-# Language Models Fine-tuning on Question Generation: `{model_name}`
+# Model Card of `{model_name}`
 This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task on the 
-[{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}).
+[{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation).
 {add_info}
+
+Please cite our paper if you use the model ({paper_link}).
+
+```
+{bib}
+```
 
 ### Overview
 - **Language model:** [{language_model}](https://huggingface.co/{language_model})   
@@ -289,7 +309,7 @@ This model is fine-tuned version of [{language_model}](https://huggingface.co/{l
 - **Training data:** [{dataset}](https://huggingface.co/datasets/{dataset}) ({dataset_name})
 - **Online Demo:** [https://autoqg.net/](https://autoqg.net/)
 - **Repository:** [https://github.com/asahi417/lm-question-generation](https://github.com/asahi417/lm-question-generation)
-- **Paper:** [TBA](TBA)
+- **Paper:** {paper_link}
 
 ### Usage
 ```python
@@ -310,5 +330,5 @@ The following hyperparameters were used during fine-tuning:
 The full configuration can be found at [fine-tuning config file](https://huggingface.co/{model_name}/raw/main/trainer_config.json).
 
 ## Citation
-TBA
+{bib}
 """
