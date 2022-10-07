@@ -6,7 +6,7 @@
 # Generative Language Models for Paragraph-Level Question Generation
 
 <p align="center">
-  <img src="https://github.com/asahi417/lm-question-generation/blob/master/assets/qg_diagram.png" width="500">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qg_diagram.png" width="500">
 </p>
 
 This is the official repository of the paper

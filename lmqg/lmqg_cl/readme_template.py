@@ -330,5 +330,7 @@ The following hyperparameters were used during fine-tuning:
 The full configuration can be found at [fine-tuning config file](https://huggingface.co/{model_name}/raw/main/trainer_config.json).
 
 ## Citation
+```
 {bib}
+```
 """
