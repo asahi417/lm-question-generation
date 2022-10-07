@@ -34,13 +34,13 @@ setup(
             'fastapi',
             'pydantic',
             'spacy_ke',
-            'pytextrank',
             'pydantic',
             'protobuf',
             'psutil'
         ]
     },
     install_requires=[
+        'pytextrank',
         "torch",
         "tqdm",
         "requests",

@@ -40,6 +40,8 @@ Please cite following paper if you use any resource:
 ```
 
 ## LMQG: Language Model for Question Generation 🚀
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13izkdp2l7G2oeh_fwL7xJdR_67HMK_hQ?usp=sharing)
+
 The `lmqg` is a python library to fine-tune seq2seq language models ([T5](https://arxiv.org/pdf/1910.10683.pdf), [BART](https://arxiv.org/pdf/1910.13461.pdf)) 
 on the question generation task and provide an API to host the model prediction via [huggingface](https://huggingface.co/).
 Let's install `lmqg` via pip first.
