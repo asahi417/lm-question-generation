@@ -65,7 +65,7 @@ Check `lmqg-eval -h` to display all the options.
 
 ### Model Training
 <p align="center">
-  <img src="https://github.com/asahi417/lm-question-generation/blob/master/assets/grid_search.png" width="500">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/grid_search.png" width="500">
 </p>
 
 To fine-tune QG model, we employ a two-stage hyper-parameter optimization, described as above diagram.
@@ -91,7 +91,7 @@ trainer.run()
 ## AutoQG
 
 <p align="center">
-  <img src="https://github.com/asahi417/lm-question-generation/blob/master/assets/autoqg.gif" width="500">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/autoqg.gif" width="500">
 </p>
 
 ***AutoQG ([https://autoqg.net](https://autoqg.net/))*** is a free web application hosting our QG models.
@@ -99,7 +99,7 @@ The QG models are listed at the [QG-Bench page](https://github.com/asahi417/lm-q
 
 ## Rest API with huggingface inference API
 <p align="center">
-  <img src="https://github.com/asahi417/lm-question-generation/blob/master/assets/api.png" width="600">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/api.png" width="600">
 </p>
 
 We provide a rest API which hosts the model inference through huggingface inference API. You need huggingface API token to run your own API and install dependencies as below.
