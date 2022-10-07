@@ -154,9 +154,6 @@ trainer.run()
 The QG models are listed at the [QG-Bench page](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
 
 ## Rest API with huggingface inference API
-<p align="center">
-  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/api.png" width="600">
-</p>
 
 We provide a rest API which hosts the model inference through huggingface inference API. You need huggingface API token to run your own API and install dependencies as below.
 ```shell
@@ -164,6 +161,7 @@ pip install lmqg[api]
 ```
 Swagger UI is available at [`http://127.0.0.1:8080/docs`](http://127.0.0.1:8080/docs), when you run the app locally (replace the address by your server address).
 
+### Build
 - Build/Run Local (command line):
 ```shell
 export API_TOKEN={Your Huggingface API Token}
@@ -177,6 +175,26 @@ docker build -t lmqg/app:latest . --build-arg api_token={Your Huggingface API To
 docker run -p 8080:8080 lmqg/app:latest
 ```
 
+### API Description
+You must pass the huggingface api token via the environmental variable `API_TOKEN`.
+The main endpoint is `question_generation`, which has following parameters,
+
+| Parameter        | Description                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| **input_text**   | input text, a paragraph or a sentence to generate question |
+| **language**     | language |
+| **qg_model**     | question generation model |
+| **answer_model** | answer extraction model |
+
+and return a list of dictionaries with `question` and `answer`. 
+```python
+{
+  "qa": [
+    {"question": "Who founded Nintendo Karuta?", "answer": "Fusajiro Yamauchi"},
+    {"question": "When did Nintendo distribute its first video game console, the Color TV-Game?", "answer": "1977"}
+  ]
+}
+```
 
 ## Misc
 Following link is useful if you need to reproduce the results in our paper.
