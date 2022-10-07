@@ -50,12 +50,49 @@ pip install lmqg
 
 ### Generate Question & Answer
 [](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction)
+
+- ***Generate Question on Answers:*** This is the basic usecase of our QG models, where one provide a paragraph and an answer to generate a question that is answerable by the answer on given the paragraph. 
+
 ```python
 from lmqg import TransformersQG
-model = TransformersQG(language='en', model='lmqg/t5-small-squad-multitask')
-context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
-prediction = model.generate_qa(context)
+# initialize model
+model = TransformersQG(language='en', model='lmqg/t5-large-squad-multitask')
+# a list of paragraph
+context = [
+    "William Turner was an English painter who specialised in watercolour landscapes",
+    "William Turner was an English painter who specialised in watercolour landscapes"
+]
+# a list of answer (same size as the context)
+answer = [
+    "William Turner",
+    "English"
+]
+# model prediction
+question = model.generate_q(list_context=context, list_answer=answer)
+print(question)
+[
+    'Who was an English painter who specialised in watercolour landscapes?',
+    'What nationality was William Turner?'
+]
+```
 
+- ***Generate Question & Answer Pair:*** Instead of specifying an answer, let a model to generate an answer on the paragraph, and generate question on it.  
+```python
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='en', model='lmqg/t5-large-squad-multitask')
+# paragraph to generate pairs of question and answer
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
+# model prediction
+question_answer = model.generate_qa(context)
+# the output is a list of tuple (question, answer)
+print(question_answer)
+[
+    ('Who was an English painter who specialised in watercolour landscapes?', 'William Turner'),
+    ("What was William Turner's nickname?", 'William Turner of Oxford'),
+    ("What did many of Turner's paintings depict around Oxford?", 'countryside'),
+    ("What is one of William Turner's best known paintings?", 'a view of the city of Oxford')
+]
 ```
 
 ### Model Evaluation

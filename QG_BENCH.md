@@ -1,4 +1,4 @@
-# QG-Bench
+# QG-Bench and Fine-tuned Models
 QG-Bench consists of question generation datasets in 8 different languages and 11 diverse domains.
 All the datasets are shared on huggingface via the [link below](#datasets).
 To use the dataset, first install `datasets` library (`pip install datasets`) and load the dataset.
@@ -64,22 +64,47 @@ See more detail at our paper (TBA)
 | [SQuADShifts/Reddit (`lmqg/qg_squadshifts`)](https://huggingface.co/datasets/lmqg/qg_squadshifts) |       3,268/1,634/4,901      |                         774/116/45/19                         |
 
 
-## Models
+## QG Models
 We release QG models fine-tuned on every dataset in QG-Bench. Following models are available via the transformers modelhub and can be used as below.
+We recommend to use the models via [`lmqg`](https://github.com/asahi417/lm-question-generation#lmqg-language-model-for-question-generation-), but they are compatible with [`transformers`](https://github.com/huggingface/transformers) too.
 
+- With `lmqg` library
+```python
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='en', model='lmqg/t5-large-squad')
+# a list of paragraph
+context = [
+    "William Turner was an English painter who specialised in watercolour landscapes",
+    "William Turner was an English painter who specialised in watercolour landscapes"
+]
+# a list of answer (same size as the context)
+answer = [
+    "William Turner",
+    "English"
+]
+# model prediction
+question = model.generate_q(list_context=context, list_answer=answer)
+print(question)
+[
+    'Who was an English painter who specialised in watercolour landscapes?',
+    'What nationality was William Turner?'
+]
+```
+
+- With `transformers` library
 ```python
 from transformers import pipeline
 
-model_path = 'lmqg/t5-small-squad'
-pipe = pipeline("text2text-generation", model_path)
-
-# Question Generation
+pipe = pipeline("text2text-generation", 'lmqg/t5-large-squad')
+# model prediction
 input_text = 'generate question: <hl> Beyonce <hl> further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records.'
 pipe(input_text)
 [{'generated_text': 'Who starred as Etta James in Cadillac Records?'}]
 ```
 
-- English QG model fine-tuned on [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad). The data split follows [Du, et al 2017](https://arxiv.org/pdf/1805.05942.pdf) and [Du, et al 2018](https://arxiv.org/pdf/1705.00106.pdf).
+### English QG Models
+English QG model fine-tuned on [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad). The data split follows [Du, et al 2017](https://arxiv.org/pdf/1805.05942.pdf) and [Du, et al 2018](https://arxiv.org/pdf/1705.00106.pdf).
 
 | model                                                                   | language model                                    | training data                                                    | test data                                                        | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
 |-------------------------------------------------------------------------|---------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|-------|--------|---------|-----------|------------|
@@ -89,7 +114,8 @@ pipe(input_text)
 | [`lmqg/bart-base-squad`](https://huggingface.co/lmqg/bart-base-squad)   | [`facebook/bart-base`](https://huggingface.co/facebook/bart-base)   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.68 |  26.05 |   52.66 |     90.87 |      64.47 |
 | [`lmqg/bart-large-squad`](https://huggingface.co/lmqg/bart-large-squad) | [`facebook/bart-large`](https://huggingface.co/facebook/bart-large) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.17 |  27.07 |   53.85 |     91.00 |      64.99 |
 
-- Non-English QG model fine-tuned on QG-Bench (multilingual).
+### Non-English QG Models
+Non-English QG model fine-tuned on QG-Bench (multilingual).
 
 | model                                                                                 | language model                                                                  | training data                                                      | test data                                                          | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
 |---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|-------|--------|---------|-----------|------------|
@@ -119,10 +145,31 @@ pipe(input_text)
 | [`lmqg/mbart-large-cc25-frquad`](https://huggingface.co/lmqg/mbart-large-cc25-frquad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  0.72 |   7.78 |   16.40 |     71.48 |      50.35 |
 
 
-### Models with Answer Extraction
+## QG Models with Answer Extraction 
 To achieve an end-to-end question and answer generation, we fine-tune language models on the both of question generation and 
 answer extraction jointly. Following model can perform both of question generation and answer extraction.
 
+- With `lmqg` library
+
+```python
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='en', model='lmqg/t5-large-squad-multitask')
+# paragraph to generate pairs of question and answer
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
+# model prediction
+question_answer = model.generate_qa(context)
+# the output is a list of tuple (question, answer)
+print(question_answer)
+[
+    ('Who was an English painter who specialised in watercolour landscapes?', 'William Turner'),
+    ("What was William Turner's nickname?", 'William Turner of Oxford'),
+    ("What did many of Turner's paintings depict around Oxford?", 'countryside'),
+    ("What is one of William Turner's best known paintings?", 'a view of the city of Oxford')
+]
+```
+
+- With `transformers` library
 ```python
 from transformers import pipeline
 
@@ -154,32 +201,3 @@ print(question)
 | [`lmqg/mt5-small-esquad-multitask`](https://huggingface.co/lmqg/mt5-small-esquad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | 8.79   | 21.66  | 23.13   | 83.39     | 58.34      |
 | [`lmqg/mt5-small-dequad-multitask`](https://huggingface.co/lmqg/mt5-small-dequad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | 0.82   | 12.18  | 10.15   | 80.39     | 55.10      |
 | [`lmqg/mt5-small-frquad-multitask`](https://huggingface.co/lmqg/mt5-small-frquad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | 7.75   | 17.62  | 28.06   | 79.90     | 56.44      |
-
-
-### Zero-shot Cross-lingual Transfer
-Zero-shot cross-lingual transfer of multilingual language models fine-tuned on [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad).
-
-| model                                                                               | language model                                                                  | training data                                                    | test data                                                          | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
-|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------|--------------------------------------------------------------------|-------|--------|---------|-----------|------------|
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) |  0.00 |   1.78 |    0.99 |     70.89 |      49.10 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) |  0.00 |   0.51 |    6.08 |     66.08 |      46.53 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_itquad`](https://huggingface.co/datasets/lmqg/qg_itquad) |  0.54 |   5.89 |    5.01 |     72.60 |      50.23 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) |  0.00 |   0.73 |    0.06 |     66.34 |      45.86 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) |  0.59 |   6.02 |    5.21 |     74.94 |      50.62 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) |  0.00 |   4.81 |    1.56 |     73.53 |      50.37 |
-| [`lmqg/mt5-small-squad`](https://huggingface.co/lmqg/mt5-small-squad)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  1.71 |   8.24 |   15.84 |     72.91 |      50.96 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) |  0.12 |   2.35 |    7.85 |     25.93 |      46.08 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) |  0.08 |   1.77 |    6.17 |     19.80 |      45.59 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_itquad`](https://huggingface.co/datasets/lmqg/qg_itquad) |  0.39 |   3.64 |   12.55 |     40.93 |      47.18 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) |  0.43 |   3.05 |   10.23 |     31.82 |      46.64 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) |  0.45 |   4.96 |   17.95 |     60.29 |      48.67 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) |  0.00 |   1.01 |    3.40 |     11.00 |      44.95 |
-| [`lmqg/mt5-base-squad`](https://huggingface.co/lmqg/mt5-base-squad)                 | [`mt5-base`](https://huggingface.co/mt5-base)                                   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  0.02 |   1.44 |    4.76 |     16.28 |      45.30 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) |  0.18 |   2.65 |    8.34 |     26.19 |      46.09 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) |  0.06 |   1.74 |    6.11 |     19.89 |      45.51 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_itquad`](https://huggingface.co/datasets/lmqg/qg_itquad) |  0.48 |   3.84 |   13.25 |     41.46 |      47.28 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) |  0.38 |   3.06 |   10.34 |     31.67 |      46.59 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) |  0.57 |   5.27 |   18.99 |     60.73 |      48.76 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) |  0.00 |   1.05 |    3.40 |     11.05 |      44.94 |
-| [`lmqg/mbart-large-cc25-squad`](https://huggingface.co/lmqg/mbart-large-cc25-squad) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  0.02 |   1.55 |    5.13 |     16.47 |      45.35 |
-
