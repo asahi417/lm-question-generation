@@ -82,9 +82,10 @@ class Trainer:
                  gradient_accumulation_steps: int = 4,
                  label_smoothing: float = None,
                  disable_log: bool = False,
-                 config_file: str = 'trainer_config.json'):
+                 config_file: str = 'trainer_config.json',
+                 use_auth_token: bool = False):
         logging.info('initialize model trainer')
-
+        self.use_auth_token = use_auth_token
         # config
         self.config = Config(
             config_file=config_file, checkpoint_dir=checkpoint_dir, dataset_path=dataset_path, dataset_name=dataset_name,
@@ -194,8 +195,7 @@ class Trainer:
         if os.path.exists(path):
             os.remove(path)
 
-    def train(self, epoch_save: None or int = 1, interval: int = 25, epoch_partial: int = None,
-              use_auth_token: bool = False):
+    def train(self, epoch_save: None or int = 1, interval: int = 25, epoch_partial: int = None):
         """ Train model.
 
         @param epoch_save: Save the model every this epoch.
@@ -213,7 +213,7 @@ class Trainer:
         for (i, o, p), cache_path in self.data_cache_paths:
             text_input, text_output = get_dataset(
                 self.config.dataset_path, self.config.dataset_name, split='train', input_type=i, output_type=o,
-                use_auth_token=use_auth_token)
+                use_auth_token=self.use_auth_token)
             encode_list += self.model.text_to_encode(text_input, text_output, prefix_type=p, cache_path=cache_path)
         loader = self.model.get_data_loader(encode_list, batch_size=self.config.batch, shuffle=True, drop_last=True)
 

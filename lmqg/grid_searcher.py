@@ -37,7 +37,7 @@ class GridSearcher:
                  prediction_aggregation: str = 'first', prediction_level: str = 'sentence',
                  batch: int = 128, batch_eval: int = 32, n_beams_eval: int = 4, lr: List or float = 1e-4,
                  label_smoothing: List or float = None, random_seed: List or int = 42, language: str = 'en',
-                 normalize: bool = True):
+                 normalize: bool = True, use_auth_token: bool = False):
 
         # evaluation configs
         max_length_eval = max_length if max_length_eval is None else max_length_eval
@@ -61,6 +61,7 @@ class GridSearcher:
         self.batch_eval = batch_eval
         self.checkpoint_dir = checkpoint_dir
         self.n_max_config = n_max_config
+        self.use_auth_token = use_auth_token
         self.split, self.metric = metric.split('/')
 
         self.dynamic_config = {
@@ -138,7 +139,7 @@ class GridSearcher:
         )
         data_cache_paths = {split: f"{prefix}.{split}.{p}.pkl" for split in ['test', 'validation']}
 
-        def get_evaluation(_checkpoint_dir_model, use_auth_token: bool = False):
+        def get_evaluation(_checkpoint_dir_model):
             return evaluate(
                 export_dir=pj(_checkpoint_dir_model, 'eval'),
                 batch_size=self.batch_eval,
@@ -155,11 +156,11 @@ class GridSearcher:
                 prediction_aggregation=self.eval_config['prediction_aggregation'],
                 prediction_level=self.eval_config['prediction_level'],
                 language=self.eval_config['language'],
-                use_auth_token=use_auth_token,
+                use_auth_token=self.use_auth_token,
                 data_caches=data_cache_paths)
         return get_evaluation
 
-    def run(self, interval: int = 25, overwrite: bool = False, use_auth_token: bool = False):
+    def run(self, interval: int = 25, overwrite: bool = False):
 
         self.initialize_searcher()
 
@@ -200,9 +201,10 @@ class GridSearcher:
                 raise ValueError(f'duplicated checkpoints are found: \n {duplicated_ckpt}')
 
             if not os.path.exists(pj(checkpoint_dir, f'epoch_{self.epoch_partial}')):
-                trainer = Trainer(checkpoint_dir=checkpoint_dir, disable_log=True, **config)
+                trainer = Trainer(
+                    checkpoint_dir=checkpoint_dir, disable_log=True, use_auth_token=self.use_auth_token, **config)
                 trainer.train(
-                    epoch_partial=self.epoch_partial, epoch_save=1, interval=interval, use_auth_token=use_auth_token)
+                    epoch_partial=self.epoch_partial, epoch_save=1, interval=interval)
 
             checkpoints.append(checkpoint_dir)
 
@@ -210,7 +212,7 @@ class GridSearcher:
         for n, checkpoint_dir in enumerate(checkpoints):
             logging.info(f'## 1st RUN (EVAL): Configuration {n}/{len(checkpoints)} ##')
             checkpoint_dir_model = pj(checkpoint_dir, f'epoch_{self.epoch_partial}')
-            metric = evaluator(checkpoint_dir_model, use_auth_token=use_auth_token)
+            metric = evaluator(checkpoint_dir_model)
             # except Exception:
             metrics[checkpoint_dir_model] = metric[self.split][self.metric]
 
@@ -235,8 +237,8 @@ class GridSearcher:
             logging.info(f'## 2nd RUN: Configuration {n}/{len(metrics)}: {self.split}/{self.metric} = {_metric}')
             model_ckpt = os.path.dirname(checkpoint_dir_model)
             if not os.path.exists(pj(model_ckpt, f'epoch_{self.epoch}')):
-                trainer = Trainer(checkpoint_dir=model_ckpt, disable_log=True)
-                trainer.train(epoch_save=1, interval=interval, use_auth_token=use_auth_token)
+                trainer = Trainer(checkpoint_dir=model_ckpt, disable_log=True, use_auth_token=self.use_auth_token)
+                trainer.train(epoch_save=1, interval=interval)
 
             checkpoints.append(model_ckpt)
 
@@ -246,7 +248,7 @@ class GridSearcher:
             for checkpoint_dir_model in sorted(glob.glob(pj(checkpoint_dir, 'epoch_*'))):
                 if int(checkpoint_dir_model.split(os.path.sep)[-1].replace('epoch_', '')) > self.static_config['epoch']:
                     continue
-                metric = evaluator(checkpoint_dir_model, use_auth_token=use_auth_token)
+                metric = evaluator(checkpoint_dir_model)
                 metrics[checkpoint_dir_model] = metric[self.split][self.metric]
 
         metrics = sorted(metrics.items(), key=lambda x: x[1], reverse=True)
@@ -277,10 +279,11 @@ class GridSearcher:
                 checkpoint_dir_model = pj(best_model_dir, f'epoch_{epoch}')
                 if not os.path.exists(checkpoint_dir_model):
                     trainer = Trainer(
-                        checkpoint_dir=best_model_dir, config_file='trainer_config.additional_training.json', disable_log=True)
-                    trainer.train(epoch_save=1, interval=interval, use_auth_token=use_auth_token)
+                        checkpoint_dir=best_model_dir, config_file='trainer_config.additional_training.json',
+                        disable_log=True, use_auth_token=self.use_auth_token)
+                    trainer.train(epoch_save=1, interval=interval)
                 logging.info(f'## 3rd RUN (EVAL): epoch {epoch} ##')
-                metric = evaluator(checkpoint_dir_model, use_auth_token=use_auth_token)
+                metric = evaluator(checkpoint_dir_model)
                 tmp_metric_score = metric[self.split][self.metric]
                 metric_list.append([epoch, tmp_metric_score])
                 logging.info(f'\t tmp metric: {tmp_metric_score}')

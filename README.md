@@ -48,6 +48,16 @@ Let's install `lmqg` via pip first.
 pip install lmqg
 ```
 
+### Generate Question & Answer
+[](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction)
+```python
+from lmqg import TransformersQG
+model = TransformersQG(language='en', model='lmqg/t5-small-squad-multitask')
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
+prediction = model.generate_qa(context)
+
+```
+
 ### Model Evaluation
 The evaluation tool reports `BLEU4`, `ROUGE-L`, `METEOR`, `BERTScore`, and `MoverScore` following [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
 From command line, run following command 

@@ -45,7 +45,7 @@ def highlight_sentence(input_text: str, highlight_span: str, prefix: str = None)
 class TransformersQGInferenceAPI:
 
     def __init__(self,
-                 qg_model: str,
+                 model: str,
                  language: str,
                  api_token: str,
                  answer_model: str = None,
@@ -54,9 +54,9 @@ class TransformersQGInferenceAPI:
                  add_prefix_answer: bool = None,
                  keyword_extraction_model: str = 'positionrank'):
         logging.info('initialize TransformersQGInferenceAPI:')
-        logging.info(f'\n\tqg:{qg_model}\n\tqa:{answer_model}\n\tla:{language}')
+        logging.info(f'\n\tqg:{model}\n\tqa:{answer_model}\n\tla:{language}')
         self.language = language
-        self.qg_model = qg_model
+        self.qg_model = model
         if add_prefix_qg is None:
             config_qg_model = transformers.AutoConfig.from_pretrained(self.qg_model, cache_dir=cache_dir)
             self.add_prefix_qg = config_qg_model.add_prefix

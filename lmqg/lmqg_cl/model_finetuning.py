@@ -88,8 +88,9 @@ def main_training():
         max_length_output=opt.max_length_output,
         fp16=opt.fp16,
         gradient_accumulation_steps=opt.gradient_accumulation_steps,
-        label_smoothing=opt.label_smoothing)
-    trainer.train(interval=opt.interval, epoch_save=opt.epoch_save, use_auth_token=opt.use_auth_token)
+        label_smoothing=opt.label_smoothing,
+        use_auth_token=opt.use_auth_token)
+    trainer.train(interval=opt.interval, epoch_save=opt.epoch_save)
 
 
 def main_training_search():
@@ -126,7 +127,8 @@ def main_training_search():
         prediction_level=opt.prediction_level,
         max_length_output_eval=opt.max_length_output_eval,
         max_length_eval=opt.max_length_eval,
-        language=opt.language
+        language=opt.language,
+        use_auth_token=opt.use_auth_token
     )
-    trainer.run(interval=opt.interval, overwrite=opt.overwrite, use_auth_token=opt.use_auth_token)
+    trainer.run(interval=opt.interval, overwrite=opt.overwrite)
 

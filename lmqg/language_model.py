@@ -3,6 +3,7 @@ import os
 import logging
 import pickle
 import re
+import urllib
 from itertools import chain
 from typing import List, Dict
 from multiprocessing import Pool
@@ -21,6 +22,16 @@ CE_IGNORE_INDEX = -100
 ADDITIONAL_SP_TOKENS = {'hl': '<hl>'}
 NUM_WORKERS = int(os.getenv('NUM_WORKERS', '0'))
 PARALLEL_PROCESSING = bool(int(os.getenv('PARALLEL_PROCESSING', '1')))
+DEFAULT_MODELS = {
+    'en': 'lmqg/t5-small-squad-multitask',
+    'ja': 'lmqg/mt5-small-jaquad-multitask',
+    'de': 'lmqg/mt5-small-dequad-multitask',
+    'es': 'lmqg/mt5-small-esquad-multitask',
+    'ko': 'lmqg/mt5-small-koquad-multitask',
+    'ru': 'lmqg/mt5-small-ruquad-multitask',
+    'it': 'lmqg/mt5-small-itquad-multitask',
+    'fr': 'lmqg/mt5-small-frquad-multitask',
+}
 
 
 def pickle_save(obj, path: str):
@@ -41,17 +52,22 @@ def clean(string):
     return None
 
 
-def load_language_model(model_name, cache_dir: str = None):
+def internet_connection(host='http://google.com'):
+    try:
+        urllib.request.urlopen(host)
+        return True
+    except:
+        return False
+
+
+def load_language_model(model_name, cache_dir: str = None, use_auth_token: bool = False):
     """ load language model from huggingface model hub """
     # tokenizer
-    try:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
-    except ValueError:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir, local_files_only=True)
-    try:
-        config = transformers.AutoConfig.from_pretrained(model_name, cache_dir=cache_dir)
-    except ValueError:
-        config = transformers.AutoConfig.from_pretrained(model_name, local_files_only=True, cache_dir=cache_dir)
+    local_files_only = not internet_connection
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        model_name, cache_dir=cache_dir, local_files_only=local_files_only, use_auth_token=use_auth_token)
+    config = transformers.AutoConfig.from_pretrained(
+        model_name, local_files_only=local_files_only, cache_dir=cache_dir, use_auth_token=use_auth_token)
 
     # model
     if config.model_type == 't5':  # T5 model requires T5ForConditionalGeneration class
@@ -64,10 +80,8 @@ def load_language_model(model_name, cache_dir: str = None):
         model_class = transformers.MBartForConditionalGeneration.from_pretrained
     else:
         raise ValueError(f'unsupported model type: {config.model_type}')
-    try:
-        model = model_class(model_name, config=config, cache_dir=cache_dir)
-    except ValueError:
-        model = model_class(model_name, config=config, cache_dir=cache_dir, local_files_only=True)
+    model = model_class(
+        model_name, config=config, cache_dir=cache_dir, local_files_only=local_files_only, use_auth_token=use_auth_token)
     # add new special tokens to the tokenizer and the model if they don't have it
     tokenizer.add_special_tokens({'additional_special_tokens': list(ADDITIONAL_SP_TOKENS.values())})
     model.resize_token_embeddings(len(tokenizer))
@@ -121,8 +135,14 @@ class Dataset(torch.utils.data.Dataset):
 class EncodePlus:
     """ Wrapper of encode_plus for multiprocessing. """
 
-    def __init__(self, tokenizer, max_length: int = 512, max_length_output: int = 34, drop_overflow_text: bool = False,
-                 skip_overflow_error: bool = False, skip_highlight_error: bool = False, prefix_type: str = None,
+    def __init__(self,
+                 tokenizer,
+                 max_length: int = 512,
+                 max_length_output: int = 34,
+                 drop_overflow_text: bool = False,
+                 skip_overflow_error: bool = False,
+                 skip_highlight_error: bool = False,
+                 prefix_type: str = None,
                  padding: bool = True):
         """ Wrapper of encode_plus for multiprocessing.
 
@@ -196,10 +216,19 @@ class EncodePlus:
 class TransformersQG:
     """ Transformers Language Model for Question Generation. """
 
-    def __init__(self, model: str, max_length: int = 512, max_length_output: int = 32, cache_dir: str = None,
-                 add_prefix: bool = None, language: str = 'en', label_smoothing: float = None,
-                 drop_overflow_text: bool = False, skip_overflow_error: bool = False,
-                 skip_highlight_error: bool = False, keyword_extraction_model: str = 'positionrank'):
+    def __init__(self,
+                 model: str = None,
+                 max_length: int = 512,
+                 max_length_output: int = 32,
+                 cache_dir: str = None,
+                 add_prefix: bool = None,
+                 language: str = 'en',
+                 label_smoothing: float = None,
+                 drop_overflow_text: bool = False,
+                 skip_overflow_error: bool = False,
+                 skip_highlight_error: bool = False,
+                 keyword_extraction_model: str = 'positionrank',
+                 use_auth_token: bool = False):
         """ Transformers Language Model for Question Generation.
 
         @param model: Model alias or path to local model file.
@@ -212,7 +241,13 @@ class TransformersQG:
         @param drop_overflow_text: If true, return None when the input exceeds the max length.
         @param skip_overflow_error: If true, raise an error when the input exceeds the max length.
         @param skip_highlight_error: If true, raise an error when a highlight span is not found in the paragraph.
+        @param use_auth_token: [optional] Huggingface transformers argument of `use_auth_token`
         """
+        if model is None:
+            assert language in DEFAULT_MODELS.keys(), f"Model with language '{language}' is not available. " \
+                                                      f"Please choose language from '{DEFAULT_MODELS.keys()}'," \
+                                                      f"or specify 'model'."
+            model = DEFAULT_MODELS[language]
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -220,9 +255,10 @@ class TransformersQG:
         self.drop_overflow_text = drop_overflow_text
         self.skip_overflow_error = skip_overflow_error
         self.skip_highlight_error = skip_highlight_error
-        self.tokenizer, self.model, config = load_language_model(self.model_name, cache_dir=cache_dir)
+        self.tokenizer, self.model, config = load_language_model(
+            self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
         self.add_prefix = config.add_prefix if 'add_prefix' in config.to_dict().keys() else add_prefix
-        assert self.add_prefix is not None, '`add_prefix` is required for not-trained models'
+        assert self.add_prefix is not None, '`add_prefix` is required for non-fine-tuned models'
         self.spacy_module = SpacyPipeline(language, keyword_extraction_model)
         # GPU setup
         self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
@@ -236,8 +272,14 @@ class TransformersQG:
         logging.info(f'\t * Prefix: {self.add_prefix}')
         logging.info(f'\t * Language: {language} (ignore at the training phase)')
 
-    def generate_qa(self, context: str, batch_size: int = None, num_beams: int = 4, cache_path: str = None,
-                    answer_model: str = 'keyword_extraction', num_questions: int = 10, sentence_level: bool = False):
+    def generate_qa(self,
+                    context: str,
+                    batch_size: int = None,
+                    num_beams: int = 4,
+                    cache_path: str = None,
+                    answer_model: str = None,
+                    num_questions: int = 10,
+                    sentence_level: bool = False):
         """ Generate question given context.
 
         @param context: Input text.
@@ -251,16 +293,10 @@ class TransformersQG:
         @param sentence_level: Run prediction on each sentence of the context independently to reduce complexity.
         @return: List of generated sentences.
         """
-        logging.info(f'running model for `answer_extraction`: {answer_model}')
-        if answer_model == 'keyword_extraction':
-            list_answer = self.spacy_module.keyword(context, num_questions)
-        elif answer_model == 'language_model':
-            list_answer = self.generate_a(
-                context, batch_size=batch_size, num_beams=num_beams, cache_path=cache_path,
-                sentence_level=sentence_level)
-            list_answer = list_answer[:min(num_questions, len(list_answer))]
-        else:
-            raise ValueError(f'unknown answer model: {answer_model}')
+        list_answer = self.generate_a(
+            context, batch_size=batch_size, num_beams=num_beams, cache_path=cache_path,
+            sentence_level=sentence_level, answer_model=answer_model, num_questions=num_questions
+        )
         list_context = [context] * len(list_answer)
         logging.info('running model for `qg`')
         list_question = self.generate_q(
@@ -270,8 +306,14 @@ class TransformersQG:
         assert len(list_answer) == len(list_question)
         return list(zip(list_question, list_answer))
 
-    def generate_a(self, context: str, batch_size: int = None, num_beams: int = 4, cache_path: str = None,
-                   sentence_level: bool = False):
+    def generate_a(self,
+                   context: str,
+                   batch_size: int = None,
+                   num_beams: int = 4,
+                   cache_path: str = None,
+                   sentence_level: bool = False,
+                   answer_model: str = None,
+                   num_questions: int = None):
         """ Generate answers from each sentence.
 
         @param context: Input text.
@@ -279,22 +321,46 @@ class TransformersQG:
         @param num_beams: Number of beam for model generation.
         @param cache_path: Path to pre-compute features.
         @param sentence_level: Run prediction on each sentence of the context independently to reduce complexity.
+        @param num_questions: Max number of questions.
+        @param answer_model: Type of answer prediction model (`keyword_extraction`. `language_model`).
+            - `keyword`: Keyword extraction model extracts top-n keyword.
+            - `language_model`: LM predicts answers (Model should have been finetuned on `answer_extraction`.
         @return: List of generated answers.
         """
-        list_sentence = self.spacy_module.sentence(context)  # split into sentence
-        prefix_type = 'ae' if self.add_prefix else None
-        list_input = [context] * len(list_sentence)
-        if sentence_level:
-            list_input = list_sentence
-        answer = self.generate_prediction(
-            list_input, highlights=list_sentence, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
-            batch_size=batch_size)
-        answer = [clean(i) for i in answer]
-        answer = list(filter(None, answer))  # remove None
-        answer = list(filter(lambda x: x in context, answer))  # remove answers not in context (should not be happened though)
-        if len(answer) == 0:
-            raise AnswerNotFoundError(context)
-        return answer
+        if answer_model is None:
+            if self.add_prefix:
+                answer_model = 'language_model'
+            else:
+                answer_model = 'keyword_extraction'
+
+        logging.info(f'running model for `answer_extraction`: {answer_model}')
+        if answer_model == 'keyword_extraction':
+            num_questions = 10 if num_questions is None else num_questions
+            return self.spacy_module.keyword(context, num_questions)
+        elif answer_model == 'language_model':
+            list_sentence = self.spacy_module.sentence(context)  # split into sentence
+
+            if not self.add_prefix:
+                raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
+                                 f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
+
+            prefix_type = 'ae' if self.add_prefix else None
+            list_input = [context] * len(list_sentence)
+            if sentence_level:
+                list_input = list_sentence
+            answer = self.generate_prediction(
+                list_input, highlights=list_sentence, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
+                batch_size=batch_size)
+            answer = [clean(i) for i in answer]
+            answer = list(filter(None, answer))  # remove None
+            answer = list(filter(lambda x: x in context, answer))  # remove answers not in context (should not be happened though)
+            if len(answer) == 0:
+                raise AnswerNotFoundError(context)
+            if num_questions is not None:
+                answer = answer[:min(num_questions, len(answer))]
+            return answer
+        else:
+            raise ValueError(f'unknown answer model: {answer_model}')
 
     def generate_q(self,
                    list_context: List,

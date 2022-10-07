@@ -43,8 +43,7 @@ QG_PRETTY_NAME = {
     'mBART LARGE (KO)': 'lmqg/mbart-large-cc25-koquad',
     'mBART LARGE (RU)': 'lmqg/mbart-large-cc25-ruquad',
     'mBART LARGE (IT)': 'lmqg/mbart-large-cc25-itquad',
-    'mBART LARGE (FR)': 'lmqg/mbart-large-cc25-frquad',
-
+    'mBART LARGE (FR)': 'lmqg/mbart-large-cc25-frquad'
 }
 QG_PREFIX_INFO = {k: AutoConfig.from_pretrained(v).add_prefix for k, v in QG_PRETTY_NAME.items()}
 AE_PRETTY_NAME = {
@@ -121,7 +120,7 @@ async def process(model_input: ModelInput):
         if model_input.language in LANGUAGE_MAP:
             model_input.language = LANGUAGE_MAP[model_input.language]
         qg_model = TransformersQGInferenceAPI(
-            qg_model=model_input.qg_model,
+            model=model_input.qg_model,
             answer_model=model_input.answer_model,
             api_token=API_TOKEN,
             language=model_input.language,
