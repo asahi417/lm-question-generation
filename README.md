@@ -15,15 +15,14 @@ A Unified Benchmark and Evaluation, EMNLP 2022 main conference".
 This repository includes following contents:
 - ***QG-Bench***, the first ever multilingual/multidomain QG benchmark.
 - ***Multilingual/multidomain QG models*** fine-tuned on QG-Bench.
-- A python library ***`lmqg`*** developed to fine-tune/evaluate QG model.
+- A python library ***`lmqg`*** developed for question generation in python as well as QG model fine-tuning/evaluation.
 - ***AutoQG***, a web application hosting QG models where user can test the model output interactively. 
 
 ### Table of Contents  
 1. **[QG-Bench: multilingual & multidomain QG datasets (+ fine-tuned models)](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md)**
-2. **[LMQG: python library to fine-tune/evaluate QG model](#lmqg-language-model-for-question-generation)**
+2. **[LMQG: python library to fine-tune/evaluate QG model](#lmqg-language-model-for-question-generation-)**
 3. **[AutoQG: web application hosting multilingual QG models](#autoqg)**
 4. **[RestAPI: run model prediction via restAPI](#rest-api-with-huggingface-inference-api)**
-5. **[Reproduce Analysis of the Paper](#reproduce-analysis)**
 
 Please cite following paper if you use any resource:
 ```
@@ -49,9 +48,9 @@ pip install lmqg
 ```
 
 ### Generate Question & Answer
-[](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction)
 
-- ***Generate Question on Answers:*** This is the basic usecase of our QG models, where one provide a paragraph and an answer to generate a question that is answerable by the answer on given the paragraph. 
+- ***Generate Question on Answers:*** This is a basic usecase of our QG models, where user provides a paragraph and an answer to generate a question that is answerable by the answer given the paragraph.
+See [MODEL CARD](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#qg-models) for the available models.
 
 ```python
 from lmqg import TransformersQG
@@ -76,7 +75,9 @@ print(question)
 ]
 ```
 
-- ***Generate Question & Answer Pair:*** Instead of specifying an answer, let a model to generate an answer on the paragraph, and generate question on it.  
+- ***Generate Question & Answer Pairs:*** Instead of specifying an answer, user can let QG model to generate an answer on the paragraph, and generate question on it sequentially.
+This functionality is only available for the QG models fine-tuned with answer extraction see [MODEL CARD](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction) for the full list of models with answer extraction (model alias usually has a suffix of `-multitask`).
+  
 ```python
 from lmqg import TransformersQG
 # initialize model
@@ -95,6 +96,7 @@ print(question_answer)
 ]
 ```
 
+
 ### Model Evaluation
 The evaluation tool reports `BLEU4`, `ROUGE-L`, `METEOR`, `BERTScore`, and `MoverScore` following [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
 From command line, run following command 
@@ -112,16 +114,14 @@ Check `lmqg-eval -h` to display all the options.
 
 ### Model Training
 <p align="center">
-  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/grid_search.png" width="500">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/grid_search.png" width="650">
 </p>
 
 To fine-tune QG model, we employ a two-stage hyper-parameter optimization, described as above diagram.
 Following command is to run the fine-tuning with parameter optimization.
 ```shell
 lmqg-train-search -c "tmp_ckpt" -d "lmqg/qg_squad" -m "t5-small" -b 64 --epoch-partial 5 -e 15 --language "en" --n-max-config 1 \
-  -g 2 4 \
-  --lr 1e-04 5e-04 1e-03 \
-  --label-smoothing 0 0.15
+  -g 2 4 --lr 1e-04 5e-04 1e-03 --label-smoothing 0 0.15
 ```
 Check `lmqg-train-search -h` to display all the options.
 
@@ -129,8 +129,17 @@ Fine-tuning models in python follows below.
 ```python
 from lmqg import GridSearcher
 trainer = GridSearcher(
-    checkpoint_dir='tmp_ckpt', dataset_path='lmqg/qg_squad', model='t5-small', epoch=15, epoch_partial=5, batch=64, n_max_config=5,
-    gradient_accumulation_steps=[2, 4], lr=[1e-04, 5e-04, 1e-03], label_smoothing=[0, 0.15])
+    checkpoint_dir='tmp_ckpt',
+    dataset_path='lmqg/qg_squad',
+    model='t5-small',
+    epoch=15,
+    epoch_partial=5,
+    batch=64,
+    n_max_config=5,
+    gradient_accumulation_steps=[2, 4], 
+    lr=[1e-04, 5e-04, 1e-03],
+    label_smoothing=[0, 0.15]
+)
 trainer.run()
 ```
 
@@ -169,7 +178,8 @@ docker run -p 8080:8080 lmqg/app:latest
 ```
 
 
-## Reproduce Analysis
+## Misc
+Following link is useful if you need to reproduce the results in our paper.
 - [Model Fine-tuning/Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/qg_model_training)
 - [QA based Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/qa_based_evaluation)
 - [NQG model baseline](https://github.com/asahi417/lm-question-generation/tree/master/misc/nqg_baseline)
