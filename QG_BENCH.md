@@ -201,3 +201,20 @@ print(question)
 | [`lmqg/mt5-small-esquad-multitask`](https://huggingface.co/lmqg/mt5-small-esquad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | 8.79   | 21.66  | 23.13   | 83.39     | 58.34      |
 | [`lmqg/mt5-small-dequad-multitask`](https://huggingface.co/lmqg/mt5-small-dequad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | 0.82   | 12.18  | 10.15   | 80.39     | 55.10      |
 | [`lmqg/mt5-small-frquad-multitask`](https://huggingface.co/lmqg/mt5-small-frquad-multitask) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | 7.75   | 17.62  | 28.06   | 79.90     | 56.44      |
+
+
+## Citation
+Please cite following paper if you use any resource:
+```
+@inproceedings{ushio-etal-2022-generative,
+    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration",
+    author = "Ushio, Asahi  and
+        Alva-Manchego, Fernando  and
+        Camacho-Collados, Jose",
+    booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, U.A.E.",
+    publisher = "Association for Computational Linguistics",
+}
+```

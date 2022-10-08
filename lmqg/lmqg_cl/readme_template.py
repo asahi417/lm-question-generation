@@ -8,9 +8,9 @@ from datasets import load_dataset
 
 bib = """
 @inproceedings{ushio-etal-2022-generative,
-    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration: {A} {U}nified {B}enchmark and {E}valuation",
+    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration",
     author = "Ushio, Asahi  and
-        Alva-Manchego, Fernando and
+        Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
     booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
     month = dec,
@@ -102,6 +102,16 @@ sample_qa_dict = {
         "<hl> Furono introdotti autocarri compatti, come la Toyota Hilux e il Datsun Truck, seguiti dal camion Mazda (venduto come il Ford Courier), e l' Isuzu costruito Chevrolet LUV. <hl> Mitsubishi rebranded il suo Forte come Dodge D-50 pochi anni dopo la crisi petrolifera. Mazda, Mitsubishi e Isuzu avevano partnership congiunte rispettivamente con Ford, Chrysler e GM. In seguito i produttori americani introdussero le loro sostituzioni nazionali (Ford Ranger, Dodge Dakota e la Chevrolet S10/GMC S-15), ponendo fine alla loro politica di importazione vincolata."
     ]
 }
+sample_qg_dict_lmqg = {
+    "en": ["William Turner was an English painter who specialised in watercolour landscapes", "William Turner"],
+    "ja": ["フェルメールの作品では、17世紀のオランダの画家、ヨハネス・フェルメールの作品について記述する。フェルメールの作品は、疑問作も含め30数点しか現存しない。現存作品はすべて油彩画で、版画、下絵、素描などは残っていない。", "30数点"],
+    "ru": ["Нелишним будет отметить, что, развивая это направление, Д. И. Менделеев, поначалу априорно выдвинув идею о температуре, при которой высота мениска будет нулевой, в мае 1860 года провёл серию опытов.", "в мае 1860 года"],
+    "ko": ["1990년 영화 《 남부군 》에서 단역으로 영화배우 첫 데뷔에 이어 같은 해 KBS 드라마 《지구인》에서 단역으로 출연하였고 이듬해 MBC 《여명의 눈동자》를 통해 단역으로 출연하였다.", "남부군"],
+    "es": ["a noviembre , que es también la estación lluviosa.", "noviembre"],
+    "fr": ["Créateur » (Maker), lui aussi au singulier, « le Suprême Berger » (The Great Shepherd) ; de l'autre, des réminiscences de la théologie de l'Antiquité : le tonnerre, voix de Jupiter, « Et souvent ta voix gronde en un tonnerre terrifiant », etc.", "le Suprême Berger"],
+    "de": ["das erste weltweit errichtete Hermann Brehmer 1855 im niederschlesischen ''Görbersdorf'' (heute Sokołowsko, Polen).", "1855"],
+    "it": ["Dopo il 1971 , l' OPEC ha tardato ad adeguare i prezzi per riflettere tale deprezzamento.", "Dopo il 1971"]
+}
 language_dict = {
     "qg_squad": 'en',
     "qg_frquad": 'fr',
@@ -141,29 +151,43 @@ def format_metric(dataset, dataset_type, metric):
 
 def format_usage(model_name, sample_qg, sample_qa):
     if len(sample_qa) > 0:
-        qg_usage = f"""
+        return f"""
 from transformers import pipeline
-
-model_path = '{model_name}'
-pipe = pipeline("text2text-generation", model_path)
-
-# Answer Extraction
+# initialize model
+pipe = pipeline("text2text-generation", '{model_name}')
+# answer extraction
 answer = pipe('{sample_qa[0]}')
-
-# Question Generation
+# question generation
 question = pipe('{sample_qg[0]}')
 """
     else:
-        qg_usage = f"""
+        return f"""
 from transformers import pipeline
-
-model_path = '{model_name}'
-pipe = pipeline("text2text-generation", model_path)
-
-# Question Generation
+# initialize model
+pipe = pipeline("text2text-generation", '{model_name}')
+# question generation
 question = pipe('{sample_qg[0]}')
 """
-    return qg_usage
+
+
+def format_usage_lmqg(model_name, answer_extraction, language):
+    sample = sample_qg_dict_lmqg[language]
+    if not answer_extraction:
+        return f"""
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='{language}', model='{model_name}')
+# model prediction
+question = model.generate_q(list_context=["{sample[0]}"], list_answer=["{sample[1]}"])
+"""
+    else:
+        return f"""
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='{language}', model='{model_name}')
+# model prediction
+question_answer = model.generate_qa("{sample[0]}")
+"""
 
 
 def get_readme(model_name: str, model_checkpoint):
@@ -198,7 +222,9 @@ def get_readme(model_name: str, model_checkpoint):
 
     # get widget
     sample_qa = []
+    answer_extraction = False
     if prefix_types is not None and len(prefix_types) > 1:  # multitask
+        answer_extraction = True
         tags = "- question generation\n- answer extraction"
         sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
         sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_qa_dict[la]]
@@ -215,6 +241,7 @@ def get_readme(model_name: str, model_checkpoint):
 
     # usage
     usage = format_usage(model_name, sample_qg, sample_qa)
+    usage_lmqg = format_usage_lmqg(model_name, answer_extraction=answer_extraction, language=la)
 
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
@@ -312,6 +339,12 @@ Please cite our paper if you use the model ({paper_link}).
 - **Paper:** {paper_link}
 
 ### Usage
+- With [`lmqg`](https://github.com/asahi417/lm-question-generation#lmqg-language-model-for-question-generation-)
+```python
+{usage_lmqg}
+```
+
+- With `transformers`
 ```python
 {usage}
 ```

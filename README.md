@@ -10,8 +10,7 @@
 </p>
 
 This is the official repository of the paper
-"Generative Language Models for Paragraph-Level Question Generation:
-A Unified Benchmark and Evaluation, EMNLP 2022 main conference".
+["Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 main conference"](paper_link).
 This repository includes following contents:
 - ***QG-Bench***, the first ever multilingual/multidomain QG benchmark.
 - ***Multilingual/multidomain QG models*** fine-tuned on QG-Bench.
@@ -27,7 +26,7 @@ This repository includes following contents:
 Please cite following paper if you use any resource:
 ```
 @inproceedings{ushio-etal-2022-generative,
-    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration: {A} {U}nified {B}enchmark and {E}valuation",
+    title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
