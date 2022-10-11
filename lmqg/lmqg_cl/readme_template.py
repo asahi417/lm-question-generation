@@ -19,7 +19,7 @@ bib = """
     publisher = "Association for Computational Linguistics",
 }
 """
-paper_link = "[TBA](TBA)"
+paper_link = "[https://arxiv.org/abs/2210.03992](https://arxiv.org/abs/2210.03992)"
 version_description = {
     'default': "This model is fine-tuned without parameter search (default configuration is taken from [ERNIE-GEN](https://arxiv.org/abs/2001.11314)).",
     'no-answer': "This model is fine-tuned without answer information, i.e. generate a question only given a paragraph (note that normal model is fine-tuned to generate a question given a pargraph and an associated answer in the paragraph).",

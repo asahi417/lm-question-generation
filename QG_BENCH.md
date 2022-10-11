@@ -1,6 +1,7 @@
 # QG-Bench and Fine-tuned Models
 QG-Bench consists of question generation datasets in 8 different languages and 11 diverse domains.
-All the datasets are shared on huggingface via the [link below](#datasets).
+The dataset is proposed in ["Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 main conference"](https://arxiv.org/abs/2210.03992),
+and all the datasets are shared on huggingface via the [link below](#datasets).
 To use the dataset, first install `datasets` library (`pip install datasets`) and load the dataset.
 
 ```python
