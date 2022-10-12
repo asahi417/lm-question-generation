@@ -32,7 +32,7 @@ Each feature contains following information:
 
 Each of `paragraph_answer`, `paragraph_sentence`, and `sentence_answer` feature is assumed to be used to train a question generation model, but with different information.
 The `paragraph_answer` and `sentence_answer` features are for answer-aware question generation and `paragraph_sentence` feature is for sentence-aware question generation.
-See more detail at our paper (TBA)
+See more detail at our paper.
 
 ## Datasets
 
@@ -49,6 +49,8 @@ See more detail at our paper (TBA)
 | [Spanish (`lmqg/qg_esquad`)](https://huggingface.co/datasets/lmqg/qg_esquad)  | 77,025/10,570/10,570         | 781/122/64/21                                                 |
 | [German (`lmqg/qg_dequad`)](https://huggingface.co/datasets/lmqg/qg_dequad)   | 9,314/2,204/2,204            | 1,577/165/59/66                                               |
   
+***IMPORTANT:*** The `lmqg/qg_frquad` is private as the original FQuAD requires filling a form first, please see [here](https://huggingface.co/datasets/lmqg/qg_frquad_dummy/discussions/1).
+
 - QG-Bench (multidomain): The multidomain subset of QG-Bench in English.
 
 | Dataset                                                                                           | Data size (train/valid/test) | Average character length (paragraph/sentence/question/answer) |
