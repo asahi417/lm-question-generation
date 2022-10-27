@@ -35,11 +35,12 @@ setup(
             'pydantic',
             'spacy_ke',
             'pydantic',
-            'protobuf',
-            'psutil'
+            'protobuf'
+
         ]
     },
     install_requires=[
+        'psutil',
         'pytextrank',
         "torch",
         "tqdm",
