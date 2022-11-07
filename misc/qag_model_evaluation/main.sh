@@ -21,12 +21,12 @@ q_generation_squadshifts () {
 }
 
 
-qa_generation_squadshifts "t5-small-squad-multitask"
-qa_generation_squadshifts "t5-base-squad-multitask"
 qa_generation_squadshifts "t5-large-squad-multitask"
-
-q_generation_squadshifts "t5-small-squad"
-q_generation_squadshifts "t5-base-squad"
+qa_generation_squadshifts "t5-base-squad-multitask"
+qa_generation_squadshifts "t5-small-squad-multitask"
 q_generation_squadshifts "t5-large-squad"
+q_generation_squadshifts "t5-base-squad"
+q_generation_squadshifts "t5-small-squad"
 q_generation_squadshifts "bart-base-squad"
+
 q_generation_squadshifts "bart-large-squad"
