@@ -32,3 +32,5 @@ q_generation_squadshifts "t5-large-squad" 256
 q_generation_squadshifts "bart-base-squad" 256
 q_generation_squadshifts "bart-large-squad" 256
 
+#for i in ["t5-small-squad-multitask", "t5-base-squad-multitask", "t5-large-squad-multitask", "t5-small-squad", "t5-base-squad", "t5-large-squad"]:
+#    TransformerQG(f"lmqg/{i}")

@@ -12,6 +12,7 @@ def main_generate_qa_pair():
     parser.add_argument('-l', '--language', default='en', type=str)
     parser.add_argument('-d', '--qa-dataset', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--qa-dataset-name', default='new_wiki', type=str)
+    parser.add_argument('--answer-model', default=None, type=str)
     parser.add_argument('-a', '--answer-extraction', action='store_true')
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('-b', '--batch-size', default=256, type=int)
