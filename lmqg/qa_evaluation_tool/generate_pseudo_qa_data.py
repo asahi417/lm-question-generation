@@ -87,8 +87,6 @@ def generate_qa_pairs(
                 for _a in a['text']:
                     list_answer.append(_a)
                     list_context.append(c)
-            list_context = list_context[:3]
-            list_answer = list_answer[:3]
             question = model.generate_q(
                 list_context=list_context,
                 list_answer=list_answer,
