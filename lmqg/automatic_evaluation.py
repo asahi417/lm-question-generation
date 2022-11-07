@@ -191,8 +191,12 @@ def evaluate(export_dir: str = '.',
     reference_files = get_reference_files(dataset_path, dataset_name)
 
     if model is not None:
-        lm = TransformersQG(model, max_length=max_length, max_length_output=max_length_output,
-                            drop_overflow_text=False, skip_overflow_error=True, language=language)
+        lm = TransformersQG(model,
+                            max_length=max_length,
+                            max_length_output=max_length_output,
+                            drop_overflow_error_text=False,
+                            skip_overflow_error=True,
+                            language=language)
         lm.eval()
 
         def get_model_prediction_file(split):

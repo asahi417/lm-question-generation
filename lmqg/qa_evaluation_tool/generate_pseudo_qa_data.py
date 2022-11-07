@@ -69,7 +69,7 @@ def generate_qa_pairs(
                     )
             full_output[_split] = output
     else:
-        model = TransformersQG(model=qg_model, language=language)
+        model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True)
         for _split in data:
             logging.info(f'running prediction on {_split}')
 
