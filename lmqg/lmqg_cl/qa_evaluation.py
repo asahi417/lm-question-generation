@@ -8,7 +8,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 def main_generate_qa_pair():
     parser = argparse.ArgumentParser(description='Generate QA pseudo dataset.')
-    parser.add_argument('-m', '--model', default='lmqg/t5-small-squad-multitask', type=str)
+    parser.add_argument('-m', '--qg-model', default='lmqg/t5-small-squad-multitask', type=str)
     parser.add_argument('-l', '--language', default='en', type=str)
     parser.add_argument('-d', '--qa-dataset', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--qa-dataset-name', default='new_wiki', type=str)
