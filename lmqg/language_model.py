@@ -139,9 +139,9 @@ class EncodePlus:
                  tokenizer,
                  max_length: int = 512,
                  max_length_output: int = 34,
-                 drop_overflow_text: bool = False,
+                 drop_overflow_error_text: bool = False,
                  skip_overflow_error: bool = False,
-                 skip_highlight_error: bool = False,
+                 drop_highlight_error_text: bool = False,
                  prefix_type: str = None,
                  padding: bool = True):
         """ Wrapper of encode_plus for multiprocessing.
@@ -149,9 +149,9 @@ class EncodePlus:
         @param tokenizer: transforms.Tokenizer
         @param max_length: Max text length of input.
         @param max_length_output: Max text length of output.
-        @param drop_overflow_text: If true, return None when the input exceeds the max length.
+        @param drop_overflow_error_text: If true, return None when the input exceeds the max length.
         @param skip_overflow_error: If true, raise an error when the input exceeds the max length.
-        @param skip_highlight_error: If true, raise an error when a highlight span is not found in the paragraph.
+        @param drop_highlight_error_text: If true, raise an error when a highlight span is not found in the paragraph.
         @param prefix_type: Either of `qg` or `answer_extraction`, which is to add at the beginning of the text.
         @param padding: Pad the sequence to the max length.
         """
@@ -160,9 +160,9 @@ class EncodePlus:
         self.max_length = max_length
         self.max_length_output = max_length_output
         # NOTE: for model training, we should drop the exceeded input but not for the evaluation
-        self.drop_overflow_text = drop_overflow_text
+        self.drop_overflow_error_text = drop_overflow_error_text
         self.skip_overflow_error = skip_overflow_error
-        self.skip_highlight_error = skip_highlight_error
+        self.drop_highlight_error_text = drop_highlight_error_text
         # truncation should be true for the batch process, but not necessary to process single input
         self.param_in = {'truncation': True, 'max_length': self.max_length}
         self.param_out = {'truncation': True, 'max_length': self.max_length_output}
@@ -186,7 +186,7 @@ class EncodePlus:
         if input_highlight is not None:
             position = input_sequence.find(input_highlight)
             if position == -1:
-                if self.skip_highlight_error:
+                if self.drop_highlight_error_text:
                     return None
                 raise HighlightNotFoundError(input_highlight, input_sequence)
             input_sequence = '{0}{1} {2} {1}{3}'.format(
@@ -197,16 +197,19 @@ class EncodePlus:
             input_sequence = f'{self.prefix}: {input_sequence}'
 
         # handling overflow text
-        if self.drop_overflow_text or not self.skip_overflow_error:
+        # drop_overflow_error_text ==> remove the overflow sentence from input
+        # skip_overflow_error ==> keep the overflow sentnce
+        # none of them ==> raise error
+        if self.drop_overflow_error_text or not self.skip_overflow_error:
             if len(self.tokenizer.encode(input_sequence)) > self.max_length:
-                if not self.drop_overflow_text:  # raise error for overflow text
+                if not self.drop_overflow_error_text:  # raise error for overflow text
                     raise ExceedMaxLengthError(self.max_length)
-                return None  # skip overflow text
+                return None  # remove overflow text
             if output_sequence is not None:
                 if len(self.tokenizer.encode(output_sequence)) > self.max_length_output:
-                    if not self.drop_overflow_text:  # raise error for overflow text
+                    if not self.drop_overflow_error_text:  # raise error for overflow text
                         raise ExceedMaxLengthError(self.max_length)
-                    return None  # skip overflow text
+                    return None  # remove overflow text
         encode = self.tokenizer.encode_plus(input_sequence, **self.param_in)
         if output_sequence is not None:
             encode['labels'] = self.tokenizer.encode(output_sequence, **self.param_out)
@@ -224,9 +227,10 @@ class TransformersQG:
                  add_prefix: bool = None,
                  language: str = 'en',
                  label_smoothing: float = None,
-                 drop_overflow_text: bool = False,
                  skip_overflow_error: bool = False,
-                 skip_highlight_error: bool = False,
+                 drop_overflow_error_text: bool = False,
+                 drop_highlight_error_text: bool = False,
+                 drop_answer_error_text: bool = False,
                  keyword_extraction_model: str = 'positionrank',
                  use_auth_token: bool = False):
         """ Transformers Language Model for Question Generation.
@@ -238,9 +242,9 @@ class TransformersQG:
         @param add_prefix: Whether model uses task-specific prefix (eg. True for T5 but False for BART models).
         @param language: Language alias for SpaCy language-specific pipelines (sentencizer/keyword extraction).
         @param label_smoothing: [Fine-tuning parameter] Label smoothing.
-        @param drop_overflow_text: If true, return None when the input exceeds the max length.
+        @param drop_overflow_error_text: If true, return None when the input exceeds the max length.
         @param skip_overflow_error: If true, raise an error when the input exceeds the max length.
-        @param skip_highlight_error: If true, raise an error when a highlight span is not found in the paragraph.
+        @param drop_highlight_error_text: If true, raise an error when a highlight span is not found in the paragraph.
         @param use_auth_token: [optional] Huggingface transformers argument of `use_auth_token`
         """
         if model is None:
@@ -252,9 +256,10 @@ class TransformersQG:
         self.max_length = max_length
         self.max_length_output = max_length_output
         self.label_smoothing = label_smoothing
-        self.drop_overflow_text = drop_overflow_text
+        self.drop_overflow_error_text = drop_overflow_error_text
         self.skip_overflow_error = skip_overflow_error
-        self.skip_highlight_error = skip_highlight_error
+        self.drop_highlight_error_text = drop_highlight_error_text
+        self.drop_answer_error_text = drop_answer_error_text
         self.tokenizer, self.model, config = load_language_model(
             self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
         self.add_prefix = config.add_prefix if 'add_prefix' in config.to_dict().keys() else add_prefix
@@ -297,6 +302,8 @@ class TransformersQG:
             context, batch_size=batch_size, num_beams=num_beams, cache_path=cache_path,
             sentence_level=sentence_level, answer_model=answer_model, num_questions=num_questions
         )
+        if list_answer is None:
+            return None
         list_context = [context] * len(list_answer)
         logging.info('running model for `qg`')
         list_question = self.generate_q(
@@ -355,6 +362,8 @@ class TransformersQG:
             answer = list(filter(None, answer))  # remove None
             answer = list(filter(lambda x: x in context, answer))  # remove answers not in context (should not be happened though)
             if len(answer) == 0:
+                if self.drop_answer_error_text:
+                    return None
                 raise AnswerNotFoundError(context)
             if num_questions is not None:
                 answer = answer[:min(num_questions, len(answer))]
@@ -456,8 +465,8 @@ class TransformersQG:
 
         # process in parallel/single
         config = {'tokenizer': self.tokenizer, 'max_length': self.max_length, 'prefix_type': prefix_type,
-                  'max_length_output': self.max_length_output, 'drop_overflow_text': self.drop_overflow_text,
-                  'skip_overflow_error': self.skip_overflow_error, 'skip_highlight_error': self.skip_highlight_error,
+                  'max_length_output': self.max_length_output, 'drop_overflow_error_text': self.drop_overflow_error_text,
+                  'skip_overflow_error': self.skip_overflow_error, 'drop_highlight_error_text': self.drop_highlight_error_text,
                   'padding': False if len(data) == 1 else True}
 
         logging.info(f'encode all the data       : {len(data)}')

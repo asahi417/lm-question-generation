@@ -119,7 +119,7 @@ class Trainer:
                     self.model = TransformersQG(
                         model=path, max_length=self.config.max_length, max_length_output=self.config.max_length_output,
                         label_smoothing=self.config.label_smoothing, add_prefix=add_prefix,
-                        drop_overflow_text=True
+                        drop_overflow_error_text=True
                     )
                     self.optimizer = self.setup_optimizer(epoch)
                     self.current_epoch = epoch
@@ -134,7 +134,7 @@ class Trainer:
             self.model = TransformersQG(
                 model=self.config.model, max_length=self.config.max_length,
                 max_length_output=self.config.max_length_output, add_prefix=add_prefix,
-                drop_overflow_text=True)
+                drop_overflow_error_text=True)
             self.optimizer = self.setup_optimizer()
             self.current_epoch = 0
 

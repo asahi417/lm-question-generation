@@ -23,21 +23,21 @@ def generate_qa_pairs(
     else:
         data = load_dataset(anchor_data, anchor_data_name)
 
-    model = TransformersQG(model=qg_model,
-                           language=language,
-                           skip_overflow_error=True,
-                           skip_highlight_error=True,
-                           drop_overflow_text=True)
     if answer_extraction is None:
         answer_extraction = True if qg_model.endswith('multitask') else False
-    if answer_model is None and answer_extraction:
-        answer_model = 'language_model' if model.add_prefix else 'keyword_extraction'
 
     if export_dir is not None:
         os.makedirs(export_dir, exist_ok=True)
 
     full_output = {}
     if answer_extraction:
+        model = TransformersQG(model=qg_model,
+                               language=language,
+                               drop_answer_error_text=True,
+                               drop_overflow_error_text=True,
+                               drop_highlight_error_text=True)
+        if answer_model is None and answer_extraction:
+            answer_model = 'language_model' if model.add_prefix else 'keyword_extraction'
         for _split in data:
             logging.info(f'running prediction on {_split}')
             if export_dir is not None:
@@ -52,6 +52,8 @@ def generate_qa_pairs(
                     answer_model=answer_model,
                     batch_size=batch_size
                 )
+                if out is None or len(out) == 0:
+                    continue
                 for q, a in out:
                     output.append(
                         {
@@ -67,6 +69,7 @@ def generate_qa_pairs(
                     )
             full_output[_split] = output
     else:
+        model = TransformersQG(model=qg_model, language=language)
         for _split in data:
             logging.info(f'running prediction on {_split}')
 
@@ -91,6 +94,8 @@ def generate_qa_pairs(
                 list_answer=list_answer,
                 batch_size=batch_size
             )
+            if question is None or len(question) == 0:
+                continue
             output = []
             for tmp_data, q in zip(data[_split], question):
                 output.append(
