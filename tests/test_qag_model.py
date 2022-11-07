@@ -1,4 +1,4 @@
-from t5qg import TransformersQG
+from lmqg import TransformersQG
 
 model = TransformersQG(model='asahi417/question-generation-squad-t5-small-multitask')
 # model = TransformersQG(model='asahi417/question-generation-squad-t5-base-multitask')

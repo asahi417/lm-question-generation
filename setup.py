@@ -54,14 +54,18 @@ setup(
         'sudachipy',
         'sudachidict_core',
         'bert-score',
-        'pyemd'  # to compute moverscore
+        'pyemd',  # to compute moverscore
+        'evaluate',
+        "wandb",
+        "ray[tune]"
     ],
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             'lmqg-train-search = lmqg.lmqg_cl.model_finetuning:main_training_search',
             'lmqg-eval = lmqg.lmqg_cl.model_evaluation:main',
-            'lmqg-push-to-hf = lmqg.lmqg_cl.push_to_hf:main'
+            'lmqg-push-to-hf = lmqg.lmqg_cl.push_to_hf:main',
+            'lmqg-generate-qa = lmqg.lmqg_cl.qa_evaluation:main_generate_qa_pair'
         ]
     }
 )
