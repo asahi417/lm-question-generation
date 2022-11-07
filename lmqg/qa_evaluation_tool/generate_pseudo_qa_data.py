@@ -23,7 +23,11 @@ def generate_qa_pairs(
     else:
         data = load_dataset(anchor_data, anchor_data_name)
 
-    model = TransformersQG(model=qg_model, language=language)
+    model = TransformersQG(model=qg_model,
+                           language=language,
+                           skip_overflow_error=True,
+                           skip_highlight_error=True,
+                           drop_overflow_text=True)
     if answer_extraction is None:
         answer_extraction = True if qg_model.endswith('multitask') else False
     if answer_model is None and answer_extraction:
