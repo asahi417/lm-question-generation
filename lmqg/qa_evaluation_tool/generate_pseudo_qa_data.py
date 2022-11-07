@@ -88,7 +88,7 @@ def generate_qa_pairs(
                 batch_size=batch_size
             )
             output = []
-            for tmp_data, q in zip(data, question):
+            for tmp_data, q in zip(data[_split], question):
                 output.append(
                     {
                         'id': tmp_data['id'],
