@@ -21,7 +21,7 @@ TASK_PREFIX = {"ae": "extract answers", "qg": "generate question"}
 CE_IGNORE_INDEX = -100
 ADDITIONAL_SP_TOKENS = {'hl': '<hl>'}
 NUM_WORKERS = int(os.getenv('NUM_WORKERS', '0'))
-PARALLEL_PROCESSING = bool(int(os.getenv('PARALLEL_PROCESSING', '1')))
+PARALLEL_PROCESSING = bool(int(os.getenv('PARALLEL_PROCESSING', '0')))
 DEFAULT_MODELS = {
     'en': 'lmqg/t5-small-squad-multitask',
     'ja': 'lmqg/mt5-small-jaquad-multitask',
@@ -198,7 +198,7 @@ class EncodePlus:
 
         # handling overflow text
         # drop_overflow_error_text ==> remove the overflow sentence from input
-        # skip_overflow_error ==> keep the overflow sentnce
+        # skip_overflow_error ==> keep the overflow sentence
         # none of them ==> raise error
         if self.drop_overflow_error_text or not self.skip_overflow_error:
             if len(self.tokenizer.encode(input_sequence)) > self.max_length:
@@ -283,7 +283,7 @@ class TransformersQG:
                     num_beams: int = 4,
                     cache_path: str = None,
                     answer_model: str = None,
-                    num_questions: int = 10,
+                    num_questions: int = None,
                     sentence_level: bool = False):
         """ Generate question given context.
 
@@ -307,11 +307,70 @@ class TransformersQG:
         list_context = [context] * len(list_answer)
         logging.info('running model for `qg`')
         list_question = self.generate_q(
-            list_context, list_answer=list_answer, batch_size=batch_size, cache_path=cache_path, num_beams=num_beams,
+            list_context,
+            list_answer=list_answer,
+            batch_size=batch_size,
+            cache_path=cache_path,
+            num_beams=num_beams,
             sentence_level=sentence_level
         )
         assert len(list_answer) == len(list_question)
         return list(zip(list_question, list_answer))
+
+    # def generate_a_batch(self,
+    #                      context: List,
+    #                      batch_size: int = None,
+    #                      num_beams: int = 4,
+    #                      cache_path: str = None,
+    #                      sentence_level: bool = False,
+    #                      answer_model: str = None,
+    #                      num_questions: int = None):
+    #     if answer_model is None:
+    #         if self.add_prefix:
+    #             answer_model = 'language_model'
+    #         else:
+    #             answer_model = 'keyword_extraction'
+    #
+    #     logging.info(f'running model for `answer_extraction`: {answer_model}')
+    #     if answer_model == 'keyword_extraction':
+    #         num_questions = 10 if num_questions is None else num_questions
+    #         output = []
+    #         for c in context:
+    #             answer = self.spacy_module.keyword(c, num_questions)
+    #             for a in answer:
+    #                 output.append((c, a))
+    #         return output
+    #     elif answer_model == 'language_model':
+    #         input_context = []
+    #         input_highlight = []
+    #         for c in context:
+    #             list_sentence = self.spacy_module.sentence(c)  # split into sentence
+    #             input_context += [c] * len(list_sentence)
+    #             input_highlight += list_sentence
+    #
+    #         if not self.add_prefix:
+    #             raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
+    #                              f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
+    #
+    #         prefix_type = 'ae' if self.add_prefix else None
+    #         list_input = [context] * len(list_sentence)
+    #         if sentence_level:
+    #             list_input = list_sentence
+    #         answer = self.generate_prediction(
+    #             list_input, highlights=list_sentence, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
+    #             batch_size=batch_size)
+    #         answer = [clean(i) for i in answer]
+    #         answer = list(filter(None, answer))  # remove None
+    #         answer = list(filter(lambda x: x in context, answer))  # remove answers not in context (should not be happened though)
+    #         if len(answer) == 0:
+    #             if self.drop_answer_error_text:
+    #                 return None
+    #             raise AnswerNotFoundError(context)
+    #         if num_questions is not None:
+    #             answer = answer[:min(num_questions, len(answer))]
+    #         return answer
+    #     else:
+    #         raise ValueError(f'unknown answer model: {answer_model}')
 
     def generate_a(self,
                    context: str,

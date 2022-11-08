@@ -30,12 +30,13 @@ def generate_qa_pairs(
         os.makedirs(export_dir, exist_ok=True)
 
     full_output = {}
+    model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True)
     if answer_extraction:
-        model = TransformersQG(model=qg_model,
-                               language=language,
-                               drop_answer_error_text=True,
-                               drop_overflow_error_text=True,
-                               drop_highlight_error_text=True)
+        # model = TransformersQG(model=qg_model,
+        #                        language=language,
+        #                        drop_answer_error_text=True,
+        #                        drop_overflow_error_text=True,
+        #                        drop_highlight_error_text=True)
         if answer_model is None and answer_extraction:
             answer_model = 'language_model' if model.add_prefix else 'keyword_extraction'
         for _split in data:
@@ -69,7 +70,6 @@ def generate_qa_pairs(
                     )
             full_output[_split] = output
     else:
-        model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True)
         for _split in data:
             logging.info(f'running prediction on {_split}')
 
