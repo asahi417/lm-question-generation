@@ -3,12 +3,22 @@ import logging
 import multiprocessing
 import os
 import json
+import urllib
 from os.path import join as pj
 import torch
 import evaluate
 from datasets import load_dataset
 from transformers import AutoModelForQuestionAnswering, TrainingArguments, Trainer, AutoTokenizer, EvalPrediction
 from ray import tune
+
+
+def internet_connection(host='http://google.com'):
+    try:
+        urllib.request.urlopen(host)
+        return True
+    except:
+        return False
+
 
 
 def preprocess_function(examples, model):
@@ -79,7 +89,8 @@ def qa_trainer(dataset,
                overwrite: bool = False):
 
     os.environ["WANDB_DISABLED"] = "true"
-    metric = evaluate.load("squad")
+    local_files_only = not internet_connection()
+    metric = evaluate.load("squad", local_files_only=local_files_only)
 
     def compute_metrics(p: EvalPrediction):
         return metric.compute(predictions=p.predictions, references=p.label_ids)

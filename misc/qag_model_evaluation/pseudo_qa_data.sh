@@ -3,9 +3,10 @@ BATCH=14
 # Generate Pseudo QA Dataset on SQuADShifts
 qa_generation_squadshifts () {
   MODEL=${1}
-#  NAME='reddit'
+#  NAME='new_wiki'
 #  lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" \
 #  -e "qa_dataset/qa_squadshifts.${MODEL}.${NAME}"
+#  for NAME in 'new_wiki' 'nyt' 'reddit'
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
     lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" \

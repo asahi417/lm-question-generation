@@ -63,7 +63,7 @@ def internet_connection(host='http://google.com'):
 def load_language_model(model_name, cache_dir: str = None, use_auth_token: bool = False):
     """ load language model from huggingface model hub """
     # tokenizer
-    local_files_only = not internet_connection
+    local_files_only = not internet_connection()
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_name, cache_dir=cache_dir, local_files_only=local_files_only, use_auth_token=use_auth_token)
     config = transformers.AutoConfig.from_pretrained(
