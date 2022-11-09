@@ -98,7 +98,7 @@ def qa_trainer(dataset,
         print(p)
         print(p.predictions)
         print(p.label_ids)
-        input("waiting")
+        # input("waiting")
         return metric.compute(predictions=p.predictions, references=p.label_ids)
 
     if dataset_name is not None:
