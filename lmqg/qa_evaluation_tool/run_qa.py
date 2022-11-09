@@ -48,7 +48,6 @@ os.environ["WANDB_DISABLED"] = "true"
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.18.0.dev0")
 require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/question-answering/requirements.txt")
-logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def internet_connection(host='http://google.com'):
@@ -81,6 +80,8 @@ def run_qa_evaluation(dataset,
     summary_file = pj(output_dir, 'test_result.json')
     if os.path.exists(summary_file) and not overwrite:
         return
+
+    os.makedirs(output_dir, exist_ok=True)
     # Set seed before initializing model.
     set_seed(random_seed)
     local_file_only = not internet_connection()
