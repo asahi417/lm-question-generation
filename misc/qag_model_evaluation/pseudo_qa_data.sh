@@ -30,7 +30,6 @@ qa_generation_squadshifts "t5-base-squad-multitask"
 q_generation_squadshifts "bart-large-squad"
 qa_generation_squadshifts "t5-small-squad-multitask"
 q_generation_squadshifts "t5-base-squad"
-
 q_generation_squadshifts "t5-small-squad"
 q_generation_squadshifts "bart-base-squad"
 

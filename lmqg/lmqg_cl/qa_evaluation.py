@@ -8,7 +8,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 def main_qa_model_training():
     parser = argparse.ArgumentParser(description='QA model training.')
-    parser.add_argument('-m', '--model', default='lmqg/distilbert-base-uncased', type=str)
+    parser.add_argument('-m', '--model', default='distilbert-base-uncased', type=str)
     parser.add_argument('-d', '--dataset', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--dataset-name', default='new_wiki', type=str)
     parser.add_argument('--eval-step', default=50, type=int)

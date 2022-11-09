@@ -66,7 +66,7 @@ setup(
             'lmqg-eval = lmqg.lmqg_cl.model_evaluation:main',
             'lmqg-push-to-hf = lmqg.lmqg_cl.push_to_hf:main',
             'lmqg-generate-qa = lmqg.lmqg_cl.qa_evaluation:main_generate_qa_pair',
-            'lmqg-qa-evaluation = lmqg.lmqg_cl.qa_evaluation:main_qa_model_training'
+            'lmqg-qae = lmqg.lmqg_cl.qa_evaluation:main_qa_model_training'
         ]
     }
 )
