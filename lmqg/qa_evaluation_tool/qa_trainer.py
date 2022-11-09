@@ -19,10 +19,11 @@ def internet_connection(host='http://google.com'):
     except:
         return False
 
+local_files_only = not internet_connection()
 
 
 def preprocess_function(examples, model):
-    tokenizer = AutoTokenizer.from_pretrained(model)
+    tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=local_files_only)
     questions = [q.strip() for q in examples["question"]]
     inputs = tokenizer(
         questions,
@@ -89,7 +90,7 @@ def qa_trainer(dataset,
                overwrite: bool = False):
 
     os.environ["WANDB_DISABLED"] = "true"
-    local_files_only = not internet_connection()
+
     metric = evaluate.load("squad", local_files_only=local_files_only)
 
     def compute_metrics(p: EvalPrediction):
@@ -104,7 +105,7 @@ def qa_trainer(dataset,
     if overwrite or not os.path.exists(best_model_path):
         logging.info(f'QA model training with {language_model}')
 
-        model = AutoModelForQuestionAnswering.from_pretrained(language_model)
+        model = AutoModelForQuestionAnswering.from_pretrained(language_model, local_files_only=local_files_only)
 
         training_args = TrainingArguments(
             report_to=None,
