@@ -38,7 +38,7 @@ def qa_trainer(dataset,
                overwrite: bool = False):
 
     def preprocess_function(examples):
-        tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=local_files_only)
+        tokenizer = AutoTokenizer.from_pretrained(language_model, local_files_only=local_files_only)
         questions = [q.strip() for q in examples["question"]]
         inputs = tokenizer(
             questions,
