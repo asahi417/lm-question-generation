@@ -30,7 +30,7 @@ def generate_qa_pairs(
         os.makedirs(export_dir, exist_ok=True)
 
     full_output = {}
-    model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True)
+    model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True, drop_answer_error_text=True)
     if answer_extraction:
         # model = TransformersQG(model=qg_model,
         #                        language=language,
