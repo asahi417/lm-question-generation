@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from lmqg.qa_evaluation_tool import generate_qa_pairs, qa_trainer
+from lmqg.qa_evaluation_tool import generate_qa_pairs, run_qa_evaluation
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -23,7 +23,7 @@ def main_qa_model_training():
     parser.add_argument('--overwrite', action='store_true')
     opt = parser.parse_args()
 
-    qa_trainer(
+    run_qa_evaluation(
         dataset=opt.dataset,
         dataset_name=opt.dataset_name,
         language_model=opt.model,
