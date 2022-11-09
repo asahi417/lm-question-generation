@@ -19,6 +19,7 @@ def internet_connection(host='http://google.com'):
     except:
         return False
 
+
 local_files_only = not internet_connection()
 
 
@@ -91,6 +92,7 @@ def qa_trainer(dataset,
 
     os.environ["WANDB_DISABLED"] = "true"
 
+    print(local_files_only)
     metric = evaluate.load("squad", local_files_only=local_files_only)
 
     def compute_metrics(p: EvalPrediction):
