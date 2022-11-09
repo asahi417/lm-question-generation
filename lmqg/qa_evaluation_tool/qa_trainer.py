@@ -91,10 +91,14 @@ def qa_trainer(dataset,
 
     os.environ["WANDB_DISABLED"] = "true"
 
-    print(local_files_only)
-    metric = evaluate.load("squad", local_files_only=local_files_only)
+    # TODO: evaluate doesn't allow offline mode
+    metric = evaluate.load("squad")
 
     def compute_metrics(p: EvalPrediction):
+        print(p)
+        print(p.predictions)
+        print(p.label_ids)
+        input("waiting")
         return metric.compute(predictions=p.predictions, references=p.label_ids)
 
     if dataset_name is not None:
