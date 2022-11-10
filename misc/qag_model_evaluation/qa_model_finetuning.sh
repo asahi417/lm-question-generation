@@ -16,7 +16,7 @@ QAE () {
     --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
     --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
     --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
-    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
+    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --skip-training
   done
 }
 
@@ -25,10 +25,9 @@ QAE "t5-large-squad"
 QAE "t5-base-squad"
 QAE "t5-small-squad"
 QAE "bart-large-squad"
+QAE "bart-base-squad"
+QAE "t5-large-squad-multitask"
 
 # TORUN
-QAE "bart-base-squad"
-
-QAE "t5-large-squad-multitask"
 QAE "t5-base-squad-multitask"
 QAE "t5-small-squad-multitask"

@@ -24,6 +24,7 @@ def main_qa_model_training():
     parser.add_argument('--ray-result-dir', default='ray_result', type=str)
     parser.add_argument('--output-dir', default='qa_eval_output', type=str)
     parser.add_argument('--overwrite', action='store_true')
+    parser.add_argument('--skip-training', action='store_true')
     opt = parser.parse_args()
     if opt.dataset_train is not None and opt.dataset_validation is not None and opt.dataset_test is not None:
         dataset_files = {
@@ -48,7 +49,9 @@ def main_qa_model_training():
         n_trials=opt.n_trials,
         ray_result_dir=opt.ray_result_dir,
         output_dir=opt.output_dir,
-        overwrite=opt.overwrite)
+        overwrite=opt.overwrite,
+        skip_training=opt.skip_training
+    )
 
 
 def main_generate_qa_pair():

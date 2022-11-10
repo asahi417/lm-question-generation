@@ -73,6 +73,7 @@ def run_qa_evaluation(dataset: str,
                       ray_result_dir: str = 'ray_result',
                       output_dir: str = 'qa_eval_output',
                       overwrite: bool = False,
+                      skip_training: bool = False,
                       doc_stride: int = 128,
                       max_seq_length: int = 384,
                       max_answer_length: int = 30,
@@ -282,53 +283,54 @@ def run_qa_evaluation(dataset: str,
     def compute_metrics(p: EvalPrediction):
         return metric.compute(predictions=p.predictions, references=p.label_ids)
 
-    # Initialize our Trainer
-    training_args = TrainingArguments(
-        report_to=None,
-        output_dir=output_dir,
-        eval_steps=eval_step,
-        seed=random_seed,
-        evaluation_strategy="steps"
-    )
-    trainer = QuestionAnsweringTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=validation_dataset,
-        eval_examples=validation_example,
-        tokenizer=tokenizer,
-        data_collator=default_data_collator,
-        post_process_function=post_processing_function,
-        compute_metrics=compute_metrics,
-        model_init=lambda x: AutoModelForQuestionAnswering.from_pretrained(language_model, return_dict=True, local_files_only=local_file_only)
-    )
-
-    logging.info("*** Finetuning ***")
-    if parallel:
-        best_run = trainer.hyperparameter_search(
-            hp_space=lambda x: {
-                "learning_rate": tune.loguniform(1e-6, 1e-4),
-                "num_train_epochs": tune.choice(list(range(1, 6))),
-                "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
-            },
-            local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
-            resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()},
-
-        )
-    else:
-        best_run = trainer.hyperparameter_search(
-            hp_space=lambda x: {
-                "learning_rate": tune.loguniform(1e-6, 1e-4),
-                "num_train_epochs": tune.choice(list(range(1, 6))),
-                "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
-            },
-            local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials
-        )
-    for n, v in best_run.hyperparameters.items():
-        setattr(trainer.args, n, v)
-    trainer.train()
     best_model_path = pj(output_dir, 'best_model')
-    trainer.save_model(best_model_path)
+    if not skip_training:
+        # Initialize our Trainer
+        training_args = TrainingArguments(
+            report_to=None,
+            output_dir=output_dir,
+            eval_steps=eval_step,
+            seed=random_seed,
+            evaluation_strategy="steps"
+        )
+        trainer = QuestionAnsweringTrainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=validation_dataset,
+            eval_examples=validation_example,
+            tokenizer=tokenizer,
+            data_collator=default_data_collator,
+            post_process_function=post_processing_function,
+            compute_metrics=compute_metrics,
+            model_init=lambda x: AutoModelForQuestionAnswering.from_pretrained(language_model, return_dict=True, local_files_only=local_file_only)
+        )
+
+        logging.info("*** Finetuning ***")
+        if parallel:
+            best_run = trainer.hyperparameter_search(
+                hp_space=lambda x: {
+                    "learning_rate": tune.loguniform(1e-6, 1e-4),
+                    "num_train_epochs": tune.choice(list(range(1, 6))),
+                    "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
+                },
+                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
+                resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()},
+
+            )
+        else:
+            best_run = trainer.hyperparameter_search(
+                hp_space=lambda x: {
+                    "learning_rate": tune.loguniform(1e-6, 1e-4),
+                    "num_train_epochs": tune.choice(list(range(1, 6))),
+                    "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
+                },
+                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials
+            )
+        for n, v in best_run.hyperparameters.items():
+            setattr(trainer.args, n, v)
+        trainer.train()
+        trainer.save_model(best_model_path)
 
     # Evaluation
     logging.info("*** Evaluate ***")
