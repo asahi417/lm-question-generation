@@ -24,6 +24,7 @@ import urllib
 import json
 import multiprocessing
 import torch
+from typing import Dict
 from os.path import join as pj
 from datasets import load_dataset, load_metric
 from transformers import (
@@ -58,8 +59,9 @@ def internet_connection(host='http://google.com'):
         return False
 
 
-def run_qa_evaluation(dataset,
+def run_qa_evaluation(dataset: str,
                       dataset_name: str = None,
+                      dataset_files: Dict = None,
                       language_model: str = "distilbert-base-uncased",
                       eval_step: int = 50,
                       random_seed: int = 42,
@@ -85,7 +87,10 @@ def run_qa_evaluation(dataset,
     # Set seed before initializing model.
     set_seed(random_seed)
     local_file_only = not internet_connection()
-    raw_datasets = load_dataset(dataset) if dataset_name is None else load_dataset(dataset, dataset_name)
+    if dataset_files is None:
+        raw_datasets = load_dataset(dataset) if dataset_name is None else load_dataset(dataset, dataset_name)
+    else:
+        raw_datasets = load_dataset(dataset, data_files=dataset_files)
 
     # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(language_model, local_files_only=local_file_only)

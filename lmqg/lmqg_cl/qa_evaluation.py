@@ -11,6 +11,9 @@ def main_qa_model_training():
     parser.add_argument('-m', '--model', default='distilbert-base-uncased', type=str)
     parser.add_argument('-d', '--dataset', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--dataset-name', default='new_wiki', type=str)
+    parser.add_argument('--dataset-train', default=None, type=str)
+    parser.add_argument('--dataset-validation', default=None, type=str)
+    parser.add_argument('--dataset-test', default=None, type=str)
     parser.add_argument('--eval-step', default=50, type=int)
     parser.add_argument('--random-seed', default=42, type=int)
     parser.add_argument('--split-train', default='train', type=str)
@@ -22,10 +25,19 @@ def main_qa_model_training():
     parser.add_argument('--output-dir', default='qa_eval_output', type=str)
     parser.add_argument('--overwrite', action='store_true')
     opt = parser.parse_args()
+    if opt.dataset_train is not None and opt.dataset_validation is not None and opt.dataset_test is not None:
+        dataset_files = {
+            'train': opt.dataset_train,
+            'validation': opt.dataset_validation,
+            'test': opt.dataset_test
+        }
+    else:
+        dataset_files = None
 
     run_qa_evaluation(
         dataset=opt.dataset,
         dataset_name=opt.dataset_name,
+        dataset_files=dataset_files,
         language_model=opt.model,
         eval_step=opt.eval_step,
         random_seed=opt.random_seed,
