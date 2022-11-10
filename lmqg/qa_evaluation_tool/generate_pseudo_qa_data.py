@@ -102,10 +102,10 @@ def generate_qa_pairs(
                     }
                 )
             full_output[_split] = output
-    if export_dir is not None:
-        for k, v in full_output.items():
-            if overwrite or not os.path.exists(pj(export_dir, f'{k}.jsonl')):
-                logging.info(f"saving {k} at {pj(export_dir, f'{k}.jsonl')}")
-                with open(pj(export_dir, f'{k}.jsonl'), 'w') as f:
-                    f.write('\n'.join([json.dumps(i) for i in v]))
+
+            if export_dir is not None:
+                logging.info(f"saving {_split} at {pj(export_dir, f'{_split}.jsonl')}")
+                with open(pj(export_dir, f'{_split}.jsonl'), 'w') as f:
+                    f.write('\n'.join([json.dumps(i) for i in output]))
+
     return full_output
