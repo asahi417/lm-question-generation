@@ -23,10 +23,10 @@ QAE () {
 # Running
 QAE "t5-large-squad"
 QAE "t5-base-squad"
-
-# TORUN
 QAE "t5-small-squad"
 QAE "bart-large-squad"
+
+# TORUN
 QAE "bart-base-squad"
 
 QAE "t5-large-squad-multitask"
