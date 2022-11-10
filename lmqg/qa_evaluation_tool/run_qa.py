@@ -244,19 +244,19 @@ def run_qa_evaluation(dataset: str,
     train_example = raw_datasets[split_train]
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
-        remove_columns=train_example.column_names, load_from_cache_file=True, desc="Running tokenizer on train dataset"
+        remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
     # Validation Feature Creation
     validation_example = raw_datasets[split_validation]
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
-        remove_columns=validation_example.column_names, load_from_cache_file=True, desc="Running tokenizer on validation dataset",
+        remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
     # Predict Feature Creation
     test_example = raw_datasets[split_test]
     test_dataset = test_example.map(
         prepare_validation_features, remove_columns=test_example.column_names,
-        batched=True, num_proc=None, load_from_cache_file=True, desc="Running tokenizer on prediction dataset"
+        batched=True, num_proc=None, desc="Running tokenizer on prediction dataset"
     )
 
     # Post-processing:
