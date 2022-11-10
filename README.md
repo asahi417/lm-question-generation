@@ -199,6 +199,6 @@ and return a list of dictionaries with `question` and `answer`.
 
 ## Misc
 Following link is useful if you need to reproduce the results in our paper.
-- [Model Fine-tuning/Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/qg_model_training)
-- [QA based Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/qa_based_evaluation)
-- [NQG model baseline](https://github.com/asahi417/lm-question-generation/tree/master/misc/nqg_baseline)
+- [Model Fine-tuning/Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/emnlp_2022/qg_model_training)
+- [QA based Evaluation](https://github.com/asahi417/lm-question-generation/tree/master/misc/emnlp_2022/qa_based_evaluation)
+- [NQG model baseline](https://github.com/asahi417/lm-question-generation/tree/master/misc/emnlp_2022/nqg_baseline)

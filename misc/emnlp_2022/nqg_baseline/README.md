@@ -5,7 +5,7 @@ Here we explain how we collect predictions for our analysis from ***non*** langu
 As our non-LM baseline, we employ [Neural Question Generation](https://arxiv.org/abs/1705.00106) (NQG), which is an LSTM based seq2seq model for the question generation task.
 To get the prediction from the NQG model, we follow the author's [github repo](https://github.com/xinyadu/nqg) with a trained model checkpoint 
 shared [here](https://github.com/xinyadu/nqg/issues/9).
-The prediction file can be found at [here](./nonlm.sample.test.hyp.txt), and following steps allow to reproduce the prediction file from scratch.
+The prediction file can be found at [here](nonlm.sample.test.hyp.txt), and following steps allow to reproduce the prediction file from scratch.
 
 ***Step 1:*** Install the repo and create a directory to put the model checkpoint. Make sure that your environment has `torch` installed.
 ```shell
