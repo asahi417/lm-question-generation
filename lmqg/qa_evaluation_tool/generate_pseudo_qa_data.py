@@ -32,11 +32,7 @@ def generate_qa_pairs(
     full_output = {}
     model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True, drop_answer_error_text=True)
     if answer_extraction:
-        # model = TransformersQG(model=qg_model,
-        #                        language=language,
-        #                        drop_answer_error_text=True,
-        #                        drop_overflow_error_text=True,
-        #                        drop_highlight_error_text=True)
+
         if answer_model is None and answer_extraction:
             answer_model = 'language_model' if model.add_prefix else 'keyword_extraction'
         for _split in data:
@@ -109,6 +105,7 @@ def generate_qa_pairs(
     if export_dir is not None:
         for k, v in full_output.items():
             if overwrite or not os.path.exists(pj(export_dir, f'{k}.jsonl')):
+                logging.info(f"saving {k} at {pj(export_dir, f'{k}.jsonl')}")
                 with open(pj(export_dir, f'{k}.jsonl'), 'w') as f:
                     f.write('\n'.join([json.dumps(i) for i in v]))
     return full_output
