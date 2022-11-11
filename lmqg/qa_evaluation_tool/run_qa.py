@@ -272,6 +272,7 @@ def run_qa_evaluation(dataset: str,
         # Post-processing: we match the start logits and end logits to answers in the original context.
         print('post_processing_function/examples')
         print(len(examples))
+        print(len(features))
         predictions = postprocess_qa_predictions(
             examples=examples,
             features=features,
@@ -285,6 +286,8 @@ def run_qa_evaluation(dataset: str,
         )
         print('post_processing_function/predictions')
         print(len(predictions))
+        print()
+        input()
         # Format the result to the format the metric expects.
         formatted_predictions = [{"id": k, "prediction_text": _v} for k, _v in predictions.items()]
         references = [{"id": ex["id"], "answers": ex[answer_column_name]} for ex in examples]
