@@ -17,6 +17,7 @@ def generate_qa_pairs(
         batch_size: int = 256,
         export_dir: str = None,
         overwrite: bool = False):
+
     logging.info(f'generate QA pairs from {anchor_data} with {qg_model}')
     if anchor_data_name is None:
         data = load_dataset(anchor_data)
@@ -31,8 +32,8 @@ def generate_qa_pairs(
 
     full_output = {}
     model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True, drop_answer_error_text=True)
+    logging.info(f"Export dir: {export_dir}")
     if answer_extraction:
-
         if answer_model is None and answer_extraction:
             answer_model = 'language_model' if model.add_prefix else 'keyword_extraction'
         for _split in data:
@@ -43,6 +44,7 @@ def generate_qa_pairs(
                         full_output[_split] = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
                     continue
             output = []
+            id_books = {}
             for tmp_data in tqdm(data[_split]):
                 out = model.generate_qa(
                     context=tmp_data['context'],
@@ -52,9 +54,14 @@ def generate_qa_pairs(
                 if out is None or len(out) == 0:
                     continue
                 for q, a in out:
+                    if tmp_data['id'] in id_books:
+                        id_books[tmp_data['id']] += 1
+                    else:
+                        id_books[tmp_data['id']] = 0
+                    _id = f"{tmp_data['id']}-{id_books[tmp_data['id']]}"
                     output.append(
                         {
-                            'id': tmp_data['id'],
+                            'id': _id,
                             'title': tmp_data['title'],
                             'context': tmp_data['context'],
                             'question': q,
@@ -65,6 +72,10 @@ def generate_qa_pairs(
                         }
                     )
             full_output[_split] = output
+            if export_dir is not None:
+                logging.info(f"saving {_split} at {pj(export_dir, f'{_split}.jsonl')}")
+                with open(pj(export_dir, f'{_split}.jsonl'), 'w') as f:
+                    f.write('\n'.join([json.dumps(i) for i in output]))
     else:
         for _split in data:
             logging.info(f'running prediction on {_split}')
