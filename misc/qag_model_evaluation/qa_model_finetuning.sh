@@ -16,7 +16,7 @@ QAE () {
     --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
     --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
     --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
-    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --skip-training
+    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
   done
 }
 

@@ -4,18 +4,18 @@ BATCH=14
 qa_generation_squadshifts () {
   MODEL=${1}
 
-  NAME='new_wiki'
-  lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
-
+#  NAME='reddit'
+#  lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
+#
 #  for NAME in 'new_wiki' 'nyt' 'reddit'
 #  do
 #    lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
 #  done
 
-#  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-#  do
-#    lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
-#  done
+  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
+  do
+    lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
+  done
 }
 
 qa_generation_squadshifts "t5-large-squad-multitask"
