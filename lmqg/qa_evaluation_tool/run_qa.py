@@ -246,18 +246,27 @@ def run_qa_evaluation(dataset: str,
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
+    print(train_example)
+    print(train_dataset)
+    input()
     # Validation Feature Creation
     validation_example = raw_datasets[split_validation]
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
+    print(validation_example)
+    print(validation_dataset)
+    input()
     # Predict Feature Creation
     test_example = raw_datasets[split_test]
     test_dataset = test_example.map(
-        prepare_validation_features, remove_columns=test_example.column_names,
-        batched=True, num_proc=None, desc="Running tokenizer on prediction dataset"
+        prepare_validation_features, batched=True, num_proc=None,
+        remove_columns=test_example.column_names, desc="Running tokenizer on prediction dataset"
     )
+    print(test_example)
+    print(test_dataset)
+    input()
 
     # Post-processing:
     def post_processing_function(examples, features, predictions, stage="eval"):
