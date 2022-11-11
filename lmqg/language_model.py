@@ -17,7 +17,11 @@ from .spacy_module import SpacyPipeline
 __all__ = ('TransformersQG', 'ADDITIONAL_SP_TOKENS', 'TASK_PREFIX', 'clean')
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
-TASK_PREFIX = {"ae": "extract answers", "qg": "generate question"}
+TASK_PREFIX = {
+    "ae": "extract answers",
+    "qg": "generate question",
+    "qag": "generate question and answer"
+}
 CE_IGNORE_INDEX = -100
 ADDITIONAL_SP_TOKENS = {'hl': '<hl>'}
 NUM_WORKERS = int(os.getenv('NUM_WORKERS', '0'))

@@ -19,8 +19,7 @@ evaluate bart_large_squad en qg_squad bart-large-squad
 lmqg-train-search -m facebook/bart-base -b 32 -g 2 4 8 16 -c lmqg_output/bart_base_squad
 evaluate bart_base_squad en qg_squad bart-base-squad
 # QG + Answer Extraction
-lmqg-train-search
-lmqg-train-search -m t5-large -b 16 -g 4 8 -c lmqg_output/t5_large_squad_answer -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae' --label-smoothing 0.15 --n-max-config 1
+lmqg-train-search -m t5-large -b 16 -g 4 8 -c lmqg_output/t5_large_squad_answer -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 evaluate t5_large_squad_answer en qg_squad t5-large-squad-multitask
 lmqg-train-search -m t5-base  -b 32 -g 2 4 8 -c lmqg_output/t5_base_squad_answer -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 evaluate t5_base_squad_answer en qg_squad t5-base-squad-multitask

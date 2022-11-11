@@ -66,7 +66,7 @@ class Trainer:
 
     def __init__(self,
                  checkpoint_dir: str,
-                 dataset_path: str = "asahi417/qg_squad",
+                 dataset_path: str = "lmqg/qg_squad",
                  dataset_name: str = 'default',
                  input_types: List or str = 'paragraph_answer',
                  output_types: List or str = 'question',
