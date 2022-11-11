@@ -241,23 +241,23 @@ def run_qa_evaluation(dataset: str,
         return tokenized_examples
 
     # Create train feature from dataset
-    train_example = raw_datasets[split_train]
+    # train_example = raw_datasets[split_train]
+    train_example = raw_datasets[split_train].select(list(range(100)))
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
     print(train_example)
     print(train_dataset)
-    input()
     # Validation Feature Creation
-    validation_example = raw_datasets[split_validation]
+    # validation_example = raw_datasets[split_validation]
+    validation_example = raw_datasets[split_validation].select(list(range(100)))
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
     print(validation_example)
     print(validation_dataset)
-    input()
     # Predict Feature Creation
     test_example = raw_datasets[split_test]
     test_dataset = test_example.map(
@@ -266,11 +266,12 @@ def run_qa_evaluation(dataset: str,
     )
     print(test_example)
     print(test_dataset)
-    input()
 
     # Post-processing:
     def post_processing_function(examples, features, predictions, stage="eval"):
         # Post-processing: we match the start logits and end logits to answers in the original context.
+        print('post_processing_function/examples')
+        print(len(examples))
         predictions = postprocess_qa_predictions(
             examples=examples,
             features=features,
@@ -282,6 +283,8 @@ def run_qa_evaluation(dataset: str,
             output_dir=output_dir,
             prefix=stage
         )
+        print('post_processing_function/predictions')
+        print(len(predictions))
         # Format the result to the format the metric expects.
         formatted_predictions = [{"id": k, "prediction_text": _v} for k, _v in predictions.items()]
         references = [{"id": ex["id"], "answers": ex[answer_column_name]} for ex in examples]
