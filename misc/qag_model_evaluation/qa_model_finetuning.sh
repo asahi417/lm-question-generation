@@ -11,31 +11,33 @@ done
 QAE () {
   MODEL=${1}
 
-  NAME='amazon'
-  lmqg-qae -m "${LM}" -d "json" \
-  --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
-  --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
-  --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
-  --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
+#  NAME='amazon'
+#  lmqg-qae -m "${LM}" -d "json" \
+#  --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
+#  --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
+#  --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
+#  --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
 
-#  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-#  do
-#    lmqg-qae -m "${LM}" -d "json" \
-#    --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
-#    --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
-#    --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
-#    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
-#  done
+  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
+  do
+    lmqg-qae -m "${LM}" -d "json" \
+    --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
+    --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
+    --dataset-test "qa_squadshifts_pseudo/${MODEL}.${NAME}/test.jsonl" \
+    --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
+  done
 }
 
-# Running
+# DONE
+QAE "t5-small-squad"
+
+# TORUN
 QAE "t5-large-squad"
 QAE "t5-base-squad"
-QAE "t5-small-squad"
 QAE "bart-large-squad"
 QAE "bart-base-squad"
 
-# TORUN
+# Running
 QAE "t5-large-squad-multitask"
 QAE "t5-base-squad-multitask"
 QAE "t5-small-squad-multitask"
