@@ -272,7 +272,12 @@ def run_qa_evaluation(dataset: str,
         # Post-processing: we match the start logits and end logits to answers in the original context.
         print('post_processing_function/examples')
         print(examples)
+        for i in examples:
+            print(i)
+            print(i['answers'] in i['context'])
         print(features)
+        for i in features:
+            print(i)
         predictions = postprocess_qa_predictions(
             examples=examples,
             features=features,
