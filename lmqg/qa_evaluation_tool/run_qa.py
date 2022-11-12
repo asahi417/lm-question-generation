@@ -255,11 +255,14 @@ def run_qa_evaluation(dataset: str,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
     # Predict Feature Creation
-    test_example = raw_datasets[split_test]
-    test_dataset = test_example.map(
-        prepare_validation_features, batched=True, num_proc=None,
-        remove_columns=test_example.column_names, desc="Running tokenizer on prediction dataset"
-    )
+    if split_test in raw_datasets:
+        test_example = raw_datasets[split_test]
+        test_dataset = test_example.map(
+            prepare_validation_features, batched=True, num_proc=None,
+            remove_columns=test_example.column_names, desc="Running tokenizer on prediction dataset"
+        )
+    else:
+        test_example = test_dataset = None
 
     # Post-processing:
     def post_processing_function(examples, features, predictions, stage="eval"):
@@ -335,20 +338,20 @@ def run_qa_evaluation(dataset: str,
         trainer.save_model(best_model_path)
 
     # Evaluation
-    logging.info("*** Evaluate ***")
-    trainer = QuestionAnsweringTrainer(
-        model=AutoModelForQuestionAnswering.from_pretrained(best_model_path, local_files_only=local_file_only),
-        args=TrainingArguments(report_to=None, output_dir=output_dir, seed=random_seed, evaluation_strategy="no"),
-        eval_dataset=test_dataset,
-        eval_examples=test_example,
-        tokenizer=tokenizer,
-        data_collator=default_data_collator,
-        post_process_function=post_processing_function,
-        compute_metrics=compute_metrics,
-    )
-    metric = trainer.evaluate()
-    result = {k: v for k, v in metric.items()}
-    logging.info(json.dumps(result, indent=4))
-    with open(summary_file, 'w') as f:
-        json.dump(result, f)
-
+    if test_example is not None and test_dataset is not None:
+        logging.info("*** Evaluate ***")
+        trainer = QuestionAnsweringTrainer(
+            model=AutoModelForQuestionAnswering.from_pretrained(best_model_path, local_files_only=local_file_only),
+            args=TrainingArguments(report_to=None, output_dir=output_dir, seed=random_seed, evaluation_strategy="no"),
+            eval_dataset=test_dataset,
+            eval_examples=test_example,
+            tokenizer=tokenizer,
+            data_collator=default_data_collator,
+            post_process_function=post_processing_function,
+            compute_metrics=compute_metrics,
+        )
+        metric = trainer.evaluate()
+        result = {k: v for k, v in metric.items()}
+        logging.info(json.dumps(result, indent=4))
+        with open(summary_file, 'w') as f:
+            json.dump(result, f)

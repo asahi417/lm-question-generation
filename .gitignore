@@ -5,18 +5,18 @@ cache
 app_hf.py
 misc/huggingface_models
 misc/lmqg_model_evaluation/*.csv
-misc/emnlp_2022/manual_evaluation/data/main*
-misc/emnlp_2022/manual_evaluation/data/final_result.*
-misc/emnlp_2022/manual_evaluation/output
-misc/emnlp_2022/manual_evaluation/data/prediction*
-misc/emnlp_2022/manual_evaluation/mturk_output
+misc/manual_evaluation/data/main*
+misc/manual_evaluation/data/final_result.*
+misc/manual_evaluation/output
+misc/manual_evaluation/data/prediction*
+misc/manual_evaluation/mturk_output
 lmqg_output
-misc/emnlp_2022/manual_evaluation/nlp-williams
-misc/emnlp_2022/qa_based_evaluation/data
+misc/manual_evaluation/nlp-williams
+misc/qa_based_evaluation/data
 
 #misc/qg_model_training/summary
 #misc/qg_model_training/config
-misc/emnlp_2022/manual_evaluation
+misc/manual_evaluation
 misc/utils
 
 dataset
