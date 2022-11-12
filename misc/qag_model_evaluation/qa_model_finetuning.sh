@@ -10,8 +10,6 @@ done
 # QAE with Generated Pseudo QA dataset
 QAE () {
   MODEL=${1}
-
-#  for NAME in 'new_wiki' 'nyt' 'reddit'
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
     lmqg-qae -m "${LM}" -d "json" \
@@ -24,11 +22,11 @@ QAE () {
 
 QAE "t5-base-squad"
 QAE "t5-large-squad"
-QAE "t5-small-squad"  # done
+QAE "t5-small-squad"
 QAE "bart-base-squad"
 QAE "bart-large-squad"
 
 QAE "t5-large-squad-multitask"
 QAE "t5-base-squad-multitask"
+QAE "t5-small-squad-multitask"
 
-QAE "t5-small-squad-multitask" # to run

@@ -47,7 +47,7 @@ def generate_qa_pairs(
             id_books = {}
             for tmp_data in tqdm(data[_split]):
                 out = model.generate_qa(
-                    context=tmp_data['context'],
+                    tmp_data['context'],
                     answer_model=answer_model,
                     batch_size=batch_size
                 )

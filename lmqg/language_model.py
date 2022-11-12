@@ -236,7 +236,8 @@ class TransformersQG:
                  drop_highlight_error_text: bool = False,
                  drop_answer_error_text: bool = False,
                  keyword_extraction_model: str = 'positionrank',
-                 use_auth_token: bool = False):
+                 use_auth_token: bool = False,
+                 end2end_qag_model: bool = None):
         """ Transformers Language Model for Question Generation.
 
         @param model: Model alias or path to local model file.
@@ -256,6 +257,7 @@ class TransformersQG:
                                                       f"Please choose language from '{DEFAULT_MODELS.keys()}'," \
                                                       f"or specify 'model'."
             model = DEFAULT_MODELS[language]
+        self.end2end_qag_model = model.endswith('-qag') if end2end_qag_model is None else end2end_qag_model
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -281,8 +283,47 @@ class TransformersQG:
         logging.info(f'\t * Prefix: {self.add_prefix}')
         logging.info(f'\t * Language: {language} (ignore at the training phase)')
 
+    def generate_qa_end2end(self,
+                            list_context: str or List,
+                            batch_size: int = None,
+                            num_beams: int = 4,
+                            cache_path: str = None):
+        """ Generate question from paragraph and answer. Note that `list_answer` is needed unless they are already
+        highlighted in the `list_context`. eg) "I live in <hl> Tokyo <hl>."
+
+        @param list_context: List of input texts.
+        @param batch_size: Batch size.
+        @param num_beams: Number of beam for model generation.
+        @param cache_path: Path to pre-compute features.
+        @return: List of generated sentences.
+        """
+        prefix_type = 'qag' if self.add_prefix else None
+        single_input = False
+        if type(list_context) is str:
+            list_context = [list_context]
+            single_input = True
+        output = self.generate_prediction(
+            list_context, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams, batch_size=batch_size
+        )
+
+        def format_qa(list_raw_string):
+            tmp = []
+            for raw_string in list_raw_string:
+                if "Q: " not in raw_string or ", A: " not in raw_string:
+                    logging.info(f"invalid prediction: {raw_string}")
+                else:
+                    q, a = raw_string.split(", A: ")
+                    q = q.replace("Q: ", "")
+                    tmp.append([q, a])
+            return tmp
+
+        output = [format_qa(o.split("\n")) for o in output]
+        if single_input:
+            return output[0]
+        return output
+
     def generate_qa(self,
-                    context: str,
+                    list_context: str or List,
                     batch_size: int = None,
                     num_beams: int = 4,
                     cache_path: str = None,
@@ -291,7 +332,7 @@ class TransformersQG:
                     sentence_level: bool = False):
         """ Generate question given context.
 
-        @param context: Input text.
+        @param list_context: Input text.
         @param batch_size: Batch size.
         @param num_beams: Number of beam for model generation.
         @param cache_path: Path to pre-compute features.
@@ -302,79 +343,35 @@ class TransformersQG:
         @param sentence_level: Run prediction on each sentence of the context independently to reduce complexity.
         @return: List of generated sentences.
         """
-        list_answer = self.generate_a(
-            context, batch_size=batch_size, num_beams=num_beams, cache_path=cache_path,
-            sentence_level=sentence_level, answer_model=answer_model, num_questions=num_questions
-        )
-        if list_answer is None:
-            return None
-        list_context = [context] * len(list_answer)
-        logging.info('running model for `qg`')
-        list_question = self.generate_q(
-            list_context,
-            list_answer=list_answer,
-            batch_size=batch_size,
-            cache_path=cache_path,
-            num_beams=num_beams,
-            sentence_level=sentence_level
-        )
-        assert len(list_answer) == len(list_question)
-        return list(zip(list_question, list_answer))
-
-    # def generate_a_batch(self,
-    #                      context: List,
-    #                      batch_size: int = None,
-    #                      num_beams: int = 4,
-    #                      cache_path: str = None,
-    #                      sentence_level: bool = False,
-    #                      answer_model: str = None,
-    #                      num_questions: int = None):
-    #     if answer_model is None:
-    #         if self.add_prefix:
-    #             answer_model = 'language_model'
-    #         else:
-    #             answer_model = 'keyword_extraction'
-    #
-    #     logging.info(f'running model for `answer_extraction`: {answer_model}')
-    #     if answer_model == 'keyword_extraction':
-    #         num_questions = 10 if num_questions is None else num_questions
-    #         output = []
-    #         for c in context:
-    #             answer = self.spacy_module.keyword(c, num_questions)
-    #             for a in answer:
-    #                 output.append((c, a))
-    #         return output
-    #     elif answer_model == 'language_model':
-    #         input_context = []
-    #         input_highlight = []
-    #         for c in context:
-    #             list_sentence = self.spacy_module.sentence(c)  # split into sentence
-    #             input_context += [c] * len(list_sentence)
-    #             input_highlight += list_sentence
-    #
-    #         if not self.add_prefix:
-    #             raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
-    #                              f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
-    #
-    #         prefix_type = 'ae' if self.add_prefix else None
-    #         list_input = [context] * len(list_sentence)
-    #         if sentence_level:
-    #             list_input = list_sentence
-    #         answer = self.generate_prediction(
-    #             list_input, highlights=list_sentence, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
-    #             batch_size=batch_size)
-    #         answer = [clean(i) for i in answer]
-    #         answer = list(filter(None, answer))  # remove None
-    #         answer = list(filter(lambda x: x in context, answer))  # remove answers not in context (should not be happened though)
-    #         if len(answer) == 0:
-    #             if self.drop_answer_error_text:
-    #                 return None
-    #             raise AnswerNotFoundError(context)
-    #         if num_questions is not None:
-    #             answer = answer[:min(num_questions, len(answer))]
-    #         return answer
-    #     else:
-    #         raise ValueError(f'unknown answer model: {answer_model}')
+        if self.end2end_qag_model:
+            return self.generate_qa_end2end(list_context, batch_size, num_beams, cache_path)
+        output = []
+        single_input = False
+        if type(list_context) is str:
+            list_context = [list_context]
+            single_input = True
+        for c in list_context:
+            list_answer = self.generate_a(
+                c, batch_size=batch_size, num_beams=num_beams, cache_path=cache_path,
+                sentence_level=sentence_level, answer_model=answer_model, num_questions=num_questions
+            )
+            if list_answer is None:
+                return None
+            list_context = [c] * len(list_answer)
+            logging.info('running model for `qg`')
+            list_question = self.generate_q(
+                list_context,
+                list_answer=list_answer,
+                batch_size=batch_size,
+                cache_path=cache_path,
+                num_beams=num_beams,
+                sentence_level=sentence_level
+            )
+            assert len(list_answer) == len(list_question)
+            output.append(list(zip(list_question, list_answer)))
+        if single_input:
+            return output[0]
+        return output
 
     def generate_a(self,
                    context: str,
@@ -397,6 +394,7 @@ class TransformersQG:
             - `language_model`: LM predicts answers (Model should have been finetuned on `answer_extraction`.
         @return: List of generated answers.
         """
+        assert not self.end2end_qag_model, "end2end qag model can not generate answer only"
         if answer_model is None:
             if self.add_prefix:
                 answer_model = 'language_model'
@@ -435,7 +433,7 @@ class TransformersQG:
             raise ValueError(f'unknown answer model: {answer_model}')
 
     def generate_q(self,
-                   list_context: List,
+                   list_context: str or List,
                    list_answer: List = None,
                    batch_size: int = None,
                    num_beams: int = 4,
@@ -452,8 +450,14 @@ class TransformersQG:
         @param sentence_level: Run prediction on each sentence of the context independently to reduce complexity.
         @return: List of generated sentences.
         """
+        assert not self.end2end_qag_model, "end2end qag model can not generate question only"
         prefix_type = 'qg' if self.add_prefix else None
+        single_input = False
+        if type(list_context) is str:
+            list_context = [list_context]
+            single_input = True
         list_input = list_context
+
         if sentence_level:
             assert list_answer is not None, '`sentence_level` needs `list_answer`.'
             assert len(list_answer) == len(list_context), str([len(list_answer), len(list_context)])
@@ -462,9 +466,12 @@ class TransformersQG:
                 s = [sentence for sentence in self.spacy_module.sentence(context) if answer in sentence]
                 list_sentence.append(s[0] if len(s) != 0 else context)
             list_input = list_sentence
-        return self.generate_prediction(
+        output = self.generate_prediction(
             list_input, highlights=list_answer, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
             batch_size=batch_size)
+        if single_input:
+            return output[0]
+        return output
 
     def generate_prediction(self, inputs: List, highlights: List or None = None, prefix_type: str = None,
                             num_beams: int = 4, batch_size: int = None, cache_path: str = None):
