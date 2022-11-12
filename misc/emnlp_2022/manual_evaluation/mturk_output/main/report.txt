@@ -1,0 +1,171 @@
+## INFO ##
+	 - num of qualified worker: 38
+	 - num of unique worker   : 19
+	 - num of new worker      : 19
+	 - frequency              : [('A11S8IAAVDXCUS', 53), ('A13XXMDHOULEZ7', 63), ('A1FP3SH704X01V', 4), ('A1V2H0UF94ATWY', 1), ('A20X14OMRL0YPZ', 23), ('A22T69YW4WUANF', 49), ('A2GK8NS27GDFCZ', 1), ('A2VE5IV9OD2SK1', 1), ('A35BY30TC8WCL4', 89), ('A36T7N6CT9GUCG', 1), ('A3862RIFFUV141', 3), ('A3C3Q963MQDPGT', 16), ('A3UV55HC87DO9C', 8), ('A5V3ZMQI0PU3F', 6), ('A7R1OLLU1Z6RA', 1), ('AAWX7QFQUNM6D', 99), ('ACGHHDT7RY1AH', 73), ('AM0JKZVOEOTMA', 7), ('ATR6RB1RULOC0', 2)]
+
+## AGREEMENTS ##
+Model: T5 Large
+ * correctness
+	 - Agree   : 342/500
+	 - Split   : 14/500
+	 - Disagree: 144/500
+ * grammaticality
+	 - Agree   : 422/500
+	 - Split   : 3/500
+	 - Disagree: 75/500
+ * understandability
+	 - Agree   : 404/500
+	 - Split   : 6/500
+	 - Disagree: 90/500
+
+Model: T5 Small
+ * correctness
+	 - Agree   : 284/500
+	 - Split   : 30/500
+	 - Disagree: 186/500
+ * grammaticality
+	 - Agree   : 385/500
+	 - Split   : 5/500
+	 - Disagree: 110/500
+ * understandability
+	 - Agree   : 359/500
+	 - Split   : 19/500
+	 - Disagree: 122/500
+
+Model: BART Large
+ * correctness
+	 - Agree   : 288/500
+	 - Split   : 19/500
+	 - Disagree: 193/500
+ * grammaticality
+	 - Agree   : 404/500
+	 - Split   : 2/500
+	 - Disagree: 94/500
+ * understandability
+	 - Agree   : 388/500
+	 - Split   : 14/500
+	 - Disagree: 98/500
+
+Model: T5 Large (No Passage)
+ * correctness
+	 - Agree   : 326/500
+	 - Split   : 13/500
+	 - Disagree: 161/500
+ * grammaticality
+	 - Agree   : 411/500
+	 - Split   : 1/500
+	 - Disagree: 88/500
+ * understandability
+	 - Agree   : 390/500
+	 - Split   : 4/500
+	 - Disagree: 106/500
+
+Model: T5 Large (No Answer)
+ * correctness
+	 - Agree   : 265/500
+	 - Split   : 40/500
+	 - Disagree: 195/500
+ * grammaticality
+	 - Agree   : 419/500
+	 - Split   : 1/500
+	 - Disagree: 80/500
+ * understandability
+	 - Agree   : 388/500
+	 - Split   : 6/500
+	 - Disagree: 106/500
+
+Model: LSTM
+ * correctness
+	 - Agree   : 387/500
+	 - Split   : 7/500
+	 - Disagree: 106/500
+ * grammaticality
+	 - Agree   : 202/500
+	 - Split   : 26/500
+	 - Disagree: 272/500
+ * understandability
+	 - Agree   : 199/500
+	 - Split   : 47/500
+	 - Disagree: 254/500
+
+## AVERAGE SCORE ##
+Model: T5 Large
+ * correctness
+	 - score 1: 17
+	 - score 2: 10
+	 - score 3: 459
+ * grammaticality
+	 - score 2: 4
+	 - score 3: 493
+ * understandability
+	 - score 1: 4
+	 - score 2: 5
+	 - score 3: 485
+
+Model: T5 Small
+ * correctness
+	 - score 1: 86
+	 - score 2: 29
+	 - score 3: 355
+ * grammaticality
+	 - score 2: 23
+	 - score 3: 472
+ * understandability
+	 - score 1: 15
+	 - score 2: 11
+	 - score 3: 455
+
+Model: BART Large
+ * correctness
+	 - score 1: 34
+	 - score 2: 24
+	 - score 3: 423
+ * grammaticality
+	 - score 2: 17
+	 - score 3: 481
+ * understandability
+	 - score 1: 4
+	 - score 2: 11
+	 - score 3: 471
+
+Model: T5 Large (No Passage)
+ * correctness
+	 - score 1: 100
+	 - score 2: 22
+	 - score 3: 365
+ * grammaticality
+	 - score 2: 6
+	 - score 3: 493
+ * understandability
+	 - score 1: 2
+	 - score 2: 6
+	 - score 3: 488
+
+Model: T5 Large (No Answer)
+ * correctness
+	 - score 1: 95
+	 - score 2: 24
+	 - score 3: 341
+ * grammaticality
+	 - score 2: 8
+	 - score 3: 491
+ * understandability
+	 - score 1: 4
+	 - score 2: 3
+	 - score 3: 487
+
+Model: LSTM
+ * correctness
+	 - score 1: 448
+	 - score 2: 13
+	 - score 3: 32
+ * grammaticality
+	 - score 1: 15
+	 - score 2: 104
+	 - score 3: 355
+ * understandability
+	 - score 1: 127
+	 - score 2: 17
+	 - score 3: 309
+
