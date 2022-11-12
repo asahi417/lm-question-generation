@@ -10,7 +10,7 @@ def main_qa_model_training():
     parser = argparse.ArgumentParser(description='QA model training.')
     parser.add_argument('-m', '--model', default='distilbert-base-uncased', type=str)
     parser.add_argument('-d', '--dataset', default='lmqg/qa_squadshifts', type=str)
-    parser.add_argument('-n', '--dataset-name', default='new_wiki', type=str)
+    parser.add_argument('-n', '--dataset-name', default=None, type=str)
     parser.add_argument('--dataset-train', default=None, type=str)
     parser.add_argument('--dataset-validation', default=None, type=str)
     parser.add_argument('--dataset-test', default=None, type=str)
