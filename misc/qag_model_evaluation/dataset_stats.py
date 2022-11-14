@@ -9,7 +9,7 @@ LMS = ["t5-small-squad",
        "t5-large-squad-multitask",
        "bart-base-squad",
        "bart-large-squad"]
-DOMAINS = ["new_wiki", "reditt", "amazon", "nyt"]
+DOMAINS = ["new_wiki", "reddit", "amazon", "nyt"]
 
 table = []
 for lm in LMS:
