@@ -24,7 +24,8 @@ version_description = {
     'default': "This model is fine-tuned without parameter search (default configuration is taken from [ERNIE-GEN](https://arxiv.org/abs/2001.11314)).",
     'no-answer': "This model is fine-tuned without answer information, i.e. generate a question only given a paragraph (note that normal model is fine-tuned to generate a question given a pargraph and an associated answer in the paragraph).",
     'no-paragraph': "This model is fine-tuned without pargraph information but only the sentence that contains the answer.",
-    'multitask': "This model is fine-tuned on the answer extraction task as well as the question generation."
+    'multitask': "This model is fine-tuned on the answer extraction task as well as the question generation.",
+    "qag": "This model is fine-tuned on the end-to-end question and answer generation.",
 }
 sample_qg_dict = {
     "en": [
@@ -205,10 +206,16 @@ def get_readme(model_name: str, model_checkpoint):
     eval_file = "metric.first.sentence.paragraph_answer.question"
     add_info = []
     _sample_qg = sample_qg_dict[la]
+    _is_qag = False
     if model_name.endswith('no-answer'):
         _sample_qg = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample_qg]
         add_info.append(version_description['no-answer'])
         eval_file = "metric.first.sentence.paragraph_sentence.question"
+    elif model_name.endswith('qag'):
+        add_info.append(version_description['qag'])
+        _sample_qg = sorted(list(set([re.sub(r'\s+', ' ', i.replace('<hl>', '')) for i in _sample_qg])))
+        eval_file = "metric.first.sentence.paragraph.questions_answers"
+        _is_qag = True
     elif model_name.endswith('no-paragraph'):
         add_info.append(version_description['no-paragraph'])
         eval_file = "metric.first.sentence.sentence_answer.question"
@@ -223,21 +230,27 @@ def get_readme(model_name: str, model_checkpoint):
     # get widget
     sample_qa = []
     answer_extraction = False
-    if prefix_types is not None and len(prefix_types) > 1:  # multitask
-        answer_extraction = True
-        tags = "- question generation\n- answer extraction"
-        sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
-        sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_qa_dict[la]]
-        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
-        widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(sample_qa_dict[la])])
-    elif prefix_types is not None:
-        tags = "- question generation"
-        sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
-        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+    if _is_qag:
+        tags = "- questions and answers generation"
+        sample_qg = [f'{TASK_PREFIX["qag"]}: {i}' for i in _sample_qg]
+        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Questions & Answers Generation Example {n + 1}" """ for n, i in
+                            enumerate(sample_qg)])
     else:
-        tags = "- question generation"
-        sample_qg = _sample_qg
-        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+        if prefix_types is not None and len(prefix_types) > 1:  # multitask
+            answer_extraction = True
+            tags = "- question generation\n- answer extraction"
+            sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
+            sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_qa_dict[la]]
+            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+            widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(sample_qa_dict[la])])
+        elif prefix_types is not None:
+            tags = "- question generation"
+            sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
+            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+        else:
+            tags = "- question generation"
+            sample_qg = _sample_qg
+            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
 
     # usage
     usage = format_usage(model_name, sample_qg, sample_qa)
