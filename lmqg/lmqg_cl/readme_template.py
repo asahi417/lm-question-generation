@@ -221,7 +221,7 @@ def get_readme(model_name: str, model_checkpoint):
         eval_file = "metric.first.sentence.paragraph_sentence.question"
     elif model_name.endswith('qag'):
         add_info.append(version_description['qag'])
-        _sample_qg = re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))
+        _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
         # _sample_qg = sorted(list(set([re.sub(r'\s+', ' ', i.replace('<hl>', '')) for i in _sample_qg])))
         eval_file = "metric.first.sentence.paragraph.questions_answers"
         _is_qag = True
