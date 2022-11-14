@@ -171,8 +171,16 @@ question = pipe('{sample_qg[0]}')
 """
 
 
-def format_usage_lmqg(model_name, answer_extraction, language):
+def format_usage_lmqg(model_name, answer_extraction, language, qag_model):
     sample = sample_qg_dict_lmqg[language]
+    if qag_model:
+        return f"""
+from lmqg import TransformersQG
+# initialize model
+model = TransformersQG(language='{language}', model='{model_name}')
+# model prediction
+question = model.generate_qa(list_context=["{sample[0]}"], list_answer=["{sample[1]}"])
+        """
     if not answer_extraction:
         return f"""
 from lmqg import TransformersQG
@@ -213,7 +221,8 @@ def get_readme(model_name: str, model_checkpoint):
         eval_file = "metric.first.sentence.paragraph_sentence.question"
     elif model_name.endswith('qag'):
         add_info.append(version_description['qag'])
-        _sample_qg = sorted(list(set([re.sub(r'\s+', ' ', i.replace('<hl>', '')) for i in _sample_qg])))
+        _sample_qg = re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))
+        # _sample_qg = sorted(list(set([re.sub(r'\s+', ' ', i.replace('<hl>', '')) for i in _sample_qg])))
         eval_file = "metric.first.sentence.paragraph.questions_answers"
         _is_qag = True
     elif model_name.endswith('no-paragraph'):
@@ -254,7 +263,7 @@ def get_readme(model_name: str, model_checkpoint):
 
     # usage
     usage = format_usage(model_name, sample_qg, sample_qa)
-    usage_lmqg = format_usage_lmqg(model_name, answer_extraction=answer_extraction, language=la)
+    usage_lmqg = format_usage_lmqg(model_name, answer_extraction=answer_extraction, language=la, qag_model=_is_qag)
 
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
