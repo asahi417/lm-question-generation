@@ -212,9 +212,12 @@ class GridSearcher:
         for n, checkpoint_dir in enumerate(checkpoints):
             logging.info(f'## 1st RUN (EVAL): Configuration {n}/{len(checkpoints)} ##')
             checkpoint_dir_model = pj(checkpoint_dir, f'epoch_{self.epoch_partial}')
-            metric = evaluator(checkpoint_dir_model)
-            # except Exception:
-            metrics[checkpoint_dir_model] = metric[self.split][self.metric]
+            try:
+                metric = evaluator(checkpoint_dir_model)
+                # except Exception:
+                metrics[checkpoint_dir_model] = metric[self.split][self.metric]
+            except Exception as e:
+                logging.exception("Error while computing metric")
 
         metrics = sorted(metrics.items(), key=lambda x: x[1], reverse=True)
         with open(pj(self.checkpoint_dir, f"metric.{self.eval_config['prediction_level']}.1st.json"), 'w') as f:

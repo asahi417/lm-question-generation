@@ -309,11 +309,11 @@ class TransformersQG:
         def format_qa(list_raw_string):
             tmp = []
             for raw_string in list_raw_string:
-                if "Q: " not in raw_string or ", A: " not in raw_string:
+                if "question: " not in raw_string or ", answer: " not in raw_string:
                     logging.info(f"invalid prediction: {raw_string}")
                 else:
-                    q, a = raw_string.split(", A: ")
-                    q = q.replace("Q: ", "")
+                    q, a = raw_string.split(", answer: ")
+                    q = q.replace("question: ", "")
                     tmp.append([q, a])
             return tmp
 

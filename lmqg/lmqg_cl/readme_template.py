@@ -241,7 +241,10 @@ def get_readme(model_name: str, model_checkpoint):
     answer_extraction = False
     if _is_qag:
         tags = "- questions and answers generation"
-        sample_qg = [f'{TASK_PREFIX["qag"]}: {i}' for i in _sample_qg]
+        if prefix_types is not None:
+            sample_qg = [f'{TASK_PREFIX["qag"]}: {i}' for i in _sample_qg]
+        else:
+            sample_qg = _sample_qg
         widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Questions & Answers Generation Example {n + 1}" """ for n, i in
                             enumerate(sample_qg)])
     else:
