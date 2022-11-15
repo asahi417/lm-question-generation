@@ -27,7 +27,7 @@ def get_reference_files(path: str = 'asahi417/qg_squad', name: str = 'default', 
     """ Get reference files for automatic evaluation """
     url = f'https://huggingface.co/datasets/{path}/raw/main/reference_files'
     if cache_dir is None:
-        cache_dir = pj(DEFAULT_CACHE_DIR, 'reference_files', 'path')
+        cache_dir = pj(DEFAULT_CACHE_DIR, 'reference_files', path)
     output = {}
     for split in ['test', 'validation']:
         for feature in ['answer', 'question', 'paragraph', 'sentence']:
