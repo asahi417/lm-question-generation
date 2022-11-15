@@ -11,13 +11,14 @@ done
 QAE () {
   MODEL=${1}
   EVAL_STEP=${2}
-  NAME='amazon'
-  lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
+#  NAME='amazon'
+#  lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
 
 #  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-#  do
-#    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
-#  done
+  for NAME in 'new_wiki' 'nyt' 'reddit'
+  do
+    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
+  done
 
 #  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
 #  do
