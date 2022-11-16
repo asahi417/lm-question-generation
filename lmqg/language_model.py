@@ -4,6 +4,7 @@ import logging
 import pickle
 import re
 import urllib
+from math import exp
 from itertools import chain
 from typing import List, Dict
 from multiprocessing import Pool
@@ -607,3 +608,39 @@ class TransformersQG:
 
     def eval(self):
         self.model.eval()
+
+    def decoder_perplexity(self,
+                           src_texts: str or List,
+                           tgt_texts: str or List,
+                           batch: int = None):
+        single_input = False
+        loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
+
+        if type(src_texts) == str:
+            src_texts = [src_texts]
+            single_input = True
+        if type(tgt_texts) == str:
+            tgt_texts = [tgt_texts]
+        assert len(src_texts) == len(tgt_texts), f"{len(src_texts)} == {len(tgt_texts)}"
+        batch = len(tgt_texts) if batch is None else batch
+        batch_id = list(range(0, len(src_texts), batch)) + [len(tgt_texts)]
+        batch_id = list(zip(batch_id[:-1], batch_id[1:]))
+        loss_list = []
+        with torch.no_grad():
+            for s, e in batch_id:
+                model_inputs = self.tokenizer(src_texts[s:e], return_tensors='pt', padding=True, truncation=True)
+                with self.tokenizer.as_target_tokenizer():
+                    labels = self.tokenizer(tgt_texts[s:e], return_tensors='pt', padding=True, truncation=True)
+                model_inputs["labels"] = labels["input_ids"]
+                out = self.model(**model_inputs)
+                loss = loss_fct(out['logits'].view(-1, out['logits'].size(-1)), model_inputs["labels"].view(-1))
+                loss = loss.cpu().numpy().tolist()
+                loss_list += loss
+        ppl = [exp(i) for i in loss_list]
+        if single_input:
+            return ppl[0]
+        return ppl
+
+
+
+
