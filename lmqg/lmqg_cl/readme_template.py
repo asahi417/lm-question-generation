@@ -199,10 +199,7 @@ question_answer = model.generate_qa("{sample[0]}")
 """
 
 
-def get_readme(model_name: str,
-               model_checkpoint: str,
-               prediction_aggregation: str = "first",
-               prediction_level: str = ):
+def get_readme(model_name: str, model_checkpoint: str):
     with open(pj(model_checkpoint, "trainer_config.json")) as f:
         config = json.load(f)
     config_text = "\n".join([f" - {k}: {v}" for k, v in config.items()])
