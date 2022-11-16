@@ -199,7 +199,10 @@ question_answer = model.generate_qa("{sample[0]}")
 """
 
 
-def get_readme(model_name: str, model_checkpoint):
+def get_readme(model_name: str,
+               model_checkpoint: str,
+               prediction_aggregation: str = "first",
+               prediction_level: str = ):
     with open(pj(model_checkpoint, "trainer_config.json")) as f:
         config = json.load(f)
     config_text = "\n".join([f" - {k}: {v}" for k, v in config.items()])
@@ -222,8 +225,7 @@ def get_readme(model_name: str, model_checkpoint):
     elif model_name.endswith('qag'):
         add_info.append(version_description['qag'])
         _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
-        # _sample_qg = sorted(list(set([re.sub(r'\s+', ' ', i.replace('<hl>', '')) for i in _sample_qg])))
-        eval_file = "metric.first.sentence.paragraph.questions_answers"
+        eval_file = "metric.first.answer.paragraph.questions_answers"
         _is_qag = True
     elif model_name.endswith('no-paragraph'):
         add_info.append(version_description['no-paragraph'])
