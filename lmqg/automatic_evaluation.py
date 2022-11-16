@@ -210,7 +210,7 @@ def evaluate(export_dir: str = '.',
                     tmp = f_read.read().split('\n')
                 if len(tmp) == len(raw_input):
                     return path_hypothesis
-                logging.warning('recompute {}'.format(path_hypothesis))
+                logging.warning(f'recompute {path_hypothesis}')
             output = lm.generate_q(
                 raw_input, batch_size=batch_size, num_beams=n_beams,
                 cache_path=None if data_caches is None else data_caches[split])
@@ -234,11 +234,11 @@ def evaluate(export_dir: str = '.',
         if prediction_level == 'answer':
             src_file = None
         else:
-            src_file = reference_files['{}-{}'.format(prediction_level, split)]
+            src_file = reference_files[f'{prediction_level}-{split}']
 
         __metric, _ = compute_metrics(
             out_file=hypothesis_file,
-            tgt_file=reference_files['question-{}'.format(split)],
+            tgt_file=reference_files[f'{output_type}-{split}'],
             src_file=src_file,
             prediction_aggregation=prediction_aggregation,
             language=language,
@@ -250,9 +250,7 @@ def evaluate(export_dir: str = '.',
     for _hypothesis_file, _split in zip([hypothesis_file_dev, hypothesis_file_test], [validation_split, test_split]):
         if _hypothesis_file is None:
             continue
-        # print(_split, metric)
         if _split in metric:
-            # print(list(metric[_split].keys()))
             _metric = get_metric(_split, _hypothesis_file, list(metric[_split].keys()))
             metric[_split].update(_metric)
         else:
