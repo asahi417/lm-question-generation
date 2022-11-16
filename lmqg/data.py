@@ -30,7 +30,7 @@ def get_reference_files(path: str = 'asahi417/qg_squad', name: str = 'default', 
         cache_dir = pj(DEFAULT_CACHE_DIR, 'reference_files', path)
     output = {}
     for split in ['test', 'validation']:
-        for feature in ['answer', 'question', 'paragraph', 'sentence']:
+        for feature in ['answer', 'question', 'paragraph', 'sentence', 'questions_answers']:
             if name == 'default':
                 filename = f'{feature}-{split}.txt'
             else:
@@ -45,7 +45,15 @@ def get_reference_files(path: str = 'asahi417/qg_squad', name: str = 'default', 
                 os.makedirs(os.path.dirname(path), exist_ok=True)
                 with open(path, "wb") as f:
                     r = requests.get(f'{url}/{filename}')
-                    f.write(r.content)
+                    content = r.content
+                    if "Entry not found" in str(content):
+                        continue
+                    f.write(content)
+            with open(path) as f:
+                line_length = len(f.read().split('\n'))
+            if line_length < 20:
+                os.remove(path)
+                continue
             assert os.path.exists(path)
             output['{}-{}'.format(feature, split)] = path
     return output
