@@ -219,7 +219,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         _sample_qg = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample_qg]
         add_info.append(version_description['no-answer'])
         eval_file = "metric.first.sentence.paragraph_sentence.question"
-    elif model_name.endswith('qag'):
+    elif 'qag' in model_name.split('-'):
         add_info.append(version_description['qag'])
         _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
         eval_file = "metric.first.answer.paragraph.questions_answers"
