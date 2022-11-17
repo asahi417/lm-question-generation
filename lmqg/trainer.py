@@ -222,6 +222,10 @@ class Trainer:
         saved_checkpoints = []
         with torch.cuda.amp.autocast(enabled=self.config.fp16):
             for e in range(self.current_epoch, self.config.epoch):  # loop over the epoch
+
+                # free the cache
+                torch.cuda.empty_cache()
+
                 mean_loss, global_step = self.train_single_epoch(loader, global_step, interval)
                 logging.info(f"[epoch {e}/{self.config.epoch}] average loss: {round(mean_loss, 3)}, "
                              f"lr: {self.optimizer.param_groups[0]['lr']}")

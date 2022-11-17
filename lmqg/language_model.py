@@ -609,11 +609,34 @@ class TransformersQG:
     def eval(self):
         self.model.eval()
 
-    def decoder_perplexity(self,
-                           src_texts: str or List,
-                           tgt_texts: str or List,
-                           batch: int = None):
-        """TODO: Fix it in a wise way """
+    def get_perplexity(self,
+                       list_context: List,
+                       list_answer: List,
+                       list_question: List,
+                       batch_size: int = None):
+        assert not self.end2end_qag_model, "end2end qag model can not generate question only"
+        # get perplexity for the answer given the paragraph
+        prefix_type = 'ae' if self.add_prefix else None
+        list_input = []
+        for context, answer in zip(list_context, list_answer):
+            # split into sentences and find a sentence that contain the answer
+            sentences = [s for s in self.spacy_module.sentence(context) if answer in s]
+            if len(sentences) == 0:
+                raise ValueError(f"answer `{answer}` not found in `{context}`")
+            list_input.append(sentences[0])
+
+
+        encode_list = self.text_to_encode(
+            list_context,
+            highlights=list_answer,
+            prefix_type=prefix_type
+        )
+        loader = self.get_data_loader(encode_list, batch_size=batch_size)
+
+
+    def compute_decoder_perplexity(self, src_texts: str or List, tgt_texts: str or List, batch: int = None):
+        """ Compute the perplexity on the decoder of the seq2seq model. """
+        self.eval()
         single_input = False
         loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
 
