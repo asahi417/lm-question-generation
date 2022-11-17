@@ -78,5 +78,5 @@ def main_generate_qa_pair():
         export_dir=opt.export_dir,
         overwrite=opt.overwrite
     )
-    if opt.compute_ppl:
+    # if opt.compute_ppl:
 
