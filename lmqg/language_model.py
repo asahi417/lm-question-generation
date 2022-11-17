@@ -704,7 +704,7 @@ class TransformersQG:
         batch_id = list(zip(batch_id[:-1], batch_id[1:]))
         loss_list = []
         with torch.no_grad():
-            for s, e in batch_id:
+            for s, e in tqdm(batch_id):
                 model_inputs = self.tokenizer(src_texts[s:e], return_tensors='pt', padding=True, truncation=True)
                 with self.tokenizer.as_target_tokenizer():
                     labels = self.tokenizer(tgt_texts[s:e], return_tensors='pt', padding=True, truncation=True)
