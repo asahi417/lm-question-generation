@@ -2,9 +2,10 @@
 import json
 from lmqg import TransformersQG
 
-models = ["t5-large-squad-multitask", "t5-base-squad-multitask", "t5-small-squad-multitask"]
+# models = ["t5-large-squad-multitask", "t5-base-squad-multitask", "t5-small-squad-multitask"]
+models = ["t5-small-squad-multitask"]
 domains = ['amazon', 'new_wiki', 'nyt', 'reddit']
-batch = 512
+batch = 128
 for m in models:
     model = TransformersQG(f"lmqg/{m}")
     for d in domains:

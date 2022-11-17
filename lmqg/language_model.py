@@ -631,6 +631,7 @@ class TransformersQG:
                        list_question: List = None,
                        list_questions_answers: List = None,
                        batch_size: int = None,
+                       fill_error=None,
                        target_output: str = 'answer'):
         if target_output == 'questions_answers':
             assert self.end2end_qag_model, "this method is for end2end QAG model"
@@ -650,6 +651,9 @@ class TransformersQG:
             for context, answer in zip(list_context, list_answer):
                 position = context.find(answer)
                 if position == -1:
+                    if fill_error is not None:
+                        list_input.append(fill_error)
+                        continue
                     raise HighlightNotFoundError(answer, context)
                 tmp = '{0}{1} {2} {1}{3}'.format(
                     context[:position], ADDITIONAL_SP_TOKENS['hl'], answer, context[position + len(answer):])
@@ -673,10 +677,16 @@ class TransformersQG:
                 # split into sentences and find a sentence that contain the answer
                 sentences = [s for s in self.spacy_module.sentence(context) if answer in s]
                 if len(sentences) == 0:
+                    if fill_error is not None:
+                        list_input.append(fill_error)
+                        continue
                     raise HighlightNotFoundError(answer, context)
                 sentence = sentences[0]
                 position = context.find(sentence)
                 if position == -1:
+                    if fill_error is not None:
+                        list_input.append(fill_error)
+                        continue
                     raise HighlightNotFoundError(sentence, context)
                 tmp = '{0}{1} {2} {1}{3}'.format(
                     context[:position], ADDITIONAL_SP_TOKENS['hl'], sentence, context[position + len(sentence):])
@@ -687,7 +697,11 @@ class TransformersQG:
             src_texts=list_input, tgt_texts=list_output, batch=batch_size
         )
 
-    def compute_decoder_perplexity(self, src_texts: str or List, tgt_texts: str or List, batch: int = None):
+    def compute_decoder_perplexity(self,
+                                   src_texts: str or List,
+                                   tgt_texts: str or List,
+                                   batch: int = None,
+                                   fill_error=None):
         """ Compute the perplexity on the decoder of the seq2seq model. """
         self.eval()
         single_input = False
@@ -698,6 +712,10 @@ class TransformersQG:
             single_input = True
         if type(tgt_texts) == str:
             tgt_texts = [tgt_texts]
+        if fill_error is not None:
+            # TODO find nans and remove them and return to the index
+            pass
+
         assert len(src_texts) == len(tgt_texts), f"{len(src_texts)} == {len(tgt_texts)}"
         batch = len(tgt_texts) if batch is None else batch
         batch_id = list(range(0, len(src_texts), batch)) + [len(tgt_texts)]
