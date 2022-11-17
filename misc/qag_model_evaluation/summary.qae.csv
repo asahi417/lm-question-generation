@@ -26,8 +26,10 @@ eval_exact_match,eval_f1,qg_model,data,data_name,qa_model
 21.06434641845407,39.86495251389928,t5-small-squad-multitask,qa_squadshifts,amazon,distilbert-base-uncased
 27.245627980922098,45.108787586525814,t5-small-squad-multitask,qa_squadshifts,nyt,distilbert-base-uncased
 24.38901486520534,44.44372156572737,t5-small-squad-multitask,qa_squadshifts,new_wiki,distilbert-base-uncased
+24.62762701489492,42.87079913655349,t5-small-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased
 25.677863213273977,46.15029603159996,t5-large-squad-multitask,qa_squadshifts,amazon,distilbert-base-uncased
 35.969793322734496,52.8584363506343,t5-large-squad-multitask,qa_squadshifts,nyt,distilbert-base-uncased
+29.014486839420528,47.47137603061919,t5-large-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased
 31.292517006802722,50.048397387028835,t5-large-squad-multitask,qa_squadshifts,new_wiki,distilbert-base-uncased
 29.765277215702145,45.72414277262728,t5-large-squad,qa_squadshifts,amazon,distilbert-base-uncased
 28.647214854111407,44.08102473146057,t5-large-squad,qa_squadshifts,reddit,distilbert-base-uncased
@@ -44,3 +46,4 @@ eval_exact_match,eval_f1,qg_model,data,data_name,qa_model
 35.054070597837175,51.73985968659963,gold_qa,qa_squadshifts,reddit,distilbert-base-uncased
 48.370429252782195,62.97151382183988,gold_qa,qa_squadshifts,nyt,distilbert-base-uncased
 41.370622323003275,58.182470355439584,gold_qa,qa_squadshifts,new_wiki,distilbert-base-uncased
+
