@@ -1,3 +1,4 @@
+import os
 import json
 from glob import glob
 import pandas as pd
@@ -14,4 +15,7 @@ for i in glob("qa_eval_output/silver_qa.*/*/test_result.json") + glob("qa_eval_o
     tmp['qa_model'] = lm
     output.append(tmp)
 df = pd.DataFrame(output)
+if os.path.exists("./summary.qae.csv"):
+    _df = pd.read_csv("./summary.qae.csv", index_col=0)
+    df = pd.concat([_df, df])
 df.to_csv("./summary.qae.csv", index=False)

@@ -238,7 +238,8 @@ class TransformersQG:
                  drop_answer_error_text: bool = False,
                  keyword_extraction_model: str = 'positionrank',
                  use_auth_token: bool = False,
-                 end2end_qag_model: bool = None):
+                 end2end_qag_model: bool = None,
+                 multitask_model: bool = None):
         """ Transformers Language Model for Question Generation.
 
         @param model: Model alias or path to local model file.
@@ -258,7 +259,16 @@ class TransformersQG:
                                                       f"Please choose language from '{DEFAULT_MODELS.keys()}'," \
                                                       f"or specify 'model'."
             model = DEFAULT_MODELS[language]
-        self.end2end_qag_model = model.endswith('-qag') if end2end_qag_model is None else end2end_qag_model
+        if end2end_qag_model is None:
+            self.end2end_qag_model = 'qag' in model.split('-')
+        else:
+            self.end2end_qag_model = end2end_qag_model
+
+        if multitask_model is None:
+            self.multitask_model = 'multitask' in model.split('-')
+        else:
+            self.multitask_model = multitask_model
+
         self.model_name = model
         self.max_length = max_length
         self.max_length_output = max_length_output
@@ -271,6 +281,7 @@ class TransformersQG:
             self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
         self.add_prefix = config.add_prefix if 'add_prefix' in config.to_dict().keys() else add_prefix
         assert self.add_prefix is not None, '`add_prefix` is required for non-fine-tuned models'
+        # assert self.add_prefix and self.multitask_model, 'multitask model should be with prefix'
         self.spacy_module = SpacyPipeline(language, keyword_extraction_model)
         # GPU setup
         self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
@@ -397,7 +408,7 @@ class TransformersQG:
         """
         assert not self.end2end_qag_model, "end2end qag model can not generate answer only"
         if answer_model is None:
-            if self.add_prefix:
+            if self.multitask_model:
                 answer_model = 'language_model'
             else:
                 answer_model = 'keyword_extraction'
@@ -407,13 +418,14 @@ class TransformersQG:
             num_questions = 10 if num_questions is None else num_questions
             return self.spacy_module.keyword(context, num_questions)
         elif answer_model == 'language_model':
+            assert self.multitask_model, "`language_model` is available only for multitask models"
             list_sentence = self.spacy_module.sentence(context)  # split into sentence
 
             if not self.add_prefix:
                 raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
                                  f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
 
-            prefix_type = 'ae' if self.add_prefix else None
+            prefix_type = 'ae'
             list_input = [context] * len(list_sentence)
             if sentence_level:
                 list_input = list_sentence
@@ -515,7 +527,11 @@ class TransformersQG:
         else:
             return label_smoothed_loss(output['logits'], encode['labels'].to(self.device), self.label_smoothing)
 
-    def text_to_encode(self, inputs, outputs: List = None, highlights: List = None, prefix_type: str = None,
+    def text_to_encode(self,
+                       inputs,
+                       outputs: List = None,
+                       highlights: List = None,
+                       prefix_type: str = None,
                        cache_path: str = None):
         """ Transform texts into encoded features.
 
@@ -611,28 +627,65 @@ class TransformersQG:
 
     def get_perplexity(self,
                        list_context: List,
-                       list_answer: List,
-                       list_question: List,
-                       batch_size: int = None):
-        assert not self.end2end_qag_model, "end2end qag model can not generate question only"
-        # get perplexity for the answer given the paragraph
-        prefix_type = 'ae' if self.add_prefix else None
-        list_input = []
-        for context, answer in zip(list_context, list_answer):
-            # split into sentences and find a sentence that contain the answer
-            sentences = [s for s in self.spacy_module.sentence(context) if answer in s]
-            if len(sentences) == 0:
-                raise ValueError(f"answer `{answer}` not found in `{context}`")
-            list_input.append(sentences[0])
+                       list_answer: List = None,
+                       list_question: List = None,
+                       list_questions_answers: List = None,
+                       batch_size: int = None,
+                       target_output: str = 'answer'):
+        if target_output == 'questions_answers':
+            assert self.end2end_qag_model, "this method is for end2end QAG model"
+            assert list_questions_answers is not None
+            if self.add_prefix:
+                list_input = [f"{TASK_PREFIX['qag']}: {i}" for i in list_context]
+            else:
+                list_input = list_context
+            list_output = list_questions_answers
+        elif target_output == 'question':
+            assert not self.end2end_qag_model, "this method is not for end2end QAG model"
+            assert list_answer is not None, '`list_answer` is required to compute ppl on question'
+            assert list_question is not None, '`list_question` is required to compute ppl on question'
+            prefix_type = 'qg' if self.add_prefix else None
+            list_input = []
+            list_output = list_question
+            for context, answer in zip(list_context, list_answer):
+                position = context.find(answer)
+                if position == -1:
+                    raise HighlightNotFoundError(answer, context)
+                tmp = '{0}{1} {2} {1}{3}'.format(
+                    context[:position], ADDITIONAL_SP_TOKENS['hl'], answer, context[position + len(answer):])
+                if prefix_type is None:
+                    list_input.append(tmp)
+                else:
+                    list_input.append(f'{TASK_PREFIX[prefix_type]}: {tmp}')
+        elif target_output == 'answer':
+            assert not self.end2end_qag_model, "this method is not for end2end QAG model"
+            assert self.multitask_model, "perplexity on answer is available only for multitask models"
+            assert list_answer is not None
+            if not self.add_prefix:
+                raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
+                                 f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
 
-
-        encode_list = self.text_to_encode(
-            list_context,
-            highlights=list_answer,
-            prefix_type=prefix_type
+            # get perplexity for the answer given the paragraph
+            prefix_type = 'ae'  # multitask model should have a prefix
+            list_input = []
+            list_output = list_answer
+            for context, answer in zip(list_context, list_answer):
+                # split into sentences and find a sentence that contain the answer
+                sentences = [s for s in self.spacy_module.sentence(context) if answer in s]
+                if len(sentences) == 0:
+                    raise HighlightNotFoundError(answer, context)
+                sentence = sentences[0]
+                position = context.find(sentence)
+                if position == -1:
+                    raise HighlightNotFoundError(sentence, context)
+                tmp = '{0}{1} {2} {1}{3}'.format(
+                    context[:position], ADDITIONAL_SP_TOKENS['hl'], sentence, context[position + len(sentence):])
+                list_input.append(f'{TASK_PREFIX[prefix_type]}: {tmp}')
+        else:
+            raise ValueError(f'invalid target_output {target_output}')
+        return self.compute_decoder_perplexity(
+            src_texts=list_input, tgt_texts=list_output, batch=batch_size
         )
-        loader = self.get_data_loader(encode_list, batch_size=batch_size)
-
 
     def compute_decoder_perplexity(self, src_texts: str or List, tgt_texts: str or List, batch: int = None):
         """ Compute the perplexity on the decoder of the seq2seq model. """

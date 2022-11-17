@@ -223,9 +223,9 @@ class Trainer:
         with torch.cuda.amp.autocast(enabled=self.config.fp16):
             for e in range(self.current_epoch, self.config.epoch):  # loop over the epoch
 
-                # free the cache
-                gc.collect()
-                torch.cuda.empty_cache()
+                # # free the cache
+                # gc.collect()
+                # torch.cuda.empty_cache()
 
                 mean_loss, global_step = self.train_single_epoch(loader, global_step, interval)
                 logging.info(f"[epoch {e}/{self.config.epoch}] average loss: {round(mean_loss, 3)}, "
@@ -244,8 +244,8 @@ class Trainer:
         self.optimizer.zero_grad()
         for n, encode in enumerate(data_loader):
 
-            gc.collect()
-            torch.cuda.empty_cache()
+            # gc.collect()
+            # torch.cuda.empty_cache()
 
             loss = self.model.encode_to_loss(encode)
             self.scaler.scale(loss).backward()
