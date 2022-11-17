@@ -18,12 +18,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 domains = ['amazon', 'new_wiki', 'nyt', 'reddit']
 
 
-def main(m, batch, target: str = "answer"):
+def main(m, batch, target: str = "answer", overwrite: bool = False):
     model = TransformersQG(f"lmqg/{m}")
     for d in domains:
         for split in ['train', 'validation']:
             output_file = f"qa_squadshifts_pseudo/{m}.{d}/perplexity_{target}.{split}.json"
-            if os.path.exists(output_file):
+            if os.path.exists(output_file) and not overwrite:
                 continue
 
             with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.jsonl") as f:
@@ -42,16 +42,16 @@ def main(m, batch, target: str = "answer"):
 
 
 if __name__ == '__main__':
-    # models = ["t5-large-squad-multitask", "t5-base-squad-multitask", "t5-small-squad-multitask"]
-
     parser = argparse.ArgumentParser(description='Get PPL')
     parser.add_argument('-b', '--batch', required=True, type=int)
     parser.add_argument('-t', '--target', required=True, type=str)
     parser.add_argument('-m', '--model', required=True, type=str)
+    parser.add_argument('--overwrite', help='', action='store_true')
     opt = parser.parse_args()
     main(
         m=opt.model,
         batch=opt.batch,
-        target=opt.target
+        target=opt.target,
+        overwrite=opt.overwrite
     )
 
