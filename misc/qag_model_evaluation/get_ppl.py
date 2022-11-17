@@ -8,9 +8,9 @@ batch = 512
 for m in models:
     model = TransformersQG(m)
     for d in domains:
-        dataset_name = f"{d}.{models}"
+        dataset_name = f"{d}.{m}"
         for split in ['train', 'validation']:
-            with open(f"qa_squadshifts_pseudo/{models}.{d}/{split}.jsonl") as f:
+            with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.jsonl") as f:
                 dataset_split = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
             print(f"Computing perplexity for answer: `{m}`, domain: `{d}`, split: `{split}`")
             ppl_answer = model.get_perplexity(
@@ -28,5 +28,5 @@ for m in models:
                 target_output='question',
                 batch_size=batch
             )
-            with open(f"qa_squadshifts_pseudo/{models}.{d}/perplexity.{split}.json", "w") as f:
+            with open(f"qa_squadshifts_pseudo/{m}.{d}/perplexity.{split}.json", "w") as f:
                 json.dump({"perplexity_answer": ppl_answer, "perplexity_question": ppl_question}, f)
