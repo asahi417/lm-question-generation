@@ -7,7 +7,7 @@ import random
 from os.path import join as pj
 from glob import glob
 from typing import List
-
+import gc
 import torch
 
 from .language_model import TransformersQG
@@ -225,6 +225,7 @@ class Trainer:
 
                 # free the cache
                 torch.cuda.empty_cache()
+                gc.collect()
 
                 mean_loss, global_step = self.train_single_epoch(loader, global_step, interval)
                 logging.info(f"[epoch {e}/{self.config.epoch}] average loss: {round(mean_loss, 3)}, "
