@@ -244,6 +244,9 @@ class Trainer:
         self.optimizer.zero_grad()
         for n, encode in enumerate(data_loader):
 
+            gc.collect()
+            torch.cuda.empty_cache()
+
             loss = self.model.encode_to_loss(encode)
             self.scaler.scale(loss).backward()
             total_loss.append(loss.cpu().item())
