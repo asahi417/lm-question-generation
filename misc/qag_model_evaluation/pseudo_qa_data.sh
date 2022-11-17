@@ -3,12 +3,12 @@ BATCH=14
 # Generate Pseudo QA Dataset on SQuADShifts
 qa_generation_squadshifts () {
   MODEL=${1}
-#  NAME='nyt'
-#  lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
-#
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
+    # QA generation
     lmqg-generate-qa -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
+    # Question generation on the gold answer
+    lmqg-generate-qa -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}-qg.${NAME}"
   done
 }
 
@@ -31,7 +31,3 @@ q_generation_squadshifts "t5-base-squad"
 q_generation_squadshifts "t5-small-squad"
 q_generation_squadshifts "bart-large-squad"
 q_generation_squadshifts "bart-base-squad"
-
-q_generation_squadshifts "t5-large-squad-multitask"
-q_generation_squadshifts "t5-base-squad-multitask"
-q_generation_squadshifts "t5-small-squad-multitask"

@@ -65,8 +65,9 @@ def main_generate_qa_pair():
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('-b', '--batch-size', default=256, type=int)
     parser.add_argument('-e', '--export-dir', default='tmp_output', type=str)
+    parser.add_argument('--compute-ppl', action='store_true')
     opt = parser.parse_args()
-    generate_qa_pairs(
+    qa_pairs = generate_qa_pairs(
         qg_model=opt.qg_model,
         language=opt.language,
         anchor_data=opt.anchor_data,
@@ -77,3 +78,5 @@ def main_generate_qa_pair():
         export_dir=opt.export_dir,
         overwrite=opt.overwrite
     )
+    if opt.compute_ppl:
+

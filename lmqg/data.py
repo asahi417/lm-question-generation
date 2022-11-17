@@ -1,9 +1,12 @@
 """ Data utility """
+import logging
 import os
 import requests
 from os.path import join as pj
 
 from datasets import load_dataset
+from .language_model import internet_connection
+
 
 __all__ = ('get_dataset', 'get_reference_files', 'DEFAULT_CACHE_DIR')
 DEFAULT_CACHE_DIR = pj(os.path.expanduser('~'), '.cache', 'lmqg')
@@ -26,6 +29,7 @@ def get_dataset(path: str = 'asahi417/qg_squad',
 def get_reference_files(path: str = 'asahi417/qg_squad', name: str = 'default', cache_dir: str = None):
     """ Get reference files for automatic evaluation """
     url = f'https://huggingface.co/datasets/{path}/raw/main/reference_files'
+    local_files_only = not internet_connection()
     if cache_dir is None:
         cache_dir = pj(DEFAULT_CACHE_DIR, 'reference_files', path)
     output = {}
@@ -42,6 +46,9 @@ def get_reference_files(path: str = 'asahi417/qg_squad', name: str = 'default', 
                 if line_length < 20:
                     os.remove(path)
             if not os.path.exists(path):
+                if local_files_only:
+                    logging.info(f'network is not reachable, could not download the file from {url}/{filename}')
+                    continue
                 os.makedirs(os.path.dirname(path), exist_ok=True)
                 with open(path, "wb") as f:
                     r = requests.get(f'{url}/{filename}')

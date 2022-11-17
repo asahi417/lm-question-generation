@@ -613,6 +613,7 @@ class TransformersQG:
                            src_texts: str or List,
                            tgt_texts: str or List,
                            batch: int = None):
+        """TODO: Fix it in a wise way """
         single_input = False
         loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
 
