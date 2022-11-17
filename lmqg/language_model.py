@@ -724,7 +724,7 @@ class TransformersQG:
                 with self.tokenizer.as_target_tokenizer():
                     labels = self.tokenizer(tgt_texts[s:e], return_tensors='pt', padding=True, truncation=True)
                 model_inputs["labels"] = labels["input_ids"]
-                out = self.model(**model_inputs)
+                out = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
                 loss = loss_fct(
                     out['logits'].view(-1, out['logits'].size(-1)),
                     model_inputs["labels"].view(-1).to(self.device)

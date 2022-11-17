@@ -1,10 +1,20 @@
-""" PPl for answer & question """
+""" PPl for answer & question
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "answer" -b 128
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "question" -b 128
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "answer" -b 32
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "question" -b 32
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "answer" -b 16
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "question" -b 16
+
+"""
 import argparse
 import os
 import json
+import logging
 from lmqg import TransformersQG
 
 
+logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 domains = ['amazon', 'new_wiki', 'nyt', 'reddit']
 
 
