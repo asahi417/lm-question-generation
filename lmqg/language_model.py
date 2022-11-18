@@ -227,7 +227,7 @@ class TransformersQG:
     def __init__(self,
                  model: str = None,
                  max_length: int = 512,
-                 max_length_output: int = 32,
+                 max_length_output: int = 256,
                  cache_dir: str = None,
                  add_prefix: bool = None,
                  language: str = 'en',
@@ -328,8 +328,12 @@ class TransformersQG:
                     logging.info(f"invalid prediction: {raw_string}")
                 else:
                     q, a = raw_string.split(answer_prefix)
+                    a = re.sub(r'\A\s+', '', a)
+                    a = re.sub(r'\s+\Z', '', a)
                     q = q.replace(question_prefix, "")
-                    tmp.append([q, a])
+                    q = re.sub(r'\A\s+', '', q)
+                    q = re.sub(r'\s+\Z', '', q)
+                    tmp.append((q, a))
             return tmp
 
         output = [format_qa(o.split(splitting_symbol)) for o in output]
@@ -706,7 +710,9 @@ class TransformersQG:
         """ Compute the perplexity on the decoder of the seq2seq model. """
         self.eval()
         single_input = False
-        loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
+
+        # loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
+        loss_fct = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id, reduction='none')
 
         if type(src_texts) == str:
             src_texts = [src_texts]
@@ -726,15 +732,19 @@ class TransformersQG:
                 model_inputs = self.tokenizer(src_texts[s:e], return_tensors='pt', padding=True, truncation=True)
                 with self.tokenizer.as_target_tokenizer():
                     labels = self.tokenizer(tgt_texts[s:e], return_tensors='pt', padding=True, truncation=True)
+
                 model_inputs["labels"] = labels["input_ids"]
                 out = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                # batch, length = out['logits'].size()
                 loss = loss_fct(
                     out['logits'].view(-1, out['logits'].size(-1)),
                     model_inputs["labels"].view(-1).to(self.device)
                 )
-                loss = loss.cpu().numpy().tolist()
-                loss_list += loss
+                loss_aligned = loss.view(out['logits'].size(0), out['logits'].size(1))
+                loss_final = loss_aligned.mean(-1)
+                loss_list += loss_final.cpu().numpy().tolist()
         ppl = [exp(i) for i in loss_list]
+        assert len(ppl) == len(src_texts)
         if single_input:
             return ppl[0]
         return ppl
