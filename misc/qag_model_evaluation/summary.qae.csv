@@ -46,4 +46,4 @@ eval_exact_match,eval_f1,qg_model,data,data_name,qa_model
 35.054070597837175,51.73985968659963,gold_qa,qa_squadshifts,reddit,distilbert-base-uncased
 48.370429252782195,62.97151382183988,gold_qa,qa_squadshifts,nyt,distilbert-base-uncased
 41.370622323003275,58.182470355439584,gold_qa,qa_squadshifts,new_wiki,distilbert-base-uncased
-
+30.34074678637013,48.547382025945794,t5-base-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased

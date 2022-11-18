@@ -309,6 +309,9 @@ class TransformersQG:
         @param cache_path: Path to pre-compute features.
         @return: List of generated sentences.
         """
+        splitting_symbol = '|'
+        question_prefix = "question: "
+        answer_prefix = ", answer: "
         prefix_type = 'qag' if self.add_prefix else None
         single_input = False
         if type(list_context) is str:
@@ -321,15 +324,15 @@ class TransformersQG:
         def format_qa(list_raw_string):
             tmp = []
             for raw_string in list_raw_string:
-                if "question: " not in raw_string or ", answer: " not in raw_string:
+                if question_prefix not in raw_string or answer_prefix not in raw_string:
                     logging.info(f"invalid prediction: {raw_string}")
                 else:
-                    q, a = raw_string.split(", answer: ")
-                    q = q.replace("question: ", "")
+                    q, a = raw_string.split(answer_prefix)
+                    q = q.replace(question_prefix)
                     tmp.append([q, a])
             return tmp
 
-        output = [format_qa(o.split("\n")) for o in output]
+        output = [format_qa(o.split(splitting_symbol)) for o in output]
         if single_input:
             return output[0]
         return output
