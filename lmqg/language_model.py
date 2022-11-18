@@ -328,7 +328,7 @@ class TransformersQG:
                     logging.info(f"invalid prediction: {raw_string}")
                 else:
                     q, a = raw_string.split(answer_prefix)
-                    q = q.replace(question_prefix)
+                    q = q.replace(question_prefix, "")
                     tmp.append([q, a])
             return tmp
 
