@@ -1,10 +1,10 @@
 """ PPl for answer & question
-python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "answer" -b 128
-python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "question" -b 128
-python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "answer" -b 32
-python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "question" -b 32
-python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "answer" -b 16
-python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "question" -b 16
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "answer" -b 128 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "question" -b 128 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "answer" -b 32 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "question" -b 32 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "answer" -b 16 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "question" -b 16 --overwrite
 """
 import argparse
 import os
@@ -12,6 +12,7 @@ import json
 import logging
 from lmqg import TransformersQG
 from datasets import load_dataset
+import pandas as pd
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -44,12 +45,27 @@ def main(m, batch, target: str = "answer", overwrite: bool = False):
                 ppl = json.load(f)[f"perplexity_{target}"]
             assert len(dataset_split) == len(ppl), f"{len(dataset_split)} != {len(ppl)}"
 
-            # reference data
-            # dataset_gold = load_dataset("lmqg/qa_squadshifts", d, split=split)
-
+            dataset_gold = load_dataset("lmqg/qa_squadshifts", d, split=split)
+            df = pd.DataFrame(dataset_split)
+            df['ppl'] = ppl
             # method 1: the same amount of data by ppl
+            filtered_1 = df.sort_values(by='ppl').head(len(dataset_gold))
+            filtered_1.pop('ppl')
+            filtered_1_d = list(filtered_1.T.to_dict().values())
+            with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.filtered.perplexity_{target}_1.jsonl", "w") as f:
+                f.write('\n'.join([json.dumps(i) for i in filtered_1_d]))
 
-            # for _ppl, _d in zip(ppl, dataset_split):
+            # method 2: the same amount for each paragraph
+            freq = {k: len(v) for k, v in dataset_gold.to_pandas().groupby('context')}
+            df_list = []
+            for c, _df in df.groupby('context'):
+                assert len(_df) >= freq[c], f"{len(_df)} < {freq[c]}"
+                df_list.append(_df.sort_values(by='ppl').head(freq[c]))
+            filtered_2 = pd.concat(df_list)
+            filtered_2.pop('ppl')
+            filtered_2_d = list(filtered_2.T.to_dict().values())
+            with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.filtered.perplexity_{target}_2.jsonl", "w") as f:
+                f.write('\n'.join([json.dumps(i) for i in filtered_2_d]))
 
 
 if __name__ == '__main__':
