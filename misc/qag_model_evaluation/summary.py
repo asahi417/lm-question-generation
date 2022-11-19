@@ -8,7 +8,12 @@ for i in glob("qa_eval_output/silver_qa.*/*/test_result.json") + glob("qa_eval_o
     with open(i) as f:
         tmp = json.load(f)
     path = i.split('/')
-    lm, data, data_name = path[2].split('.')
+    config = path[2].split('.')
+    if len(config) == 3:
+        lm, data, data_name = path[2].split('.')
+    else:
+        lm, data, data_name, filtering = path[2].split('.')
+        lm = f"{lm}.{filtering}"
     tmp['qg_model'] = path[1].replace('silver_qa.', '')
     tmp['data'] = data
     tmp['data_name'] = data_name

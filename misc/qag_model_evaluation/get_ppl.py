@@ -1,10 +1,10 @@
 """ PPl for answer & question
-python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "answer" -b 128 --overwrite
-python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "question" -b 128 --overwrite
-python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "answer" -b 32 --overwrite
-python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "question" -b 32 --overwrite
-python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "answer" -b 16 --overwrite
-python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "question" -b 16 --overwrite
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "answer" -b 128
+python misc/qag_model_evaluation/get_ppl.py -m "t5-small-squad-multitask" -t "question" -b 128
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "answer" -b 32
+python misc/qag_model_evaluation/get_ppl.py -m "t5-base-squad-multitask" -t "question" -b 32
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "answer" -b 16
+python misc/qag_model_evaluation/get_ppl.py -m "t5-large-squad-multitask" -t "question" -b 16
 """
 import argparse
 import os
