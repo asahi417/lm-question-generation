@@ -198,7 +198,10 @@ def run_qa_evaluation(dataset: str,
         # Some of the questions have lots of whitespace on the left, which is not useful and will make the
         # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
         # left whitespace
+        print(len(examples))
         examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+        print(len(examples))
+        input()
 
         # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
         # in one example possible giving several features when a context is long, each of those features having a
@@ -242,21 +245,21 @@ def run_qa_evaluation(dataset: str,
 
     # Create train feature from dataset
     # train_example = raw_datasets[split_train]
-    train_example = raw_datasets[split_train].select(list(range(100)))
+    train_example = raw_datasets[split_train].select(list(range(50)))
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
     # Validation Feature Creation
     # validation_example = raw_datasets[split_validation]
-    validation_example = raw_datasets[split_validation].select(list(range(100)))
+    validation_example = raw_datasets[split_validation].select(list(range(50)))
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
     print(len(validation_example))
     print(len(validation_dataset))
-    input()
+    # input()
     # Predict Feature Creation
     if split_test in raw_datasets:
         test_example = raw_datasets[split_test]
