@@ -198,10 +198,7 @@ def run_qa_evaluation(dataset: str,
         # Some of the questions have lots of whitespace on the left, which is not useful and will make the
         # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
         # left whitespace
-        print(len(examples))
         examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
-        print(len(examples))
-        input()
 
         # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
         # in one example possible giving several features when a context is long, each of those features having a
@@ -284,9 +281,13 @@ def run_qa_evaluation(dataset: str,
             output_dir=output_dir,
             prefix=stage
         )
+
         # Format the result to the format the metric expects.
         formatted_predictions = [{"id": k, "prediction_text": _v} for k, _v in predictions.items()]
         references = [{"id": ex["id"], "answers": ex[answer_column_name]} for ex in examples]
+        print(references)
+        print(formatted_predictions)
+        print(len(references), len(formatted_predictions))
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
 
     metric = load_metric("squad")
