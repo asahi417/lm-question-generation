@@ -11,10 +11,10 @@ for i in glob("qa_eval_output/silver_qa.*/*/test_result.json") + glob("qa_eval_o
     config = path[2].split('.')
     if len(config) == 3:
         lm, data, data_name = path[2].split('.')
+        tmp['qg_model'] = path[1].replace('silver_qa.', '')
     else:
         lm, data, data_name, filtering = path[2].split('.')
-        lm = f"{lm}.{filtering}"
-    tmp['qg_model'] = path[1].replace('silver_qa.', '')
+        tmp['qg_model'] = f"{path[1].replace('silver_qa.', '')}.{filtering}"
     tmp['data'] = data
     tmp['data_name'] = data_name
     tmp['qa_model'] = lm
