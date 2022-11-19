@@ -44,6 +44,7 @@ def generate_qa_pairs(
             if answer_model is None and answer_extraction:
                 answer_model = 'language_model' if model.multitask_model else 'keyword_extraction'
             output = []
+            _id = 0
             for c, df in tqdm(data[_split].to_pandas().groupby('context')):
                 out = model.generate_qa(
                     df['context'].values[0],
@@ -52,13 +53,17 @@ def generate_qa_pairs(
                 )
                 if out is None or len(out) == 0:
                     continue
-                output += [{
-                    'id': df['id'].values[0],
-                    'title': df['title'].values[0],
-                    'context': df['context'].values[0],
-                    'question': q,
-                    'answers': {'text': [a], 'answer_start': [df['context'].values[0].index(a)]}
-                } for q, a in out]
+                for q, a in out:
+                    _id += 1
+                    output.append(
+                        {
+                            'id': str(_id),
+                            'title': df['title'].values[0],
+                            'context': df['context'].values[0],
+                            'question': q,
+                            'answers': {'text': [a], 'answer_start': [df['context'].values[0].index(a)]}
+                        }
+                    )
 
         else:
             question = model.generate_q(

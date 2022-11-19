@@ -241,22 +241,19 @@ def run_qa_evaluation(dataset: str,
         return tokenized_examples
 
     # Create train feature from dataset
-    # train_example = raw_datasets[split_train]
-    train_example = raw_datasets[split_train].select(list(range(50)))
+    train_example = raw_datasets[split_train]
+    # train_example = raw_datasets[split_train].select(list(range(50)))
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
     # Validation Feature Creation
-    # validation_example = raw_datasets[split_validation]
-    validation_example = raw_datasets[split_validation].select(list(range(50)))
+    validation_example = raw_datasets[split_validation]
+    # validation_example = raw_datasets[split_validation].select(list(range(50)))
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
-    print(len(validation_example))
-    print(len(validation_dataset))
-    # input()
     # Predict Feature Creation
     if split_test in raw_datasets:
         test_example = raw_datasets[split_test]
@@ -285,9 +282,6 @@ def run_qa_evaluation(dataset: str,
         # Format the result to the format the metric expects.
         formatted_predictions = [{"id": k, "prediction_text": _v} for k, _v in predictions.items()]
         references = [{"id": ex["id"], "answers": ex[answer_column_name]} for ex in examples]
-        print(references)
-        print(formatted_predictions)
-        print(len(references), len(formatted_predictions))
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
 
     metric = load_metric("squad")
