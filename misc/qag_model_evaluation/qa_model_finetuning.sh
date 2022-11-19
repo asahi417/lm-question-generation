@@ -32,9 +32,9 @@ QAE "t5-large-squad-multitask-qg" 50
 QAE "t5-base-squad-multitask-qg" 50
 QAE "t5-small-squad-multitask-qg" 50
 
-QAE "t5-large-squad-multitask" 50
-QAE "t5-base-squad-multitask" 50
-QAE "t5-small-squad-multitask" 50
+QAE "t5-large-squad-multitask" 250
+QAE "t5-base-squad-multitask" 250
+QAE "t5-small-squad-multitask" 250
 
 
 #QAE "t5-large-squad-multitask" 500
