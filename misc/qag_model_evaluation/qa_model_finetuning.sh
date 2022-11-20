@@ -63,22 +63,11 @@ QAE_FILTERED () {
 }
 
 
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_answer_1"
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_answer_2"
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_question_1"
-[UKRI]
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_question_2"
+QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_answer"
+QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_question"
 
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_answer_1"
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_answer_2"
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_question_1"
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_question_2"
-
-[STONE]
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_answer_1"
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_answer_2"
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_question_1"
-
-[UKRI]
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_question_2"
+QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_answer"
+QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_question"
+QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_answer"
+QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_question"
 
