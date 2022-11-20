@@ -46,13 +46,13 @@ def main(m, batch, overwrite: bool = False):
                 assert len(dataset_split) == len(ppl), f"{len(dataset_split)} != {len(ppl)}"
                 df[f'perplexity_{target}'] = ppl
 
-            # target_col = [i for i in df.columns if 'perplexity' not in i]
-            # # method 1: the same amount of data by ppl
-            # for target in ['answer', 'question']:
-            #     filtered_1 = df.sort_values(by=f'perplexity_{target}').head(len(dataset_gold))[target_col]
-            #     filtered_1_d = list(filtered_1.T.to_dict().values())
-            #     with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.filtered.perplexity_{target}.jsonl", "w") as f:
-            #         f.write('\n'.join([json.dumps(i) for i in filtered_1_d]))
+            target_col = [i for i in df.columns if 'perplexity' not in i]
+            # method 1: the same amount of data by ppl
+            for target in ['answer', 'question']:
+                filtered_1 = df.sort_values(by=f'perplexity_{target}').head(len(dataset_gold))[target_col]
+                filtered_1_d = list(filtered_1.T.to_dict().values())
+                with open(f"qa_squadshifts_pseudo/{m}.{d}/{split}.filtered.perplexity_{target}.jsonl", "w") as f:
+                    f.write('\n'.join([json.dumps(i) for i in filtered_1_d]))
             #
             # # method 2: the same amount for each paragraph
             # for target in ['answer', 'question']:
