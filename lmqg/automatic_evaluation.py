@@ -30,8 +30,13 @@ class QGEvalCap:
         if bleu_only:
             scorers = [(Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"])]
         else:
-            scorers = [(Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]), (Meteor(), "METEOR"), (Rouge(), "ROUGE_L"),
-                       (BERTScore(language=language), "BERTScore"), (MoverScore(language=language), 'MoverScore')]
+            scorers = [
+                (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
+                (Meteor(), "METEOR"),
+                (Rouge(), "ROUGE_L"),
+                (BERTScore(language=language), "BERTScore"),
+                (MoverScore(language=language), 'MoverScore')
+            ]
 
         # =================================================
         # Compute scores

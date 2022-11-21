@@ -141,11 +141,11 @@ class MoverScore:
 
         return preds
 
-    def get_score(self, hypothesis: List, references: List):
-        assert len(hypothesis) == len(references)
+    def get_score(self, hyps, refs):
+        assert len(hyps) == len(refs)
         idf_dict_hyp = defaultdict(lambda: 1.)
         idf_dict_ref = defaultdict(lambda: 1.)
-        return self.word_mover_score(references, hypothesis, idf_dict_ref, idf_dict_hyp, batch_size=MOVERSCORE_BATCH)
+        return np.array(self.word_mover_score(refs, hyps, idf_dict_ref, idf_dict_hyp, batch_size=MOVERSCORE_BATCH))
 
     def compute_score(self, gts, res):
         assert gts.keys() == res.keys()
@@ -153,8 +153,7 @@ class MoverScore:
         hyps = [res[_id][0].decode() for _id in _ids]
         refs = [gts[_id][0].decode() for _id in _ids]
         _score = self.get_score(hyps, refs)
-        average_score = np.mean(_score)
-        return average_score, np.array(_score)
+        return np.mean(_score), _score
 
     @staticmethod
     def method():
