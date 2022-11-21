@@ -11,57 +11,12 @@ from .automatic_evaluation_tool.meteor.meteor import Meteor
 from .automatic_evaluation_tool.rouge import Rouge
 from .automatic_evaluation_tool.bertscore import BERTScore
 from .automatic_evaluation_tool.moverscore import MoverScore
+from .automatic_evaluation_tool.qa_aligned_f1_score import QAAlignedF1Score
 from .spacy_module import SpacyPipeline
 from .language_model import TransformersQG
 from .data import get_reference_files, get_dataset
 
 LANG_NEED_TOKENIZATION = ['ja', 'zh']
-
-
-class QGEvalCap:
-
-    def __init__(self, gts, res):
-        self.gts = gts
-        self.res = res
-
-    def evaluate(self, bleu_only: bool = False, language: str = 'en', skip: List = None):
-        output = {}
-        output_individual = {}
-        if bleu_only:
-            scorers = [(Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"])]
-        else:
-            scorers = [
-                (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
-                (Meteor(), "METEOR"),
-                (Rouge(), "ROUGE_L"),
-                (BERTScore(language=language), "BERTScore"),
-                (MoverScore(language=language), 'MoverScore')
-            ]
-
-        # =================================================
-        # Compute scores
-        # =================================================
-        for scorer, method in scorers:
-            if skip is not None:
-                if type(method) == list:
-                    if all(m in skip for m in method):
-                        continue
-                else:
-                    if method in skip:
-                        continue
-            score, scores = scorer.compute_score(self.gts, self.res)
-            if type(method) == list:
-                for sc, scs, m in zip(score, scores, method):
-                    logging.info("%s: %0.5f" % (m, sc))
-                    output[m] = sc
-                    output_individual[m] = scs
-            else:
-                logging.info("%s: %0.5f" % (method, score))
-                output[method] = score
-                output_individual[method] = scores
-                if method in ['BERTScore', 'MoverScore']:
-                    torch.cuda.empty_cache()
-        return output, output_individual
 
 
 def compute_metrics(out_file,
@@ -70,15 +25,11 @@ def compute_metrics(out_file,
                     prediction_aggregation: str = 'first',
                     bleu_only: bool = False,
                     language: str = 'en',
-                    skip: List = None):
+                    skip: List = None,
+                    qag_model: bool = False):
     """ compute automatic metric """
-    if language in LANG_NEED_TOKENIZATION:
-        spacy_model = SpacyPipeline(language=language)
-    else:
-        spacy_model = None
-
+    spacy_model = SpacyPipeline(language=language) if language in LANG_NEED_TOKENIZATION else None
     pairs = []
-
     with open(tgt_file, "r") as infile:
         for n, line in enumerate(infile):
             if line.endswith('\n'):
@@ -88,7 +39,6 @@ def compute_metrics(out_file,
             else:
                 pairs.append({'tokenized_question': ' '.join(spacy_model.token(line.strip())), 'tokenized_sentence': n})
 
-    # print(len(pairs), src_file, tgt_file)
     if src_file is not None and prediction_aggregation is not None:
         # group by the source (sentence where the question are produced); this is used for grouping but not evaluation
         with open(src_file, 'r') as infile:
@@ -103,7 +53,6 @@ def compute_metrics(out_file,
     # fix prediction's tokenization: lower-casing and detaching sp characters
     with open(out_file, 'r') as infile:
         for n, line in enumerate(infile):
-            # print(n, line)
             if line.endswith('\n'):
                 line = line[:-1]
             if spacy_model is not None:
@@ -112,7 +61,6 @@ def compute_metrics(out_file,
                 pairs[n]['prediction'] = line.strip()
     # eval
     json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
-
     res = defaultdict(lambda: [])
     gts = defaultdict(lambda: [])
 
@@ -134,12 +82,10 @@ def compute_metrics(out_file,
 
     res_filtered = defaultdict(lambda: [])
     for k, v in res.items():
-
         # answer-level evaluation
         if prediction_aggregation is None:
             assert len(v) == 1
             res_filtered[k] = v
-
         elif prediction_aggregation == 'first':
             # the first one
             res_filtered[k] = [v[0]]
@@ -156,9 +102,35 @@ def compute_metrics(out_file,
             # middle length generation
             res_filtered[k] = [v[v.index(sorted(v, key=len)[int(len(v)/2)])]]
         else:
-            raise ValueError('unknown aggregation method: {}'.format(prediction_aggregation))
+            raise ValueError(f'unknown aggregation method: {prediction_aggregation}')
 
-    return QGEvalCap(gts, res_filtered).evaluate(bleu_only=bleu_only, language=language, skip=skip)
+    output = {}
+    scorers = [(Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"])]
+    if not bleu_only:
+        scorers_extra = [
+            (Meteor(), "METEOR"),
+            (Rouge(), "ROUGE_L"),
+            (BERTScore(language=language), "BERTScore"),
+            (MoverScore(language=language), 'MoverScore')
+        ]
+        if qag_model:
+            scorers_extra += [
+                (QAAlignedF1Score(base_metric='bertscore', language=language), "QAAlignedF1Score (BERTScore)"),
+                (QAAlignedF1Score(base_metric='moverscore', language=language), "QAAlignedF1Score (MoverScore)")
+            ]
+        if skip is not None:
+            scorers_extra = [s for s in scorers_extra if s[1] not in skip]
+        scorers += scorers_extra
+
+    for scorer, method in scorers:
+        score, scores = scorer.compute_score(gts, res_filtered)
+        torch.cuda.empty_cache()
+        if type(method) is not list:
+            score, scores, method = [score], [scores], [method]
+        for sc, scs, m in zip(score, scores, method):
+            logging.info(f"\t{m}: {sc}")
+            output[m] = sc
+    return output
 
 
 def evaluate(export_dir: str = '.',
@@ -169,29 +141,27 @@ def evaluate(export_dir: str = '.',
              model: str = None,
              max_length: int = 512,
              max_length_output: int = 64,
-             dataset_path: str = 'asahi417/qg_squad',
+             dataset_path: str = 'lmqg/qg_squad',
              dataset_name: str = 'default',
              input_type: str = 'paragraph_answer',
              output_type: str = 'question',
              prediction_aggregation: str = 'first',
-             prediction_level: str = 'sentence',
+             prediction_level: str = 'answer',
              data_caches: Dict = None,
              bleu_only: bool = False,
              overwrite: bool = False,
              use_auth_token: bool = False,
              language: str = 'en',
              test_split: str = 'test',
-             validation_split: str = 'validation'
-             ):
+             validation_split: str = 'validation'):
     """ Evaluate question-generation model """
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
-    if not overwrite:
-        if os.path.exists(path_metric):
-            with open(path_metric, 'r') as f:
-                metric = json.load(f)
-                if bleu_only:
-                    return metric
+    if not overwrite and os.path.exists(path_metric):
+        with open(path_metric, 'r') as f:
+            metric = json.load(f)
+            if bleu_only:
+                return metric
     os.makedirs(export_dir, exist_ok=True)
     reference_files = get_reference_files(dataset_path, dataset_name)
 
@@ -241,14 +211,15 @@ def evaluate(export_dir: str = '.',
         else:
             src_file = reference_files[f'{prediction_level}-{split}']
 
-        __metric, _ = compute_metrics(
+        __metric = compute_metrics(
             out_file=hypothesis_file,
             tgt_file=reference_files[f'{output_type}-{split}'],
             src_file=src_file,
             prediction_aggregation=prediction_aggregation,
             language=language,
             bleu_only=bleu_only,
-            skip=skip_metrics
+            skip=skip_metrics,
+            qag_model=output_type == 'questions_answers'
         )
         return __metric
 
