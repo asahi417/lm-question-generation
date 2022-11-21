@@ -125,7 +125,7 @@ language_dict = {
 
 
 def format_metric(dataset, dataset_type, metric):
-    return f"""  - task:
+    tmp = f"""  - task:
       name: Text2text Generation
       type: text2text-generation
     dataset:
@@ -148,6 +148,17 @@ def format_metric(dataset, dataset_type, metric):
     - name: MoverScore
       type: moverscore
       value: {metric["test"]["MoverScore"]}"""
+    if "QAAlignedF1Score (BERTScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedF1Score (BERTScore)
+      type: qa_aligned_f1_score_bertscore
+      value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
+    if "QAAlignedF1Score (MoverScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedF1Score (MoverScore)
+      type: qa_aligned_f1_score_moverscore
+      value: {metric["test"]["QAAlignedF1Score (MoverScore)"]}"""
+    return tmp
 
 
 def format_usage(model_name, sample_qg, sample_qa):
@@ -304,6 +315,15 @@ def get_readme(model_name: str, model_checkpoint: str):
 | Dataset | Type | BLEU4 | ROUGE-L | METEOR | BERTScore | MoverScore | Link |
 |:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
 | [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']['Bleu_4'], 3)} | {round(metric_main[2]['test']['ROUGE_L'], 3)} | {round(metric_main[2]['test']['METEOR'], 3)} | {round(metric_main[2]['test']['BERTScore'], 3)} | {round(metric_main[2]['test']['MoverScore'], 3)} | [link]({link}) | 
+"""
+    if _is_qag:
+        markdown_table += f"""
+
+### Metrics (QAG)
+
+| Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
+|:--------|:-----|--------------------------------:|---------------------------------:|-----:|
+| [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[2]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link}) | 
 """
     if len(metrics_ood) != 0:
         content = "\n".join([

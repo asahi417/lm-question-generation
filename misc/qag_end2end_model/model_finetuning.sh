@@ -30,3 +30,11 @@ lmqg-train-search -d "lmqg/qag_tweetqa" -m "facebook/bart-large" -b 32 -g 4 8 -c
 lmqg-eval -m "lmqg_output/bart_large_tweetqa/best_model" -e "lmqg_output/bart_large_tweetqa/best_model/eval" --language "en" -d "lmqg/qag_tweetqa" -i "paragraph" -o 'questions_answers' --prediction-aggregation "first" --prediction-level "answer" --max-length-output 128 --max-length 256
 lmqg-push-to-hf -m "lmqg_output/bart_large_tweetqa/best_model" -a "bart-large-tweetqa-qag" -o "lmqg"
 
+# extra evaluation
+for LM in "bart-base-tweetqa-qag" "bart-large-tweetqa-qag" "t5-small-tweetqa-qag" "t5-base-tweetqa-qag" "t5-large-tweetqa-qag" "t5-small-tweetqa-qag-np" "t5-base-tweetqa-qag-np" "t5-large-tweetqa-qag-np"
+do
+  git clone "https://huggingface.co/lmqg/${LM}"
+  lmqg-eval -m "${LM}" -e "${LM}/eval" --language "en" -d "lmqg/qag_tweetqa" -i "paragraph" -o 'questions_answers' --prediction-aggregation "first" --prediction-level "answer" --max-length-output 128 --max-length 256
+  lmqg-push-to-hf -m "${LM}" -a "${LM}" -o "lmqg"
+  rm -rf "${LM}"
+done
