@@ -25,7 +25,7 @@ class QAAlignedF1Score:
                  base_metric: str = 'bertscore',
                  instance_separator: str = " | ",
                  question_key: str = 'question: ',
-                 answer_key: str = 'answer: ',
+                 answer_key: str = 'answer:',
                  qa_separator: str = ', '):
         self.language = language
         # self.aggregation = aggregation
@@ -36,7 +36,7 @@ class QAAlignedF1Score:
         self.qa_separator = qa_separator
 
     def sanity_check(self, sample: str):
-        qa_pair = sample.split(self.qa_separator)
+        qa_pair = sample.split(self.qa_separator + self.answer_key)
         if len(qa_pair) != 2:
             logging.info(f'error (length != 2): {sample}')
             return False
@@ -64,10 +64,11 @@ class QAAlignedF1Score:
         for hyp, ref in zip(hyps, refs):
             if len(hyp) == 0:
                 output.append({"f1": 0, "precision": 0, "recall": 0})
-            precision = mean(max(pair_score[f"{h}--{r}"] for r in ref) for h in hyp)
-            recall = mean(max(pair_score[f"{h}--{r}"] for h in hyp) for r in ref)
-            f1 = 2 * precision * recall / (precision + recall + EPS)
-            output.append({"f1": f1, "precision": precision, "recall": recall})
+            else:
+                precision = mean(max(pair_score[f"{h}--{r}"] for r in ref) for h in hyp)
+                recall = mean(max(pair_score[f"{h}--{r}"] for h in hyp) for r in ref)
+                f1 = 2 * precision * recall / (precision + recall + EPS)
+                output.append({"f1": f1, "precision": precision, "recall": recall})
         return output
 
     def compute_score(self, gts, res, return_precision_recall: bool = False):
