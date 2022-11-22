@@ -21,14 +21,12 @@ class QAAlignedF1Score:
 
     def __init__(self,
                  language: str = 'en',
-                 # aggregation: str = 'macro',
                  base_metric: str = 'bertscore',
                  instance_separator: str = " | ",
                  question_key: str = 'question: ',
                  answer_key: str = 'answer: ',
                  qa_separator: str = ', '):
         self.language = language
-        # self.aggregation = aggregation
         self.base_metric = get_score(base_metric, language)
         self.instance_separator = instance_separator
         self.question_key = question_key
@@ -50,9 +48,8 @@ class QAAlignedF1Score:
         return list(qa_pairs)
 
     def get_score(self, hyps: List, refs: List):
-        print(len(hyps))
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
-        input(len([i for i in hyps if len(i) == 0]))
+        logging.info(f"found {len([i for i in hyps if len(i) == 0])} empty prediction from {len(hyps)}")
         pairs = list(chain(*[list(product(h, r)) for h, r in zip(hyps, refs) if len(h) != 0]))
         h, r = list(zip(*pairs))
         scores = self.base_metric.get_score(h, r)
@@ -75,14 +72,7 @@ class QAAlignedF1Score:
         hyps = [res[_id][0].decode().split(self.instance_separator) for _id in _ids]
         refs = [gts[_id][0].decode().split(self.instance_separator) for _id in _ids]
         _score = self.get_score(hyps, refs)
-        # if self.aggregation == 'macro':
         f1 = np.array([i['f1'] for i in _score])
-        # elif self.aggregation == 'micro':
-        #     recall = mean(i['recall'] for i in _score)
-        #     precision = mean(i['precision'] for i in _score)
-        #     f1 = 2 * precision * recall / (precision + recall + EPS)
-        # else:
-        #     raise ValueError(f"invalid aggregation: {self.aggregation}")
         if return_precision_recall:
             return np.mean(f1), f1,\
                    np.array([i['precision'] for i in _score]),\
