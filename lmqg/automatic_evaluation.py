@@ -186,8 +186,14 @@ def evaluate(export_dir: str = '.',
                 if len(tmp) == len(raw_input):
                     return path_hypothesis
                 logging.warning(f'recompute {path_hypothesis}')
-            output = lm.generate_q(
-                raw_input, batch_size=batch_size, num_beams=n_beams,
+            prefix_type = None
+            if lm.add_prefix:
+                prefix_type = 'qag' if output_type == 'questions_answers' else 'qg'
+            output = lm.generate_prediction(
+                raw_input,
+                batch_size=batch_size,
+                num_beams=n_beams,
+                prefix_type=prefix_type,
                 cache_path=None if data_caches is None else data_caches[split])
             with open(path_hypothesis, 'w') as f_writer:
                 f_writer.write('\n'.join(output))

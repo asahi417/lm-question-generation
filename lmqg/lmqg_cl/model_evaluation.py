@@ -57,7 +57,7 @@ def main():
         overwrite=opt.overwrite,
         language=opt.language,
         bleu_only=opt.bleu_only,
-        use_auth_token=opt.use_auth_token
+        use_auth_token=opt.use_auth_token,
     )
     print(json.dumps(metric, indent=4, sort_keys=True))
 

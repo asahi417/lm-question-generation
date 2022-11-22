@@ -476,25 +476,27 @@ class TransformersQG:
         if type(list_context) is str:
             list_context = [list_context]
             single_input = True
-        list_input = list_context
-
-        if sentence_level:
-            assert list_answer is not None, '`sentence_level` needs `list_answer`.'
-            assert len(list_answer) == len(list_context), str([len(list_answer), len(list_context)])
-            list_sentence = []
-            for context, answer in zip(list_context, list_answer):
-                s = [sentence for sentence in self.spacy_module.sentence(context) if answer in sentence]
-                list_sentence.append(s[0] if len(s) != 0 else context)
-            list_input = list_sentence
         output = self.generate_prediction(
-            list_input, highlights=list_answer, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
-            batch_size=batch_size)
+            list_context,
+            highlights=list_answer,
+            prefix_type=prefix_type,
+            cache_path=cache_path,
+            num_beams=num_beams,
+            batch_size=batch_size,
+            sentence_level=sentence_level
+        )
         if single_input:
             return output[0]
         return output
 
-    def generate_prediction(self, inputs: List, highlights: List or None = None, prefix_type: str = None,
-                            num_beams: int = 4, batch_size: int = None, cache_path: str = None):
+    def generate_prediction(self,
+                            inputs: List,
+                            highlights: List or None = None,
+                            prefix_type: str = None,
+                            num_beams: int = 4,
+                            batch_size: int = None,
+                            cache_path: str = None,
+                            sentence_level: bool = False):
         """ General method to generate model prediction
 
         @param inputs: List of input sequences.
@@ -506,7 +508,17 @@ class TransformersQG:
         @return: List of generated sequences.
         """
         self.eval()
-        assert type(inputs) == list, inputs
+
+        if sentence_level:
+            assert highlights is not None, '`sentence_level` needs `highlights`.'
+            assert len(highlights) == len(inputs), str([len(highlights), len(inputs)])
+            list_sentence = []
+            for context, answer in zip(inputs, highlights):
+                s = [sentence for sentence in self.spacy_module.sentence(context) if answer in sentence]
+                list_sentence.append(s[0] if len(s) != 0 else context)
+            inputs = list_sentence
+
+        assert type(inputs) is list, inputs
         encode_list = self.text_to_encode(inputs, highlights=highlights, prefix_type=prefix_type, cache_path=cache_path)
         loader = self.get_data_loader(encode_list, batch_size=batch_size)
         outputs = []
