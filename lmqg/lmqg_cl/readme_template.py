@@ -190,7 +190,7 @@ from lmqg import TransformersQG
 # initialize model
 model = TransformersQG(language='{language}', model='{model_name}')
 # model prediction
-question = model.generate_qa(list_context=["{sample[0]}"], list_answer=["{sample[1]}"])
+question = model.generate_qa("{sample[0]}")
         """
     if not answer_extraction:
         return f"""
@@ -244,6 +244,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         add_info.append(f"This model is continuously fine-tuned with [{language_model}](https://huggingface.co/{language_model}).")
     if model_name.endswith('multitask'):
         add_info.append(version_description['multitask'])
+    _sample_qg = [re.sub(r"\A\s+", "", i) for i in _sample_qg]
     add_info = ' '.join(add_info)
 
     # get widget

@@ -121,7 +121,6 @@ def compute_metrics(out_file,
         if skip is not None:
             scorers_extra = [s for s in scorers_extra if s[1] not in skip]
         scorers += scorers_extra
-        scorers = list(reversed(scorers))
 
     for scorer, method in scorers:
         score, scores = scorer.compute_score(gts, res_filtered)
@@ -154,7 +153,10 @@ def evaluate(export_dir: str = '.',
              use_auth_token: bool = False,
              language: str = 'en',
              test_split: str = 'test',
-             validation_split: str = 'validation'):
+             validation_split: str = 'validation',
+             multitask_input_type: str = None,  # 'paragraph_sentence',
+             multitask_output_type: str = None,  # 'answer'
+             ):
     """ Evaluate question-generation model """
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
