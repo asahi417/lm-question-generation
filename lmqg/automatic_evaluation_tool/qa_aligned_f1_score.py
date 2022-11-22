@@ -57,7 +57,8 @@ class QAAlignedF1Score:
     def get_score(self, hyps: List, refs: List):
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
         pairs = list(chain(*[list(product(h, r)) for h, r in zip(hyps, refs) if len(h) != 0]))
-        scores = self.base_metric.get_score(*list(zip(*pairs)))
+        h, r = list(zip(*pairs))
+        scores = self.base_metric.get_score(h, r)
         assert len(scores) == len(pairs), f"{len(scores)} != {len(pairs)}"
         pair_score = {f"{h}--{r}": s for (h, r), s in zip(pairs, scores)}
         output = []
