@@ -46,6 +46,8 @@ def main():
     model = None
     if opt.model_checkpoint is not None:
         model = TransformersQG(opt.model_checkpoint,
+                               skip_overflow_error=True,
+                               drop_answer_error_text=True,
                                language=opt.language,
                                max_length=opt.max_length,
                                max_length_output=opt.max_length_output,
@@ -117,7 +119,7 @@ def main():
                     _index += len(h)
 
             # formatting prediction
-            prediction = [' | '.join([f"question: {q}, answer: {a}" for q, a in p]) for p in prediction]
+            prediction = [' | '.join([f"question: {q}, answer: {a}" for q, a in p]) if p is not None else "" for p in prediction]
             assert len(prediction) == len(model_input), f"{len(prediction)} != {len(model_input)}"
             with open(_file, 'w') as f:
                 f.write('\n'.join(prediction))

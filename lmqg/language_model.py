@@ -375,7 +375,8 @@ class TransformersQG:
                 sentence_level=sentence_level, answer_model=answer_model, num_questions=num_questions
             )
             if list_answer is None:
-                return None
+                output.append(None)
+                continue
             list_context = [c] * len(list_answer)
             logging.info('running model for `qg`')
             list_question = self.generate_q(
