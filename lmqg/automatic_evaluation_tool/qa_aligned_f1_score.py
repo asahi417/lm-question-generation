@@ -9,10 +9,10 @@ EPS = 1e-6
 
 def get_score(base_metric, language: str = 'en'):
     if base_metric == 'bertscore':
-        from lmqg.automatic_evaluation_tool.bertscore import BERTScore
+        from .bertscore import BERTScore
         return BERTScore(language=language)
     if base_metric == 'moverscore':
-        from lmqg.automatic_evaluation_tool.moverscore import MoverScore
+        from .moverscore import MoverScore
         return MoverScore(language=language)
     raise ValueError(f'unknown metric {base_metric}: metric should be `moverscore`/`bertscore`')
 

@@ -64,6 +64,7 @@ setup(
         'console_scripts': [
             'lmqg-train-search = lmqg.lmqg_cl.model_finetuning:main_training_search',
             'lmqg-eval = lmqg.lmqg_cl.model_evaluation:main',
+            'lmqg-eval-qag = lmqg.lmqg_cl.model_evaluation_qag:main',
             'lmqg-push-to-hf = lmqg.lmqg_cl.push_to_hf:main',
             'lmqg-generate-qa = lmqg.lmqg_cl.qa_evaluation:main_generate_qa_pair',
             'lmqg-qae = lmqg.lmqg_cl.qa_evaluation:main_qa_model_training'

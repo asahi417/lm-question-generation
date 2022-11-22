@@ -6,9 +6,9 @@ qa_generation_squadshifts () {
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
     # QA generation
-    lmqg-generate-qa --overwrite -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}"
+    lmqg-generate-qa --overwrite -a -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}.${NAME}" --compute-ppl
     # Question generation on the gold answer
-#    lmqg-generate-qa -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}-qg.${NAME}"
+    lmqg-generate-qa -m "lmqg/${MODEL}" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${MODEL}-qg.${NAME}"
   done
 }
 

@@ -317,7 +317,7 @@ def get_readme(model_name: str, model_checkpoint: str):
 |:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
 | [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']['Bleu_4'], 3)} | {round(metric_main[2]['test']['ROUGE_L'], 3)} | {round(metric_main[2]['test']['METEOR'], 3)} | {round(metric_main[2]['test']['BERTScore'], 3)} | {round(metric_main[2]['test']['MoverScore'], 3)} | [link]({link}) | 
 """
-    if _is_qag:
+    if "QAAlignedF1Score (BERTScore)" in metric_main[2]['test'] and "QAAlignedF1Score (MoverScore)" in metric_main[2]['test']:
         markdown_table += f"""
 
 ### Metrics (QAG)

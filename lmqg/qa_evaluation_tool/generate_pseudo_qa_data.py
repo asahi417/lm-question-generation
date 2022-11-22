@@ -16,7 +16,9 @@ def generate_qa_pairs(
         answer_model: str = None,  # language_model or keyword_extraction
         batch_size: int = 256,
         export_dir: str = None,
-        overwrite: bool = False):
+        overwrite: bool = False,
+        max_length: int = 512,
+        max_length_output = 256):
 
     logging.info(f'generate QA pairs from {anchor_data} with {qg_model}')
     data = load_dataset(anchor_data) if anchor_data_name is None else load_dataset(anchor_data, anchor_data_name)
@@ -24,8 +26,13 @@ def generate_qa_pairs(
     if export_dir is not None:
         os.makedirs(export_dir, exist_ok=True)
 
-
-    model = TransformersQG(model=qg_model, language=language, skip_overflow_error=True, drop_answer_error_text=True)
+    model = TransformersQG(
+        model=qg_model,
+        language=language,
+        skip_overflow_error=True,
+        drop_answer_error_text=True,
+        max_length=max_length,
+        max_length_output=max_length_output)
     if answer_extraction is None:
         answer_extraction = True if model.multitask_model else False
 

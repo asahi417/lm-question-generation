@@ -153,10 +153,7 @@ def evaluate(export_dir: str = '.',
              use_auth_token: bool = False,
              language: str = 'en',
              test_split: str = 'test',
-             validation_split: str = 'validation',
-             multitask_input_type: str = None,  # 'paragraph_sentence',
-             multitask_output_type: str = None,  # 'answer'
-             ):
+             validation_split: str = 'validation'):
     """ Evaluate question-generation model """
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
@@ -177,39 +174,52 @@ def evaluate(export_dir: str = '.',
                             language=language)
         lm.eval()
 
-        def get_model_prediction_file(split):
-            path_hypothesis = pj(export_dir, f'samples.{split}.hyp.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.txt')
+        def get_model_prediction_file(split, _input_type, _output_type):
+            path = pj(
+                export_dir,
+                f'samples.{split}.hyp.{_input_type}.{_output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.txt')
             raw_input, _ = get_dataset(
-                dataset_path, dataset_name, split=split, input_type=input_type, output_type=output_type,
+                dataset_path,
+                dataset_name,
+                split=split,
+                input_type=_input_type,
+                output_type=_output_type,
                 use_auth_token=use_auth_token)
-
-            if os.path.exists(path_hypothesis) and not overwrite:
-                with open(path_hypothesis) as f_read:
+            if os.path.exists(path) and not overwrite:
+                with open(path) as f_read:
                     tmp = f_read.read().split('\n')
                 if len(tmp) == len(raw_input):
-                    return path_hypothesis
-                logging.warning(f'recompute {path_hypothesis}')
+                    return path
+                logging.warning(f'recompute {path}: {len(tmp)} != {len(raw_input)}')
             prefix_type = None
             if lm.add_prefix:
-                prefix_type = 'qag' if output_type == 'questions_answers' else 'qg'
+                if _output_type == 'questions_answers':
+                    prefix_type = 'qag'
+                elif _output_type == 'question':
+                    prefix_type = 'qg'
+                elif _output_type == 'answer':
+                    prefix_type = 'ae'
+                else:
+                    raise ValueError(f"prefix type is not determined for the output_type {_output_type}")
             output = lm.generate_prediction(
                 raw_input,
                 batch_size=batch_size,
                 num_beams=n_beams,
                 prefix_type=prefix_type,
                 cache_path=None if data_caches is None else data_caches[split])
-            with open(path_hypothesis, 'w') as f_writer:
+            with open(path, 'w') as f_writer:
                 f_writer.write('\n'.join(output))
-            return path_hypothesis
+            return path
 
         try:
-            hypothesis_file_test = get_model_prediction_file(test_split)
+            hypothesis_file_test = get_model_prediction_file(test_split, input_type, output_type)
         except ValueError:
             hypothesis_file_test = None
         try:
-            hypothesis_file_dev = get_model_prediction_file(validation_split)
+            hypothesis_file_dev = get_model_prediction_file(validation_split, input_type, output_type)
         except ValueError:
             hypothesis_file_dev = None
+
     assert hypothesis_file_dev is not None or hypothesis_file_test is not None,\
         f'model ({model}) or file path ({hypothesis_file_dev}, {hypothesis_file_test}) is needed'
 
