@@ -121,6 +121,7 @@ def compute_metrics(out_file,
         if skip is not None:
             scorers_extra = [s for s in scorers_extra if s[1] not in skip]
         scorers += scorers_extra
+        scorers = list(reversed(scorers))
 
     for scorer, method in scorers:
         score, scores = scorer.compute_score(gts, res_filtered)

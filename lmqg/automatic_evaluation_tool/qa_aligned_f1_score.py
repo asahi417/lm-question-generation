@@ -25,7 +25,7 @@ class QAAlignedF1Score:
                  base_metric: str = 'bertscore',
                  instance_separator: str = " | ",
                  question_key: str = 'question: ',
-                 answer_key: str = 'answer:',
+                 answer_key: str = 'answer: ',
                  qa_separator: str = ', '):
         self.language = language
         # self.aggregation = aggregation
@@ -36,16 +36,11 @@ class QAAlignedF1Score:
         self.qa_separator = qa_separator
 
     def sanity_check(self, sample: str):
-        qa_pair = sample.split(self.qa_separator + self.answer_key)
-        if len(qa_pair) != 2:
+        if len(sample.split(self.qa_separator + self.answer_key)) != 2:
             logging.info(f'error (length != 2): {sample}')
             return False
-        q, a = qa_pair
-        if not q.startswith(self.question_key):
+        if not sample.startswith(self.question_key):
             logging.info(f'error (question not found): {sample}')
-            return False
-        if not a.startswith(self.answer_key):
-            logging.info(f'error (answer not found): {sample}')
             return False
         return True
 
@@ -55,7 +50,9 @@ class QAAlignedF1Score:
         return list(qa_pairs)
 
     def get_score(self, hyps: List, refs: List):
+        print(len(hyps))
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
+        input(len([i for i in hyps if len(i) == 0]))
         pairs = list(chain(*[list(product(h, r)) for h, r in zip(hyps, refs) if len(h) != 0]))
         h, r = list(zip(*pairs))
         scores = self.base_metric.get_score(h, r)
