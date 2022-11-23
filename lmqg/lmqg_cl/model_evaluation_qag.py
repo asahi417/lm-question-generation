@@ -28,10 +28,8 @@ def get_options():
     parser.add_argument('-l', '--language', help='', default='en', type=str)
     parser.add_argument('--use-auth-token', help='', action='store_true')
     parser.add_argument('-e', '--export-dir', required=True, type=str)
-
     parser.add_argument('--hyp-test', default=None, type=str)
     parser.add_argument('--hyp-dev', default=None, type=str)
-
     parser.add_argument('--overwrite', help='', action='store_true')
     return parser.parse_args()
 
@@ -86,7 +84,10 @@ def main():
                 f"question: {i['question']}, answer: {i['answer']}" for _, i in g.iterrows()
             ]))
         prediction = None
+        print(_file)
         if not opt.overwrite and os.path.exists(_file):
+            print(not opt.overwrite and os.path.exists(_file))
+            input()
             with open(_file) as f:
                 _prediction = f.read().split('\n')
             if len(_prediction) == len(gold_reference):

@@ -59,3 +59,15 @@ eval_exact_match,eval_f1,qg_model,data,data_name,qa_model
 31.08108108108108,47.168345325228756,t5-base-squad-multitask.perplexity_question,qa_squadshifts,nyt,distilbert-base-uncased
 24.14002428166734,42.19666962329104,t5-base-squad-multitask.perplexity_question,qa_squadshifts,amazon,distilbert-base-uncased
 23.52581105896756,34.7681655141831,t5-base-squad-multitask.perplexity_answer,qa_squadshifts,reddit,distilbert-base-uncased
+25.6886349724546,44.027309593070285,t5-small-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased
+27.90143084260731,45.60764605519339,t5-small-squad-multitask,qa_squadshifts,nyt,distilbert-base-uncased
+22.885471469040873,42.046788638033256,t5-small-squad-multitask,qa_squadshifts,amazon,distilbert-base-uncased
+24.111866969009824,44.33338662657104,t5-small-squad-multitask,qa_squadshifts,new_wiki,distilbert-base-uncased
+31.17731075290757,49.086044011436485,t5-base-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased
+35.05564387917329,52.52572363722998,t5-base-squad-multitask,qa_squadshifts,nyt,distilbert-base-uncased
+28.89518413597734,48.84288536664911,t5-base-squad-multitask,qa_squadshifts,amazon,distilbert-base-uncased
+28.495842781557066,48.107103732589444,t5-base-squad-multitask,qa_squadshifts,new_wiki,distilbert-base-uncased
+31.23852275045909,48.986230786607365,t5-large-squad-multitask,qa_squadshifts,reddit,distilbert-base-uncased
+35.870429252782195,53.03281393656122,t5-large-squad-multitask,qa_squadshifts,nyt,distilbert-base-uncased
+26.02185350060704,46.29852177147484,t5-large-squad-multitask,qa_squadshifts,amazon,distilbert-base-uncased
+30.612244897959183,49.60942990677461,t5-large-squad-multitask,qa_squadshifts,new_wiki,distilbert-base-uncased
