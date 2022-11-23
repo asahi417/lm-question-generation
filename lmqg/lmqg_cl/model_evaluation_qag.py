@@ -106,11 +106,12 @@ def main():
                     batch_size=opt.batch_size)
             else:
                 logging.info("model prediction: (qg model, answer fixed by reference)")
+                # model_input, model_highlight = model_input[:30], model_highlight[:30]
                 model_input_flat = list(chain(*[[i] * len(h) for i, h in zip(model_input, model_highlight)]))
                 model_highlight_flat = list(chain(*model_highlight))
                 prediction_flat = model.generate_q(
-                    list_context=model_input_flat[:30],
-                    list_answer=model_highlight_flat[:30],
+                    list_context=model_input_flat,
+                    list_answer=model_highlight_flat,
                     num_beams=opt.n_beams,
                     batch_size=opt.batch_size)
                 _index = 0
@@ -119,10 +120,10 @@ def main():
                     questions = prediction_flat[_index:_index+len(h)]
                     answers = model_highlight_flat[_index:_index+len(h)]
                     prediction.append(list(zip(questions, answers)))
-                    print(_index, _index+len(h))
+                    # print(_index, _index+len(h))
                     _index += len(h)
-                    print(prediction)
-                    input()
+                    # print(prediction)
+                    # input()
 
             # formatting prediction
             prediction = [' | '.join([f"question: {q}, answer: {a}" for q, a in p]) if p is not None else "" for p in prediction]
