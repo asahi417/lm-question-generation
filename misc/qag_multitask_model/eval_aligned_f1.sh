@@ -4,9 +4,9 @@ qag_metric () {
   DATA=${2}
   LA=${3}
   git clone "https://huggingface.co/lmqg/${MODEL}"
-  lmqg-eval-qag -m "lmqg/${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}"
+  lmqg-eval-qag -m "lmqg/${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}" --batch-size 64
   lmqg-push-to-hf -m "${MODEL}" -a "${MODEL}" -o "lmqg"
-  rm -rf "${MODEL}"
+#  rm -rf "${MODEL}"
 }
 
 
@@ -26,6 +26,8 @@ qag_metric 'mt5-small-frquad-multitask' 'lmqg/qg_frquad' "fr"
 qag_metric 't5-small-squad' 'lmqg/qg_squad' "en"
 qag_metric 't5-base-squad' 'lmqg/qg_squad' "en"
 qag_metric 't5-large-squad' 'lmqg/qg_squad' "en"
+qag_metric 'bart-base-squad' 'lmqg/qg_squad' "en"
+qag_metric 'bart-large-squad' 'lmqg/qg_squad' "en"
 
 qag_metric 'mt5-small-dequad' 'lmqg/qg_dequad' "de"
 qag_metric 'mt5-small-esquad' 'lmqg/qg_esquad' "es"
