@@ -87,13 +87,11 @@ def main():
         if not opt.overwrite and os.path.exists(_file):
             with open(_file) as f:
                 _prediction = f.read().split('\n')
-            if len(_prediction) == len(gold_reference):
+            if len(_prediction) != len(gold_reference):
                 logging.warning(f"found prediction file at {_file} but length not match "
                                 f"({len(_prediction)} != {len(gold_reference)})")
             else:
                 prediction = _prediction
-        print(prediction is None)
-        input()
         if prediction is None:
             assert model is not None, f"require `-m` or `--model-checkpoint`"
             # model prediction
