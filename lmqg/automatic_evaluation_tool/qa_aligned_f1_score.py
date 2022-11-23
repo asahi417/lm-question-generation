@@ -48,6 +48,9 @@ class QAAlignedF1Score:
         return list(qa_pairs)
 
     def get_score(self, hyps: List, refs: List):
+        hyps = [h.split(self.instance_separator) for h in hyps]
+        refs = [r.split(self.instance_separator) for r in refs]
+        
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
         logging.info(f"found {len([i for i in hyps if len(i) == 0])} empty prediction from {len(hyps)}")
         pairs = list(chain(*[list(product(h, r)) for h, r in zip(hyps, refs) if len(h) != 0]))
@@ -69,8 +72,8 @@ class QAAlignedF1Score:
     def compute_score(self, gts, res, return_precision_recall: bool = False):
         assert gts.keys() == res.keys()
         _ids = gts.keys()
-        hyps = [res[_id][0].decode().split(self.instance_separator) for _id in _ids]
-        refs = [gts[_id][0].decode().split(self.instance_separator) for _id in _ids]
+        hyps = [res[_id][0].decode() for _id in _ids]
+        refs = [gts[_id][0].decode() for _id in _ids]
         _score = self.get_score(hyps, refs)
         f1 = np.array([i['f1'] for i in _score])
         if return_precision_recall:
