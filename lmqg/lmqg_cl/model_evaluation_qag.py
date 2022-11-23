@@ -84,10 +84,7 @@ def main():
                 f"question: {i['question']}, answer: {i['answer']}" for _, i in g.iterrows()
             ]))
         prediction = None
-        print(_file)
-        if not opt.overwrite and os.path.exists(_file):
-            print(not opt.overwrite and os.path.exists(_file))
-            input()
+        if opt.overwrite or not os.path.exists(_file):
             with open(_file) as f:
                 _prediction = f.read().split('\n')
             if len(_prediction) == len(gold_reference):
@@ -126,7 +123,7 @@ def main():
                 f.write('\n'.join(prediction))
 
         for metric, metric_name in metrics:
-            if not opt.overwrite and metric_name not in output[_split]:
+            if opt.overwrite or metric_name not in output[_split]:
                 scores = metric.get_score(prediction, gold_reference)
                 output[_split][metric_name] = mean([i['f1'] for i in scores])
 
