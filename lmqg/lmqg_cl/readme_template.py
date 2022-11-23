@@ -124,7 +124,7 @@ language_dict = {
 }
 
 
-def format_metric(dataset, dataset_type, metric):
+def format_metric(dataset, dataset_type, metric, metric_qag):
     tmp = f"""  - task:
       name: Text2text Generation
       type: text2text-generation
@@ -158,6 +158,17 @@ def format_metric(dataset, dataset_type, metric):
     - name: QAAlignedF1Score (MoverScore)
       type: qa_aligned_f1_score_moverscore
       value: {metric["test"]["QAAlignedF1Score (MoverScore)"]}"""
+    if metric_qag is not None:
+        if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
+            tmp += f"""
+        - name: QAAlignedF1Score (BERTScore)
+          type: qa_aligned_f1_score_bertscore
+          value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
+        if "QAAlignedF1Score (MoverScore)" in metric_qag['test']:
+            tmp += f"""
+        - name: QAAlignedF1Score (MoverScore)
+          type: qa_aligned_f1_score_moverscore
+          value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
     return tmp
 
 
@@ -223,6 +234,7 @@ def get_readme(model_name: str, model_checkpoint: str):
 
     # model_version
     eval_file = "metric.first.sentence.paragraph_answer.question"
+    eval_file_qag = "metric.first.answer.paragraph.questions_answers"
     add_info = []
     _sample_qg = sample_qg_dict[la]
     _is_qag = False
@@ -235,6 +247,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
         eval_file = "metric.first.answer.paragraph.questions_answers"
         _is_qag = True
+        eval_file_qag = None
     elif model_name.endswith('no-paragraph'):
         add_info.append(version_description['no-paragraph'])
         eval_file = "metric.first.sentence.sentence_answer.question"
@@ -282,7 +295,13 @@ def get_readme(model_name: str, model_checkpoint: str):
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
         metric = json.load(f)
-        metric_main = [dataset, dataset_name, metric]
+
+        if eval_file_qag is not None:
+            with open(pj(model_checkpoint, "eval", f"{eval_file_qag}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
+                metric_qag = json.load(f)
+            metric_main = [dataset, dataset_name, metric, metric_qag]
+        else:
+            metric_main = [dataset, dataset_name, metric, None]
     # metric for ood
     metrics_ood = []
     for i in glob(pj(model_checkpoint, "eval_ood", f"{eval_file}.*.json")):
@@ -306,8 +325,8 @@ def get_readme(model_name: str, model_checkpoint: str):
                 raise ValueError(f"dataset {_dataset} is not found")
         with open(i) as f:
             metric = json.load(f)
-            metrics_ood.append([_dataset, _dataset_name, metric])
-    metrics = '\n'.join([format_metric(d, t, m) for d, t, m in [metric_main] + metrics_ood])
+            metrics_ood.append([_dataset, _dataset_name, metric, None])
+    metrics = '\n'.join([format_metric(d, t, m, m_qag) for d, t, m, m_qag in [metric_main] + metrics_ood])
     # readme table
     link = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
     markdown_table = f"""
@@ -326,6 +345,16 @@ def get_readme(model_name: str, model_checkpoint: str):
 |:--------|:-----|--------------------------------:|---------------------------------:|-----:|
 | [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[2]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link}) | 
 """
+    if metric_main[3] is not None:
+        link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        markdown_table += f"""
+
+    ### Metrics (QAG)
+
+    | Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
+    |:--------|:-----|--------------------------------:|---------------------------------:|-----:|
+    | [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[3]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[3]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link_qag}) | 
+    """
     if len(metrics_ood) != 0:
         content = "\n".join([
                       f"| [{d}](https://huggingface.co/datasets/{d}) | {t} | {round(m['test']['Bleu_4'], 3)} | {round(m['test']['ROUGE_L'], 3)} | {round(m['test']['METEOR'], 3)} | {round(m['test']['BERTScore'], 3)} | {round(m['test']['MoverScore'], 3)} | "

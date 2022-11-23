@@ -41,16 +41,19 @@ def main():
         (QAAlignedF1Score(base_metric='bertscore', language=opt.language), "QAAlignedF1Score (BERTScore)"),
         (QAAlignedF1Score(base_metric='moverscore', language=opt.language), "QAAlignedF1Score (MoverScore)")
     ]
-    model = None
-    if opt.model_checkpoint is not None:
-        model = TransformersQG(opt.model_checkpoint,
-                               skip_overflow_error=True,
-                               drop_answer_error_text=True,
-                               language=opt.language,
-                               max_length=opt.max_length,
-                               max_length_output=opt.max_length_output,
-                               use_auth_token=opt.use_auth_token)
-        model.eval()
+
+    def load_model():
+        if opt.model_checkpoint is not None:
+            _model = TransformersQG(opt.model_checkpoint,
+                                   skip_overflow_error=True,
+                                   drop_answer_error_text=True,
+                                   language=opt.language,
+                                   max_length=opt.max_length,
+                                   max_length_output=opt.max_length_output,
+                                   use_auth_token=opt.use_auth_token)
+            _model.eval()
+            return _model
+        raise ValueError(f"require `-m` or `--model-checkpoint`")
 
     metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
                   f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.json"
@@ -93,7 +96,7 @@ def main():
             else:
                 prediction = _prediction
         if prediction is None:
-            assert model is not None, f"require `-m` or `--model-checkpoint`"
+            model = load_model()
             # model prediction
             if model.multitask_model:
                 logging.info("model prediction: (multitask model)")
