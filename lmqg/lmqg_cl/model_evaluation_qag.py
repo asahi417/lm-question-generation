@@ -109,14 +109,16 @@ def main():
                 model_input_flat = list(chain(*[[i] * len(h) for i, h in zip(model_input, model_highlight)]))
                 model_highlight_flat = list(chain(*model_highlight))
                 prediction_flat = model.generate_q(
-                    list_context=model_input_flat,
-                    list_answer=model_highlight_flat,
+                    list_context=model_input_flat[:30],
+                    list_answer=model_highlight_flat[:30],
                     num_beams=opt.n_beams,
                     batch_size=opt.batch_size)
                 _index = 0
                 prediction = []
                 for h in model_highlight:
-                    prediction.append(prediction_flat[_index:_index+len(h)])
+                    questions = prediction_flat[_index:_index+len(h)]
+                    answers = model_highlight_flat[_index:_index+len(h)]
+                    prediction.append(list(zip(questions, answers)))
                     print(_index, _index+len(h))
                     _index += len(h)
                     print(prediction)
