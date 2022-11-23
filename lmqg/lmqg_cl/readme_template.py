@@ -349,11 +349,11 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         markdown_table += f"""
 
-    ### Metrics (QAG)
+### Metrics (QAG)
 
-    | Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
-    |:--------|:-----|--------------------------------:|---------------------------------:|-----:|
-    | [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[3]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[3]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link_qag}) | 
+| Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
+|:--------|:-----|--------------------------------:|---------------------------------:|-----:|
+| [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[3]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[3]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link_qag}) | 
     """
     if len(metrics_ood) != 0:
         content = "\n".join([
