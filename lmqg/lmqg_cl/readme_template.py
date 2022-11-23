@@ -161,14 +161,14 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
     if metric_qag is not None:
         if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
             tmp += f"""
-        - name: QAAlignedF1Score (BERTScore)
-          type: qa_aligned_f1_score_bertscore
-          value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
+    - name: QAAlignedF1Score (BERTScore)
+      type: qa_aligned_f1_score_bertscore
+      value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
         if "QAAlignedF1Score (MoverScore)" in metric_qag['test']:
             tmp += f"""
-        - name: QAAlignedF1Score (MoverScore)
-          type: qa_aligned_f1_score_moverscore
-          value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
+    - name: QAAlignedF1Score (MoverScore)
+      type: qa_aligned_f1_score_moverscore
+      value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
     return tmp
 
 
