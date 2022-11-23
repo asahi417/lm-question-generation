@@ -117,7 +117,10 @@ def main():
                 prediction = []
                 for h in model_highlight:
                     prediction.append(prediction_flat[_index:_index+len(h)])
+                    print(_index, _index+len(h))
                     _index += len(h)
+                    print(prediction)
+                    input()
 
             # formatting prediction
             prediction = [' | '.join([f"question: {q}, answer: {a}" for q, a in p]) if p is not None else "" for p in prediction]
