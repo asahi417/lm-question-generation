@@ -153,12 +153,12 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
     - name: QAAlignedF1Score (BERTScore)
       type: qa_aligned_f1_score_bertscore
       value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
-    if "QAAlignedRecallScore (BERTScore)" in metric['test']:
+    if "QAAlignedRecall (BERTScore)" in metric['test']:
         tmp += f"""
     - name: QAAlignedRecall (BERTScore)
       type: qa_aligned_recall_bertscore
       value: {metric["test"]["QAAlignedRecall (BERTScore)"]}"""
-    if "QAAlignedF1Score (BERTScore)" in metric['test']:
+    if "QAAlignedPrecision (BERTScore)" in metric['test']:
         tmp += f"""
     - name: QAAlignedPrecision (BERTScore)
       type: qa_aligned_precision_bertscore
@@ -180,14 +180,13 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
       type: qa_aligned_precision_moverscore
       value: {metric["test"]["QAAlignedPrecision (MoverScore)"]}"""
 
-
     if metric_qag is not None:
         if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
             tmp += f"""
     - name: QAAlignedF1Score (BERTScore)
       type: qa_aligned_f1_score_bertscore
       value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
-        if "QAAlignedRecallScore (BERTScore)" in metric_qag['test']:
+        if "QAAlignedRecall (BERTScore)" in metric_qag['test']:
             tmp += f"""
     - name: QAAlignedRecall (BERTScore)
       type: qa_aligned_recall_bertscore
