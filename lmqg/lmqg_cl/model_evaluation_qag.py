@@ -38,8 +38,18 @@ def main():
     opt = get_options()
     os.makedirs(opt.export_dir, exist_ok=True)
     metrics = [
-        (QAAlignedF1Score(base_metric='bertscore', language=opt.language), "QAAlignedF1Score (BERTScore)"),
-        (QAAlignedF1Score(base_metric='moverscore', language=opt.language), "QAAlignedF1Score (MoverScore)")
+        (QAAlignedF1Score(target_metric='f1', base_metric='bertscore', language=opt.language),
+         "QAAlignedF1Score (BERTScore)"),
+        (QAAlignedF1Score(target_metric='recall', base_metric='bertscore', language=opt.language),
+         "QAAlignedRecall (BERTScore)"),
+        (QAAlignedF1Score(target_metric='precision', base_metric='bertscore', language=opt.language),
+         "QAAlignedPrecision (BERTScore)"),
+        (QAAlignedF1Score(target_metric='f1', base_metric='moverscore', language=opt.language),
+         "QAAlignedF1Score (MoverScore)"),
+        (QAAlignedF1Score(target_metric='recall', base_metric='moverscore', language=opt.language),
+         "QAAlignedRecall (MoverScore)"),
+        (QAAlignedF1Score(target_metric='precision', base_metric='moverscore', language=opt.language),
+         "QAAlignedPrecision (MoverScore)")
     ]
 
     def load_model():
