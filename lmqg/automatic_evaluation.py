@@ -115,8 +115,18 @@ def compute_metrics(out_file,
         ]
         if qag_model:
             scorers_extra += [
-                (QAAlignedF1Score(base_metric='bertscore', language=language), "QAAlignedF1Score (BERTScore)"),
-                (QAAlignedF1Score(base_metric='moverscore', language=language), "QAAlignedF1Score (MoverScore)")
+                (QAAlignedF1Score(target_metric='f1', base_metric='bertscore', language=language),
+                 "QAAlignedF1Score (BERTScore)"),
+                (QAAlignedF1Score(target_metric='recall', base_metric='bertscore', language=language),
+                 "QAAlignedRecallScore (BERTScore)"),
+                (QAAlignedF1Score(target_metric='precision', base_metric='bertscore', language=language),
+                 "QAAlignedPrecisionScore (BERTScore)"),
+                (QAAlignedF1Score(target_metric='f1', base_metric='moverscore', language=language),
+                 "QAAlignedF1Score (MoverScore)"),
+                (QAAlignedF1Score(target_metric='recall', base_metric='moverscore', language=language),
+                 "QAAlignedRecallScore (MoverScore)"),
+                (QAAlignedF1Score(target_metric='precision', base_metric='moverscore', language=language),
+                 "QAAlignedPrecisionScore (MoverScore)")
             ]
         if skip is not None:
             scorers_extra = [s for s in scorers_extra if s[1] not in skip]

@@ -1,0 +1,1 @@
+{"test": {"QAAlignedF1Score (BERTScore)": 0.9549468463495571, "QAAlignedF1Score (MoverScore)": 0.7037994906840926}, "validation": {"QAAlignedF1Score (BERTScore)": 0.9558224424194867, "QAAlignedF1Score (MoverScore)": 0.7148265205301874}}

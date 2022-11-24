@@ -21,6 +21,7 @@ class QAAlignedF1Score:
 
     def __init__(self,
                  language: str = 'en',
+                 target_metric: str = 'f1',
                  base_metric: str = 'bertscore',
                  instance_separator: str = " | ",
                  question_key: str = 'question: ',
@@ -32,6 +33,8 @@ class QAAlignedF1Score:
         self.question_key = question_key
         self.answer_key = answer_key
         self.qa_separator = qa_separator
+        assert target_metric in ['f1', 'recall', 'precision'], target_metric
+        self.target_metric = target_metric
 
     def sanity_check(self, sample: str):
         if len(sample.split(self.qa_separator + self.answer_key)) != 2:
@@ -69,18 +72,14 @@ class QAAlignedF1Score:
                 output.append({"f1": f1, "precision": precision, "recall": recall})
         return output
 
-    def compute_score(self, gts, res, return_precision_recall: bool = False):
+    def compute_score(self, gts, res):
         assert gts.keys() == res.keys()
         _ids = gts.keys()
         hyps = [res[_id][0].decode() for _id in _ids]
         refs = [gts[_id][0].decode() for _id in _ids]
         _score = self.get_score(hyps, refs)
-        f1 = np.array([i['f1'] for i in _score])
-        if return_precision_recall:
-            return np.mean(f1), f1,\
-                   np.array([i['precision'] for i in _score]),\
-                   np.array([i['recall'] for i in _score])
-        return np.mean(f1), f1
+        _target = np.array([i[self.target_metric] for i in _score])
+        return np.mean(_target), _target
 
     @staticmethod
     def method():
