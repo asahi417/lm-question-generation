@@ -153,22 +153,67 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
     - name: QAAlignedF1Score (BERTScore)
       type: qa_aligned_f1_score_bertscore
       value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
+    if "QAAlignedRecallScore (BERTScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedRecall (BERTScore)
+      type: qa_aligned_recall_bertscore
+      value: {metric["test"]["QAAlignedRecall (BERTScore)"]}"""
+    if "QAAlignedF1Score (BERTScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedPrecision (BERTScore)
+      type: qa_aligned_precision_bertscore
+      value: {metric["test"]["QAAlignedPrecision (BERTScore)"]}"""
+
     if "QAAlignedF1Score (MoverScore)" in metric['test']:
         tmp += f"""
     - name: QAAlignedF1Score (MoverScore)
       type: qa_aligned_f1_score_moverscore
       value: {metric["test"]["QAAlignedF1Score (MoverScore)"]}"""
+    if "QAAlignedRecall (MoverScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedRecall (MoverScore)
+      type: qa_aligned_recall_moverscore
+      value: {metric["test"]["QAAlignedRecall (MoverScore)"]}"""
+    if "QAAlignedPrecision (MoverScore)" in metric['test']:
+        tmp += f"""
+    - name: QAAlignedPrecision (MoverScore)
+      type: qa_aligned_precision_moverscore
+      value: {metric["test"]["QAAlignedPrecision (MoverScore)"]}"""
+
+
     if metric_qag is not None:
         if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
             tmp += f"""
     - name: QAAlignedF1Score (BERTScore)
       type: qa_aligned_f1_score_bertscore
       value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
+        if "QAAlignedRecallScore (BERTScore)" in metric_qag['test']:
+            tmp += f"""
+    - name: QAAlignedRecall (BERTScore)
+      type: qa_aligned_recall_bertscore
+      value: {metric_qag["test"]["QAAlignedRecall (BERTScore)"]}"""
+        if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
+            tmp += f"""
+    - name: QAAlignedPrecision (BERTScore)
+      type: qa_aligned_precision_bertscore
+      value: {metric_qag["test"]["QAAlignedPrecision (BERTScore)"]}"""
+
         if "QAAlignedF1Score (MoverScore)" in metric_qag['test']:
             tmp += f"""
     - name: QAAlignedF1Score (MoverScore)
       type: qa_aligned_f1_score_moverscore
       value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
+        if "QAAlignedRecall (MoverScore)" in metric_qag['test']:
+            tmp += f"""
+    - name: QAAlignedRecall (MoverScore)
+      type: qa_aligned_recall_moverscore
+      value: {metric_qag["test"]["QAAlignedRecall (MoverScore)"]}"""
+        if "QAAlignedPrecision (MoverScore)" in metric_qag['test']:
+            tmp += f"""
+    - name: QAAlignedPrecision (MoverScore)
+      type: qa_aligned_precision_moverscore
+      value: {metric_qag["test"]["QAAlignedPrecision (MoverScore)"]}"""
+
     return tmp
 
 
