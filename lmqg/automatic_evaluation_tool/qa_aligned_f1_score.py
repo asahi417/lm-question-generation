@@ -70,6 +70,7 @@ class QAAlignedF1Score:
                 recall = mean(max(pair_score[f"{h}--{r}"] for h in hyp) for r in ref)
                 f1 = 2 * precision * recall / (precision + recall + EPS)
                 output.append({"f1": f1, "precision": precision, "recall": recall})
+        output = np.array([o[self.target_metric] for o in output])
         return output
 
     def compute_score(self, gts, res):
@@ -78,8 +79,7 @@ class QAAlignedF1Score:
         hyps = [res[_id][0].decode() for _id in _ids]
         refs = [gts[_id][0].decode() for _id in _ids]
         _score = self.get_score(hyps, refs)
-        _target = np.array([i[self.target_metric] for i in _score])
-        return np.mean(_target), _target
+        return np.mean(_score), _score
 
     @staticmethod
     def method():

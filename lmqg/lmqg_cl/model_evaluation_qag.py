@@ -30,7 +30,8 @@ def get_options():
     parser.add_argument('-e', '--export-dir', required=True, type=str)
     parser.add_argument('--hyp-test', default=None, type=str)
     parser.add_argument('--hyp-dev', default=None, type=str)
-    parser.add_argument('--overwrite', help='', action='store_true')
+    parser.add_argument('--overwrite-prediction', help='', action='store_true')
+    parser.add_argument('--overwrite-metric', help='', action='store_true')
     return parser.parse_args()
 
 
@@ -55,12 +56,12 @@ def main():
     def load_model():
         if opt.model_checkpoint is not None:
             _model = TransformersQG(opt.model_checkpoint,
-                                   skip_overflow_error=True,
-                                   drop_answer_error_text=True,
-                                   language=opt.language,
-                                   max_length=opt.max_length,
-                                   max_length_output=opt.max_length_output,
-                                   use_auth_token=opt.use_auth_token)
+                                    skip_overflow_error=True,
+                                    drop_answer_error_text=True,
+                                    language=opt.language,
+                                    max_length=opt.max_length,
+                                    max_length_output=opt.max_length_output,
+                                    use_auth_token=opt.use_auth_token)
             _model.eval()
             return _model
         raise ValueError(f"require `-m` or `--model-checkpoint`")
@@ -97,7 +98,7 @@ def main():
                 f"question: {i['question']}, answer: {i['answer']}" for _, i in g.iterrows()
             ]))
         prediction = None
-        if not opt.overwrite and os.path.exists(_file):
+        if not opt.overwrite_prediction and os.path.exists(_file):
             with open(_file) as f:
                 _prediction = f.read().split('\n')
             if len(_prediction) != len(gold_reference):
@@ -142,9 +143,9 @@ def main():
                 f.write('\n'.join(prediction))
 
         for metric, metric_name in metrics:
-            if opt.overwrite or metric_name not in output[_split]:
+            if opt.overwrite_metric or metric_name not in output[_split]:
                 scores = metric.get_score(prediction, gold_reference)
-                output[_split][metric_name] = mean([i['f1'] for i in scores])
+                output[_split][metric_name] = mean(scores.tolist())
 
     with open(metric_file, "w") as f:
         json.dump(output, f)
