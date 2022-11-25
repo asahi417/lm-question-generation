@@ -4,7 +4,7 @@ qag_metric () {
   DATA=${2}
   LA=${3}
   git clone "https://huggingface.co/lmqg/${MODEL}"
-#  lmqg-eval-qag --use-auth-token -m "lmqg/${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}" --batch-size 4
+  lmqg-eval-qag --use-auth-token --overwrite-metric -m "lmqg/${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}" --batch-size 4
   lmqg-push-to-hf -m "${MODEL}" -a "${MODEL}" -o "lmqg"
 }
 

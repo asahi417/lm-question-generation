@@ -29,7 +29,7 @@ if not os.path.exists("./summary.qae.csv"):
 
 
 #### SUMMARY FOR QA F1 ####
-TMP_DIR = 'metric'
+TMP_DIR = 'metric_files'
 os.makedirs(TMP_DIR, exist_ok=True)
 
 
