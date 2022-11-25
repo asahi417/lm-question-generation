@@ -340,12 +340,14 @@ def get_readme(model_name: str, model_checkpoint: str):
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
         metric = json.load(f)
 
-        if eval_file_qag is not None:
-            with open(pj(model_checkpoint, "eval", f"{eval_file_qag}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
+    metric_qag = None
+    if eval_file_qag is not None:
+        tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qag}.{dataset.replace('/', '_')}.{dataset_name}.json")
+        if os.path.exists(tmp_path):
+            with open(tmp_path) as f:
                 metric_qag = json.load(f)
-            metric_main = [dataset, dataset_name, metric, metric_qag]
-        else:
-            metric_main = [dataset, dataset_name, metric, None]
+
+    metric_main = [dataset, dataset_name, metric, metric_qag]
     # metric for ood
     metrics_ood = []
     for i in glob(pj(model_checkpoint, "eval_ood", f"{eval_file}.*.json")):
