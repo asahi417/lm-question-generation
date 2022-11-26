@@ -16,13 +16,11 @@ mlqg_answer () {
   MODEL_ALIAS=${2}
   BATCH=${3}
   GRAD=${4}
-  LA='ja'
-  evaluate "${MODEL_NAME}_${LA}quad_answer" ${LA} "qg_${LA}quad" "${MODEL_NAME//_/-}-${LA}quad-multitask"
-#  for LA in "ja" "es" "ko" "it" "de" "ru" "fr"
-#  do
-#    lmqg-train-search -c "lmqg_output/${MODEL_NAME}_${LA}quad_answer" -d lmqg/qg_${LA}quad -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
-#    evaluate "${MODEL_NAME}_${LA}quad_answer" ${LA} "qg_${LA}quad" "${MODEL_NAME//_/-}-${LA}quad-multitask"
-#  done
+  for LA in "ja" "es" "ko" "it" "de" "ru" "fr"
+  do
+    lmqg-train-search -c "lmqg_output/${MODEL_NAME}_${LA}quad_answer" -d lmqg/qg_${LA}quad -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+    evaluate "${MODEL_NAME}_${LA}quad_answer" ${LA} "qg_${LA}quad" "${MODEL_NAME//_/-}-${LA}quad-multitask"
+  done
 }
 
 

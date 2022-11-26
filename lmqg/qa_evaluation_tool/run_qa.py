@@ -74,12 +74,14 @@ def run_qa_evaluation(dataset: str,
                       output_dir: str = 'qa_eval_output',
                       overwrite: bool = False,
                       skip_training: bool = False,
+                      skip_test: bool = False,
                       doc_stride: int = 128,
                       max_seq_length: int = 384,
                       max_answer_length: int = 30,
                       question_column_name: str = "question",
                       context_column_name: str = "context",
-                      answer_column_name: str = "answers"):
+                      answer_column_name: str = "answers",
+                      answer_extraction_mode: bool = False):
     summary_file = pj(output_dir, 'test_result.json')
     if os.path.exists(summary_file) and not overwrite:
         return
@@ -117,24 +119,35 @@ def run_qa_evaluation(dataset: str,
 
     # Training preprocessing
     def prepare_train_features(examples):
-        # Some of the questions have lots of whitespace on the left, which is not useful and will make the
-        # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
-        # left whitespace
-        examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+        if answer_extraction_mode:
+            tokenized_examples = tokenizer(
+                examples[context_column_name],
+                truncation=True,
+                max_length=max_seq_length,
+                stride=doc_stride,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length"
+            )
+        else:
+            # Some of the questions have lots of whitespace on the left, which is not useful and will make the
+            # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
+            # left whitespace
+            examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
 
-        # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
-        # in one example possible giving several features when a context is long, each of those features having a
-        # context that overlaps a bit the context of the previous feature.
-        tokenized_examples = tokenizer(
-            examples[question_column_name if pad_on_right else context_column_name],
-            examples[context_column_name if pad_on_right else question_column_name],
-            truncation="only_second" if pad_on_right else "only_first",
-            max_length=max_seq_length,
-            stride=doc_stride,
-            return_overflowing_tokens=True,
-            return_offsets_mapping=True,
-            padding="max_length"
-        )
+            # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
+            # in one example possible giving several features when a context is long, each of those features having a
+            # context that overlaps a bit the context of the previous feature.
+            tokenized_examples = tokenizer(
+                examples[question_column_name if pad_on_right else context_column_name],
+                examples[context_column_name if pad_on_right else question_column_name],
+                truncation="only_second" if pad_on_right else "only_first",
+                max_length=max_seq_length,
+                stride=doc_stride,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length"
+            )
 
         # Since one example might give us several features if it has a long context, we need a map from a feature to
         # its corresponding example. This key gives us just that.
@@ -195,24 +208,35 @@ def run_qa_evaluation(dataset: str,
 
     # Validation preprocessing
     def prepare_validation_features(examples):
-        # Some of the questions have lots of whitespace on the left, which is not useful and will make the
-        # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
-        # left whitespace
-        examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+        if answer_extraction_mode:
+            tokenized_examples = tokenizer(
+                examples[context_column_name],
+                truncation=True,
+                max_length=max_seq_length,
+                stride=doc_stride,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length"
+            )
+        else:
+            # Some of the questions have lots of whitespace on the left, which is not useful and will make the
+            # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
+            # left whitespace
+            examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
 
-        # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
-        # in one example possible giving several features when a context is long, each of those features having a
-        # context that overlaps a bit the context of the previous feature.
-        tokenized_examples = tokenizer(
-            examples[question_column_name if pad_on_right else context_column_name],
-            examples[context_column_name if pad_on_right else question_column_name],
-            truncation="only_second" if pad_on_right else "only_first",
-            max_length=max_seq_length,
-            stride=doc_stride,
-            return_overflowing_tokens=True,
-            return_offsets_mapping=True,
-            padding="max_length"
-        )
+            # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
+            # in one example possible giving several features when a context is long, each of those features having a
+            # context that overlaps a bit the context of the previous feature.
+            tokenized_examples = tokenizer(
+                examples[question_column_name if pad_on_right else context_column_name],
+                examples[context_column_name if pad_on_right else question_column_name],
+                truncation="only_second" if pad_on_right else "only_first",
+                max_length=max_seq_length,
+                stride=doc_stride,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length"
+            )
 
         # Since one example might give us several features if it has a long context, we need a map from a feature to
         # its corresponding example. This key gives us just that.
@@ -339,7 +363,7 @@ def run_qa_evaluation(dataset: str,
         trainer.save_model(best_model_path)
 
     # Evaluation
-    if test_example is not None and test_dataset is not None:
+    if not skip_test and test_example is not None and test_dataset is not None:
         logging.info("*** Evaluate ***")
         trainer = QuestionAnsweringTrainer(
             model=AutoModelForQuestionAnswering.from_pretrained(best_model_path, local_files_only=local_file_only),
