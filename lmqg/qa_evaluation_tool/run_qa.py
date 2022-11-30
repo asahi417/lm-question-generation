@@ -184,11 +184,14 @@ def run_qa_evaluation(dataset: str,
                 tokenized_examples["end_positions"].append(cls_index)
             else:
                 # Start/end character index of the answer in the text.
+
                 start_char = answers["answer_start"][0]
                 end_char = start_char + len(answers["text"][0])
 
                 # Start token index of the current span in the text.
+                # answer_extraction_mode
                 token_start_index = 0
+                print(sequence_ids)
                 while sequence_ids[token_start_index] != (1 if pad_on_right else 0):
                     token_start_index += 1
 
