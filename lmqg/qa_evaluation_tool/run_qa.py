@@ -21,6 +21,7 @@ Fine-tuning the library models for question answering using a slightly adapted v
 import logging
 import os
 import urllib
+import shutil
 import json
 import multiprocessing
 import torch
@@ -40,6 +41,7 @@ from transformers import (
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 from ray import tune
+from huggingface_hub import create_repo
 
 from .trainer_qa import QuestionAnsweringTrainer
 from .utils_qa import postprocess_qa_predictions
@@ -81,7 +83,12 @@ def run_qa_evaluation(dataset: str,
                       question_column_name: str = "question",
                       context_column_name: str = "context",
                       answer_column_name: str = "answers",
-                      answer_extraction_mode: bool = False):
+                      answer_extraction_mode: bool = False,
+                      hf_model_alias_to_push: str = None,
+                      hf_organization_to_push: str = None,
+                      hf_use_auth_token: bool = False):
+    best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
+    best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')
     if os.path.exists(summary_file) and not overwrite:
         return
@@ -313,7 +320,6 @@ def run_qa_evaluation(dataset: str,
     def compute_metrics(p: EvalPrediction):
         return metric.compute(predictions=p.predictions, references=p.label_ids)
 
-    best_model_path = pj(output_dir, 'best_model')
     if not skip_training:
         # Initialize our Trainer
         training_args = TrainingArguments(
@@ -357,10 +363,16 @@ def run_qa_evaluation(dataset: str,
                 },
                 local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials
             )
-        for n, v in best_run.hyperparameters.items():
+        best_run_hyperparameters = best_run.hyperparameters
+        logging.info("best config")
+        logging.info(json.dumps(best_run_hyperparameters, indent=4))
+        with open(best_hyperparameters_path, 'w') as f:
+            json.dump(best_run_hyperparameters, f)
+        for n, v in best_run_hyperparameters.items():
             setattr(trainer.args, n, v)
         trainer.train()
         trainer.save_model(best_model_path)
+        tokenizer.save_pretrained(best_model_path)
 
     # Evaluation
     if not skip_test and test_example is not None and test_dataset is not None:
@@ -380,3 +392,18 @@ def run_qa_evaluation(dataset: str,
         logging.info(json.dumps(result, indent=4))
         with open(summary_file, 'w') as f:
             json.dump(result, f)
+
+    if hf_organization_to_push is not None and hf_model_alias_to_push is not None:
+        url = create_repo(hf_model_alias_to_push, organization=hf_organization_to_push, exist_ok=True)
+        args = {"use_auth_token": hf_use_auth_token, "repo_url": url, "organization": hf_organization_to_push}
+        model.push_to_hub(hf_model_alias_to_push, **args)
+        tokenizer.push_to_hub(hf_model_alias_to_push, **args)
+        readme = "This model is automatically pushed by [lmqg](https://github.com/asahi417/lm-question-generation) library."
+        with open(f"{hf_model_alias_to_push}/README.md", "w") as f:
+            f.write(readme)
+        if os.path.exists(best_hyperparameters_path):
+            shutil.copy2(best_hyperparameters_path, pj(hf_model_alias_to_push, 'best_run_hyperparameters.json'))
+        if os.path.exists(summary_file):
+            shutil.copy2(summary_file, pj(hf_model_alias_to_push, 'metric.json'))
+        os.system(
+            f"cd {hf_model_alias_to_push} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
