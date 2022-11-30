@@ -301,6 +301,8 @@ def run_qa_evaluation(dataset: str,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
     if down_sample_size_train is not None:
+        assert down_sample_size_train < len(train_example), \
+            f"{down_sample_size_train} should be less than {len(train_example)}"
         train_example_search = train_example.shuffle(random_seed)
         train_example_search = train_example_search.select(list(range(down_sample_size_train)))
         train_dataset_search = train_example_search.map(
@@ -313,6 +315,8 @@ def run_qa_evaluation(dataset: str,
     # Validation Feature Creation
     validation_example = raw_datasets[split_validation]
     if down_sample_size_validation is not None:
+        assert down_sample_size_validation < len(validation_example), \
+            f"{down_sample_size_validation} should be less than {len(validation_example)}"
         validation_example = validation_example.shuffle(random_seed)
         validation_example = validation_example.select(list(range(down_sample_size_validation)))
     validation_dataset = validation_example.map(
