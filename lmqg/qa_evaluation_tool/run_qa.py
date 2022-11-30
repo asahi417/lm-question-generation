@@ -386,8 +386,7 @@ def run_qa_evaluation(dataset: str,
                     "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
                 },
                 local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
-                resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()},
-
+                resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()}
             )
         else:
             best_run = trainer.hyperparameter_search(
@@ -396,7 +395,8 @@ def run_qa_evaluation(dataset: str,
                     "num_train_epochs": tune.choice(list(range(1, 6))),
                     "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
                 },
-                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials
+                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
+                resources_per_trial={'cpu': 1, "gpu": torch.cuda.device_count()}
             )
         best_run_hyperparameters = best_run.hyperparameters
         logging.info("best config")

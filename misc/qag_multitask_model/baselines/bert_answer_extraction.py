@@ -1,7 +1,8 @@
 from lmqg.qa_evaluation_tool.run_qa import run_qa_evaluation
 
-language_model = "distilbert-base-uncased"
-# language_model = "robert-base"
+# language_model = "distilbert-base-uncased"
+language_model = "bert-base-uncased"
+# language_model = "roberta-base"
 # model fine-tuning
 run_qa_evaluation(
     dataset='lmqg/qa_squad',
@@ -15,3 +16,8 @@ run_qa_evaluation(
     hf_model_alias_to_push=f"{language_model}-squad-answer-extraction",
     hf_organization_to_push='lmqg'
 )
+
+# for language_model in ["bert-base-uncased", "distilbert-base-uncased", "roberta-base"]:
+#     config = AutoConfig.from_pretrained(language_model)
+#     tokenizer = AutoTokenizer.from_pretrained(language_model, use_fast=True)
+#     model = AutoModelForQuestionAnswering.from_pretrained(language_model, config=config)

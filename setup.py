@@ -58,6 +58,7 @@ setup(
         'pyemd',  # to compute moverscore
         'evaluate',
         "wandb",
+        "ray",
         "ray[tune]"
     ],
     python_requires='>=3.6',
