@@ -86,7 +86,9 @@ def run_qa_evaluation(dataset: str,
                       answer_extraction_mode: bool = False,
                       hf_model_alias_to_push: str = None,
                       hf_organization_to_push: str = None,
-                      hf_use_auth_token: bool = False):
+                      hf_use_auth_token: bool = False,
+                      down_sample_size_train: int = None,
+                      down_sample_size_validation: int = None):
     best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
     best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')
@@ -292,16 +294,27 @@ def run_qa_evaluation(dataset: str,
         return tokenized_examples
 
     # Create train feature from dataset
+
     train_example = raw_datasets[split_train]
-    # train_example = raw_datasets[split_train].select(list(range(50)))
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
+    if down_sample_size_train is not None:
+        train_example_search = train_example.shuffle(random_seed)
+        train_example_search = train_example_search.select(list(range(down_sample_size_train)))
+        train_dataset_search = train_example_search.map(
+            prepare_train_features, batched=True, num_proc=None,
+            remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
+        )
+    else:
+        train_dataset_search = train_dataset
 
     # Validation Feature Creation
     validation_example = raw_datasets[split_validation]
-    # validation_example = raw_datasets[split_validation].select(list(range(50)))
+    if down_sample_size_validation is not None:
+        validation_example = validation_example.shuffle(random_seed)
+        validation_example = validation_example.select(list(range(down_sample_size_validation)))
     validation_dataset = validation_example.map(
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
@@ -354,7 +367,7 @@ def run_qa_evaluation(dataset: str,
         trainer = QuestionAnsweringTrainer(
             model=model,
             args=training_args,
-            train_dataset=train_dataset,
+            train_dataset=train_dataset_search,
             eval_dataset=validation_dataset,
             eval_examples=validation_example,
             tokenizer=tokenizer,
@@ -392,6 +405,10 @@ def run_qa_evaluation(dataset: str,
             json.dump(best_run_hyperparameters, f)
         for n, v in best_run_hyperparameters.items():
             setattr(trainer.args, n, v)
+        # update training dataset to full dataset without down sampling
+        setattr(trainer, 'train_dataset', train_dataset)
+        assert trainer.train_dataset == train_dataset
+        # train
         trainer.train()
         trainer.save_model(best_model_path)
         tokenizer.save_pretrained(best_model_path)
