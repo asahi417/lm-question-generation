@@ -1,6 +1,7 @@
 from lmqg.qa_evaluation_tool.run_qa import run_qa_evaluation
 
 language_model = "distilbert-base-uncased"
+# language_model = "bert-base-uncased"
 # model fine-tuning
 run_qa_evaluation(
     dataset='lmqg/qa_squad',

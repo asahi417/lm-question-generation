@@ -184,24 +184,31 @@ def run_qa_evaluation(dataset: str,
                 tokenized_examples["end_positions"].append(cls_index)
             else:
                 # Start/end character index of the answer in the text.
-
                 start_char = answers["answer_start"][0]
                 end_char = start_char + len(answers["text"][0])
 
                 # Start token index of the current span in the text.
-                # answer_extraction_mode
                 token_start_index = 0
-                print(sequence_ids)
-                while sequence_ids[token_start_index] != (1 if pad_on_right else 0):
-                    token_start_index += 1
+                if answer_extraction_mode:
+                    while sequence_ids[token_start_index] != 0:
+                        token_start_index += 1
+                else:
+                    while sequence_ids[token_start_index] != (1 if pad_on_right else 0):
+                        token_start_index += 1
 
                 # End token index of the current span in the text.
                 token_end_index = len(input_ids) - 1
-                while sequence_ids[token_end_index] != (1 if pad_on_right else 0):
-                    token_end_index -= 1
+                if answer_extraction_mode:
+                    while sequence_ids[token_end_index] != 0:
+                        token_end_index -= 1
+                else:
+                    while sequence_ids[token_end_index] != (1 if pad_on_right else 0):
+                        token_end_index -= 1
 
                 # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
                 if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
+                    logging.warning(f"answer not found:\n \t - answer: {answers}\n \t - context: "
+                                    f"{tokenizer.decode(tokenized_examples['input_ids'][i])}")
                     tokenized_examples["start_positions"].append(cls_index)
                     tokenized_examples["end_positions"].append(cls_index)
                 else:
@@ -213,6 +220,13 @@ def run_qa_evaluation(dataset: str,
                     while offsets[token_end_index][1] >= end_char:
                         token_end_index -= 1
                     tokenized_examples["end_positions"].append(token_end_index + 1)
+                    answer_found = tokenizer.decode(
+                        tokenized_examples["input_ids"][i][
+                        tokenized_examples["start_positions"][i]: 1 + tokenized_examples["end_positions"][i]]
+                    )
+                    if answers['text'][0].lower().replace(" ", "") != answer_found.lower().replace(" ", ""):
+                        logging.debug(f"answer not matched:\n \t - reference: {answers['text'][0].lower()}\n \t "
+                                      f"- found: {answer_found.lower()}")
 
         return tokenized_examples
 
@@ -259,7 +273,10 @@ def run_qa_evaluation(dataset: str,
         for i in range(len(tokenized_examples["input_ids"])):
             # Grab the sequence corresponding to that example (to know what is the context and what is the question).
             sequence_ids = tokenized_examples.sequence_ids(i)
-            context_index = 1 if pad_on_right else 0
+            if answer_extraction_mode:
+                context_index = 0
+            else:
+                context_index = 1 if pad_on_right else 0
 
             # One example can give several spans, this is the index of the example containing this span of text.
             sample_index = sample_mapping[i]
@@ -281,6 +298,7 @@ def run_qa_evaluation(dataset: str,
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
+
     # Validation Feature Creation
     validation_example = raw_datasets[split_validation]
     # validation_example = raw_datasets[split_validation].select(list(range(50)))
@@ -288,6 +306,7 @@ def run_qa_evaluation(dataset: str,
         prepare_validation_features, batched=True, num_proc=None,
         remove_columns=validation_example.column_names, desc="Running tokenizer on validation dataset",
     )
+
     # Predict Feature Creation
     if split_test in raw_datasets:
         test_example = raw_datasets[split_test]
