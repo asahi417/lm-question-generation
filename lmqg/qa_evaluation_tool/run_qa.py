@@ -92,9 +92,6 @@ def run_qa_evaluation(dataset: str,
     best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
     best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')
-    if not os.path.exists(summary_file) or overwrite:
-
-
     os.makedirs(output_dir, exist_ok=True)
     # Set seed before initializing model.
     set_seed(random_seed)
