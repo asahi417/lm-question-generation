@@ -43,3 +43,4 @@ evaluate t5-base-squad-answer-extraction en qg_squad t5-base-squad-answer-extrac
 
 lmqg-train-search -m t5-small -b 64 -g 1 2 4 -c lmqg_output/t5-large-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
 evaluate t5-large-squad-answer-extraction en qg_squad t5-large-squad-answer-extraction
+

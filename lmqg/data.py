@@ -12,7 +12,7 @@ __all__ = ('get_dataset', 'get_reference_files', 'DEFAULT_CACHE_DIR')
 DEFAULT_CACHE_DIR = pj(os.path.expanduser('~'), '.cache', 'lmqg')
 
 
-def get_dataset(path: str = 'asahi417/qg_squad',
+def get_dataset(path: str = 'lmqg/qg_squad',
                 name: str = 'default',
                 split: str = 'train',
                 input_type: str = 'paragraph_answer',

@@ -15,7 +15,7 @@ import transformers
 from .exceptions import ExceedMaxLengthError, HighlightNotFoundError, AnswerNotFoundError
 from .spacy_module import SpacyPipeline
 
-__all__ = ('TransformersQG', 'ADDITIONAL_SP_TOKENS', 'TASK_PREFIX', 'clean')
+__all__ = ('TransformersQG', 'ADDITIONAL_SP_TOKENS', 'TASK_PREFIX', 'clean', 'internet_connection')
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
