@@ -89,6 +89,12 @@ def run_qa_evaluation(dataset: str,
                       hf_use_auth_token: bool = False,
                       down_sample_size_train: int = None,
                       down_sample_size_validation: int = None):
+    if answer_extraction_mode:
+        raise NotImplementedError(
+            "Answer extraction is QA without question, and is currently not in a right form as single"
+            "paragraph can have multiple answers. Answer should be conditioned by a sentence which is"
+            "not implemented yet. Need directly fix on the huggingface dataset `raw_dataset` for AE mode."
+        )
     best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
     best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')

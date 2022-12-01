@@ -123,13 +123,15 @@ class GridSearcher:
         # configure evaluation data types
         input_types = to_list(self.static_config['input_types'], sorting=False)
         output_types = to_list(self.static_config['output_types'], sorting=False)
-        assert len(input_types) == len(output_types)
+        assert len(input_types) == len(output_types), f"{len(input_types)} != {len(output_types)}"
         if self.static_config['prefix_types'] is None:
             prefix_types = [None] * len(input_types)
         else:
             prefix_types = to_list(self.static_config['prefix_types'], sorting=False)
-        tmp = [(i, o, p) for i, o, p in zip(input_types, output_types, prefix_types) if o in ['question', 'questions_answers']]
-        assert len(tmp) == 1
+        if len(input_types) > 1:
+            tmp = [(i, o, p) for i, o, p in zip(input_types, output_types, prefix_types) if
+                   o in ['question', 'questions_answers']]
+        assert len(tmp) == 1, tmp
         i, o, p = tmp[0]
         prefix = pj(
             DEFAULT_CACHE_DIR,
