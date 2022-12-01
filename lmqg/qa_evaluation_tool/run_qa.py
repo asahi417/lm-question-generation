@@ -92,8 +92,8 @@ def run_qa_evaluation(dataset: str,
     best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
     best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')
-    if os.path.exists(summary_file) and not overwrite:
-        return
+    if not os.path.exists(summary_file) or overwrite:
+
 
     os.makedirs(output_dir, exist_ok=True)
     # Set seed before initializing model.
@@ -359,7 +359,7 @@ def run_qa_evaluation(dataset: str,
     def compute_metrics(p: EvalPrediction):
         return metric.compute(predictions=p.predictions, references=p.label_ids)
 
-    if not skip_training:
+    if not skip_training and (not os.path.exists(best_model_path) or overwrite):
         # Initialize our Trainer
         training_args = TrainingArguments(
             report_to=None,
@@ -380,33 +380,36 @@ def run_qa_evaluation(dataset: str,
             compute_metrics=compute_metrics,
             model_init=lambda x: AutoModelForQuestionAnswering.from_pretrained(language_model, return_dict=True, local_files_only=local_file_only)
         )
+        if not os.path.exists(best_hyperparameters_path) or overwrite:
 
-        logging.info("*** Finetuning ***")
-        if parallel:
-            best_run = trainer.hyperparameter_search(
-                hp_space=lambda x: {
-                    "learning_rate": tune.loguniform(1e-6, 1e-4),
-                    "num_train_epochs": tune.choice(list(range(1, 6))),
-                    "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
-                },
-                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
-                resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()}
-            )
-        else:
-            best_run = trainer.hyperparameter_search(
-                hp_space=lambda x: {
-                    "learning_rate": tune.loguniform(1e-6, 1e-4),
-                    "num_train_epochs": tune.choice(list(range(1, 6))),
-                    "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
-                },
-                local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
-                resources_per_trial={'cpu': 1, "gpu": torch.cuda.device_count()}
-            )
-        best_run_hyperparameters = best_run.hyperparameters
-        logging.info("best config")
-        logging.info(json.dumps(best_run_hyperparameters, indent=4))
-        with open(best_hyperparameters_path, 'w') as f:
-            json.dump(best_run_hyperparameters, f)
+            logging.info("*** Finetuning ***")
+            if parallel:
+                best_run = trainer.hyperparameter_search(
+                    hp_space=lambda x: {
+                        "learning_rate": tune.loguniform(1e-6, 1e-4),
+                        "num_train_epochs": tune.choice(list(range(1, 6))),
+                        "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
+                    },
+                    local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
+                    resources_per_trial={'cpu': multiprocessing.cpu_count(), "gpu": torch.cuda.device_count()}
+                )
+            else:
+                best_run = trainer.hyperparameter_search(
+                    hp_space=lambda x: {
+                        "learning_rate": tune.loguniform(1e-6, 1e-4),
+                        "num_train_epochs": tune.choice(list(range(1, 6))),
+                        "per_device_train_batch_size": tune.choice([4, 8, 16, 32, 64]),
+                    },
+                    local_dir=ray_result_dir, direction="maximize", backend="ray", n_trials=n_trials,
+                    resources_per_trial={'cpu': 1, "gpu": torch.cuda.device_count()}
+                )
+            best_run_hyperparameters = best_run.hyperparameters
+            logging.info("best config")
+            logging.info(json.dumps(best_run_hyperparameters, indent=4))
+            with open(best_hyperparameters_path, 'w') as f:
+                json.dump(best_run_hyperparameters, f)
+        with open(best_hyperparameters_path) as f:
+            best_run_hyperparameters = json.load(f)
         for n, v in best_run_hyperparameters.items():
             setattr(trainer.args, n, v)
         # update training dataset to full dataset without down sampling
@@ -419,22 +422,23 @@ def run_qa_evaluation(dataset: str,
 
     # Evaluation
     if not skip_test and test_example is not None and test_dataset is not None:
-        logging.info("*** Evaluate ***")
-        trainer = QuestionAnsweringTrainer(
-            model=AutoModelForQuestionAnswering.from_pretrained(best_model_path, local_files_only=local_file_only),
-            args=TrainingArguments(report_to=None, output_dir=output_dir, seed=random_seed, evaluation_strategy="no"),
-            eval_dataset=test_dataset,
-            eval_examples=test_example,
-            tokenizer=tokenizer,
-            data_collator=default_data_collator,
-            post_process_function=post_processing_function,
-            compute_metrics=compute_metrics,
-        )
-        metric = trainer.evaluate()
-        result = {k: v for k, v in metric.items()}
-        logging.info(json.dumps(result, indent=4))
-        with open(summary_file, 'w') as f:
-            json.dump(result, f)
+        if not os.path.exists(summary_file) or overwrite:
+            logging.info("*** Evaluate ***")
+            trainer = QuestionAnsweringTrainer(
+                model=AutoModelForQuestionAnswering.from_pretrained(best_model_path, local_files_only=local_file_only),
+                args=TrainingArguments(report_to=None, output_dir=output_dir, seed=random_seed, evaluation_strategy="no"),
+                eval_dataset=test_dataset,
+                eval_examples=test_example,
+                tokenizer=tokenizer,
+                data_collator=default_data_collator,
+                post_process_function=post_processing_function,
+                compute_metrics=compute_metrics,
+            )
+            metric = trainer.evaluate()
+            result = {k: v for k, v in metric.items()}
+            logging.info(json.dumps(result, indent=4))
+            with open(summary_file, 'w') as f:
+                json.dump(result, f)
 
     if hf_organization_to_push is not None and hf_model_alias_to_push is not None:
         url = create_repo(hf_model_alias_to_push, organization=hf_organization_to_push, exist_ok=True)
