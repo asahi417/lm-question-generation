@@ -128,9 +128,9 @@ class GridSearcher:
             prefix_types = [None] * len(input_types)
         else:
             prefix_types = to_list(self.static_config['prefix_types'], sorting=False)
-        if len(input_types) > 1:
-            tmp = [(i, o, p) for i, o, p in zip(input_types, output_types, prefix_types) if
-                   o in ['question', 'questions_answers']]
+        tmp = [(i, o, p) for i, o, p in zip(input_types, output_types, prefix_types)]
+        if len(tmp) > 1:
+            tmp = [(i, o, p) for i, o, p in tmp if o in ['question', 'questions_answers']]
         assert len(tmp) == 1, tmp
         i, o, p = tmp[0]
         prefix = pj(
