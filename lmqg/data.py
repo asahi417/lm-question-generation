@@ -40,10 +40,10 @@ def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cach
                 continue
             filename = f'{feature}-{split}.txt' if name is None else f'{feature}-{split}.{name}.txt'
             ref_path = pj(cache_dir, filename)
+            os.makedirs(os.path.dirname(ref_path), exist_ok=True)
             if path in DATA_NEED_CUSTOM_REFERENCE:
                 if not os.path.exists(ref_path):
                     assert not local_files_only, f'network is not reachable, could not download the file from {url}/{filename}'
-                    os.makedirs(os.path.dirname(ref_path), exist_ok=True)
                     r = requests.get(f'{url}/{filename}')
                     content = r.content
                     assert "Entry not found" not in str(content) and content != b'', content
