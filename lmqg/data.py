@@ -53,8 +53,7 @@ def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cach
                         assert len(f.read().split('\n')) > 20, f"invalid file {ref_path}"
             else:
                 with open(ref_path, 'w') as f:
-                    tmp_data = dataset['paragraph_id'] if feature == 'paragraph' else dataset[feature]
-                    f.write('\n'.join([i.replace('\n', '.') for i in tmp_data]))
+                    f.write('\n'.join([i.replace('\n', '.') for i in dataset[feature]]))
             assert os.path.exists(ref_path)
             output[f'{feature}-{split}'] = ref_path
     return output

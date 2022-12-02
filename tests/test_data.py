@@ -26,6 +26,22 @@ data_list_domains = [
     ["lmqg/qg_subjqa", ["all", "books", "electronics", "grocery", "movies", "restaurants", "tripadvisor"]]
 ]
 
+data_qag = [
+    "lmqg/qag_tweetqa",
+    "lmqg/qag_squad"
+]
+
+data_qa = [
+    "lmqg/qa_harvesting_from_wikipedia",
+    "lmqg/qa_harvesting_from_wikipedia_pseudo",
+    "lmqg/qa_squad"
+]
+data_qa_domain = [
+    "lmqg/qa_squadshifts",
+    "lmqg/qa_squadshifts_pseudo"
+]
+
+get_reference_files('lmqg/qg_tweetqa')
 for data in data_list:
     get_dataset(data)
     get_reference_files(data)
