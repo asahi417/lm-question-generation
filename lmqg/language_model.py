@@ -21,7 +21,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 TASK_PREFIX = {
     "ae": "extract answers",
     "qg": "generate question",
-    "qag": "generate question and answer"
+    "qag": "generate question and answer",
+    "qa": "answer question"
 }
 CE_IGNORE_INDEX = -100
 ADDITIONAL_SP_TOKENS = {'hl': '<hl>'}
