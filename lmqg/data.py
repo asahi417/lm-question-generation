@@ -38,7 +38,7 @@ def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cach
         for feature in ['answer', 'question', 'paragraph', 'sentence', 'questions_answers']:
             if feature not in dataset.features:
                 continue
-            if name == 'default':
+            if name is None:
                 filename = f'{feature}-{split}.txt'
             else:
                 filename = f'{feature}-{split}.{name}.txt'
@@ -56,7 +56,7 @@ def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cach
                 try:
                     r = requests.get(f'{url}/{filename}')
                     content = r.content
-                    assert "Entry not found" not in str(content)
+                    assert "Entry not found" not in str(content) and content != b'', content
                     with open(ref_path, "wb") as f:
                         f.write(content)
                 except Exception:
