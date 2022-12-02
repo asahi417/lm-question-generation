@@ -35,8 +35,6 @@ evaluate_ae_only () { # CKPT LANG DATA
   lmqg-push-to-hf -m "lmqg_output/${1}/best_model" -a "${1}" -o "lmqg"
 }
 
-lmqg-train-search -m t5-large -b 16 -g 4 8 -c lmqg_output/t5-large-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
-#lmqg-train-search -m t5-large -b 8 -g 8 16 -c lmqg_output/t5-large-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
 lmqg-train-search -m t5-large -b 4 -g 16 32 -c lmqg_output/t5-large-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
 evaluate t5-large-squad-answer-extraction en qg_squad
 

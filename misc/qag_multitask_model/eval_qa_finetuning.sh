@@ -12,16 +12,14 @@ QAE () {
   LM="distilbert-base-uncased"
   MODEL=${1}
   EVAL_STEP=${2}
-  NAME='reddit'
-  lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
-#  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-#  for NAME in 'nyt' 'reddit'
-#  do
-#    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
-#  done
+  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
+  do
+    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
+  done
 }
 
 QAE_LOCAL () {
+  # Same function as `QAE` but for local file
   LM="distilbert-base-uncased"
   MODEL=${1}
   EVAL_STEP=${2}
@@ -62,6 +60,7 @@ QAE_FILTERED () {
 }
 
 QAE_FILTERED_LOCAL () {
+  # Same function as `QAE_FILTERED` but for local file
   LM="distilbert-base-uncased"
   MODEL=${1}
   EVAL_STEP=${2}
@@ -77,8 +76,6 @@ QAE_FILTERED_LOCAL () {
 }
 
 
-
-[running]
 QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_answer"
 QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_question"
 QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_answer"
