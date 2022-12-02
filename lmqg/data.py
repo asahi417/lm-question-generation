@@ -36,7 +36,7 @@ def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cach
     for split in ['test', 'validation']:
         dataset = load_dataset(path, name, split=split)
         for feature in ['answer', 'question', 'paragraph', 'sentence', 'questions_answers']:
-            if feature not in dataset:
+            if feature not in dataset.features:
                 continue
             if name == 'default':
                 filename = f'{feature}-{split}.txt'
