@@ -57,7 +57,6 @@ sample_qa_dict = {
     ],
     "it": [
         "question: Quale batterio ha il nome del paese che colpisce di più nel suo nome?, context: Il complesso M. tubercolosi (MTBC) comprende altri quattro micobatteri causa di tubercolosi: M. bovis, M. africanum, M. canetti e M. microti. M. africanum non è molto diffuso, ma è una causa significativa di tubercolosi in alcune parti dell' Africa. M. bovis era una volta una causa comune della tubercolosi, ma l' introduzione del latte pastorizzato ha quasi completamente eliminato questo problema di salute pubblica nei paesi sviluppati. M. canetti è raro e sembra essere limitato al Corno d' Africa, anche se alcuni casi sono stati osservati negli emigranti africani. M. microti è anche raro ed è visto quasi solo in persone immunodeficienti, anche se la sua prevalenza può essere significativamente sottovalutata.",
-        """question: Chi era il rivale di Disraeli?, context: Palmerston morì nel 1865, e dopo un breve ministero guidato da Russell, Derby tornò al potere. Nel 1866, Victoria partecipò all' apertura del Parlamento per la prima volta dalla morte di Albert. L' anno successivo sostenne l' approvazione della legge di riforma del 1867, che raddoppiava l' elettorato estendendo la franchigia a molti uomini che lavorano nelle città, anche se non era favorevole ai voti per le donne. Derby si dimise nel 1868, per essere sostituito da Benjamin Disraeli, che affascinò Victoria. "Ognuno ama l' adulazione", disse,"e quando si arriva alla regalità si dovrebbe posarla con una cazzuola". Con la frase "noi autori, Ma' am", si complimentò con lei. Il ministero di Disraeli durò solo qualche mese, e alla fine dell' anno il suo rivale liberale, William Ewart Gladstone, fu nominato primo ministro."""
     ]
 }
 sample_qg_dict = {
@@ -273,20 +272,20 @@ def format_usage(model_name, sample, sample_ae):
         return f"""
 from transformers import pipeline
 
-pipe = pipeline("text2text-generation", '{model_name}')
+pipe = pipeline("text2text-generation", "{model_name}")
 
 # answer extraction
-answer = pipe('{sample[0]}')
+answer = pipe("{sample[0]}")
 
 # question generation
-question = pipe('{sample_ae[0]}')
+question = pipe("{sample_ae[0]}")
 """
     else:
         return f"""
 from transformers import pipeline
 
-pipe = pipeline("text2text-generation", '{model_name}')
-output = pipe('{sample[0]}')
+pipe = pipeline("text2text-generation", "{model_name}")
+output = pipe("{sample[0]}")
 """
 
 
@@ -295,7 +294,7 @@ def format_usage_lmqg(model_name, language, is_multitask, is_end2end, is_qa, is_
 from lmqg import TransformersQG
 
 # initialize model
-model = TransformersQG(language='{language}', model='{model_name}')
+model = TransformersQG(language="{language}", model="{model_name}")
 """
     if is_multitask or is_end2end:
         desc += f"""
