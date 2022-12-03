@@ -100,7 +100,7 @@ def main():
 
         prediction = [{"prediction_text": p, "id": str(n)} for n, p in enumerate(prediction)]
 
-        if opt.overwrite_metric or 'F1 (QA)' not in output[_split] or 'Exat Match (QA)' not in output[_split]:
+        if opt.overwrite_metric or 'F1 (QA)' not in output[_split] or 'Exact Match (QA)' not in output[_split]:
             scores = squad_metric.compute(predictions=prediction, references=references)
             output[_split]['AnswerF1Score'] = scores['f1']
             output[_split]['AnswerExactMatch'] = scores['exact_match']

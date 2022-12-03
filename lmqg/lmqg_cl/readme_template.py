@@ -536,7 +536,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         content = "\n".join([
                       f"| [{d}](https://huggingface.co/datasets/{d}) | {t} | {m['test']['BERTScore']} | {m['test']['Bleu_4']} | {m['test']['METEOR']} | {m['test']['MoverScore']} | {m['test']['ROUGE_L']} | "
                       f"[link](https://huggingface.co/{model_name}/raw/main/eval_ood/{eval_file}.{d.replace('/', '_')}.{t}.json) |"
-                      for d, t, m, _ in metrics_ood])
+                      for d, t, m, _, _, _ in metrics_ood])
         markdown_table += f"""
 - ***Metrics ({metric_title}, Out-of-Domain) ***
         
