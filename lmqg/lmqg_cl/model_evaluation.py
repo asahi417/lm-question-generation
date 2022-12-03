@@ -13,8 +13,6 @@ def get_options():
     parser = argparse.ArgumentParser(description='QG evaluation on SQuAD.')
     parser.add_argument('-m', '--model-checkpoint', default=None, type=str)
     parser.add_argument('--batch-size', default=16, type=int)
-    parser.add_argument('--prediction-aggregation', help='', default='first', type=str)
-    parser.add_argument('--prediction-level', help="'sentence', 'context', 'answer'", default=None, type=str)
     parser.add_argument('--n-beams', default=4, type=int)
     parser.add_argument('-e', '--export-dir', required=True, type=str)
     parser.add_argument('--hyp-test', default=None, type=str)
@@ -31,11 +29,21 @@ def get_options():
     parser.add_argument('--overwrite', help='', action='store_true')
     parser.add_argument('--bleu-only', help='', action='store_true')
     parser.add_argument('--use-auth-token', help='', action='store_true')
+    parser.add_argument('--prediction-aggregation', default=None, type=str)
+    parser.add_argument('--prediction-level', default=None, type=str)
+
     return parser.parse_args()
 
 
 def main():
     opt = get_options()
+    prediction_aggregation = 'first' if opt.prediction_aggregation is None else opt.prediction_aggregation
+    prediction_level = 'sentence'  # qg
+    if opt.input_type == 'paragraph' and opt.output_type == 'questions_answers':  # e2e qag
+        prediction_level = 'answer'
+    elif opt.output_type == 'answer':  # answer extraction, question answering
+        prediction_level = 'answer'
+    prediction_level = opt.prediction_level if opt.prediction_level is not None else prediction_level
     assert opt.model_checkpoint or opt.hyp_test or opt.hyp_dev
     assert opt.prediction_aggregation in ['first', 'last', 'long', 'short', 'middle']
     metric = evaluate(
@@ -51,8 +59,8 @@ def main():
         dataset_name=opt.dataset_name,
         input_type=opt.input_type,
         output_type=opt.output_type,
-        prediction_aggregation=opt.prediction_aggregation,
-        prediction_level=opt.prediction_level,
+        prediction_aggregation=prediction_aggregation,
+        prediction_level=prediction_level,
         overwrite=opt.overwrite,
         language=opt.language,
         bleu_only=opt.bleu_only,

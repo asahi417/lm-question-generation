@@ -30,6 +30,8 @@ def get_options():
     parser.add_argument('--hyp-dev', default=None, type=str)
     parser.add_argument('--overwrite-prediction', help='', action='store_true')
     parser.add_argument('--overwrite-metric', help='', action='store_true')
+    parser.add_argument('-i', '--input-type', help='', default='paragraph_question', type=str)
+    parser.add_argument('-o', '--output-type', help='', default='answer', type=str)
     return parser.parse_args()
 
 
@@ -51,7 +53,7 @@ def main():
             return _model
         raise ValueError(f"require `-m` or `--model-checkpoint`")
 
-    metric_file = f"{opt.export_dir}/metric.first.answer.paragraph_question.answer." \
+    metric_file = f"{opt.export_dir}/metric.first.answer.{opt.input_type}.{opt.output_type}." \
                   f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.json"
     if os.path.exists(metric_file):
         with open(metric_file) as f:
@@ -60,7 +62,7 @@ def main():
         output = {}
 
     for _split, _file in zip([opt.test_split, opt.validation_split], [opt.hyp_test, opt.hyp_dev]):
-        _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph_question.answer." \
+        _file = f"{opt.export_dir}/samples.{_split}.hyp.{opt.input_type}.{opt.output_type}." \
                 f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.txt" if _file is None else _file
         logging.info(f'generate qa for split {_split}')
         if _split not in output:
@@ -70,8 +72,8 @@ def main():
         data_in, gold_reference = get_dataset(
             opt.dataset_path,
             opt.dataset_name,
-            input_type='paragraph_question',
-            output_type='answer',
+            input_type=opt.input_type,
+            output_type=opt.output_type,
             split=_split,
             use_auth_token=opt.use_auth_token)
         references = [{"answers": {"answer_start": [100], "text": [r]}, "id": str(n)} for n, r in

@@ -510,12 +510,12 @@ class TransformersQG:
             return output[0]
         return output
 
-    def answer_question(self,
-                        list_context: str or List,
-                        list_question: str or List,
-                        batch_size: int = None,
-                        num_beams: int = 4,
-                        cache_path: str = None):
+    def answer_q(self,
+                 list_context: str or List,
+                 list_question: str or List,
+                 batch_size: int = None,
+                 num_beams: int = 4,
+                 cache_path: str = None):
         assert self.qa_model, "model is not fine-tuned for QA"
         assert type(list_context) is type(list_question), "invalid input"
         single_input = False

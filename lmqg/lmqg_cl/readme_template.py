@@ -3,6 +3,7 @@ import json
 import re
 from os.path import join as pj
 from glob import glob
+import pandas as pd
 from lmqg.language_model import TASK_PREFIX
 from datasets import load_dataset
 
@@ -24,9 +25,6 @@ version_description = {
     'default': "This model is fine-tuned without parameter search (default configuration is taken from [ERNIE-GEN](https://arxiv.org/abs/2001.11314)).",
     'no-answer': "This model is fine-tuned without answer information, i.e. generate a question only given a paragraph (note that normal model is fine-tuned to generate a question given a pargraph and an associated answer in the paragraph).",
     'no-paragraph': "This model is fine-tuned without pargraph information but only the sentence that contains the answer.",
-    'multitask': "This model is fine-tuned on the answer extraction task as well as the question generation.",
-    "qag": "This model is fine-tuned on the end-to-end question and answer generation.",
-    "qa": "This model is fine-tuned on question answering.",
 }
 sample_qa_dict = {
     "en": [
@@ -138,7 +136,7 @@ sample_ae_dict = {
         "<hl> Furono introdotti autocarri compatti, come la Toyota Hilux e il Datsun Truck, seguiti dal camion Mazda (venduto come il Ford Courier), e l' Isuzu costruito Chevrolet LUV. <hl> Mitsubishi rebranded il suo Forte come Dodge D-50 pochi anni dopo la crisi petrolifera. Mazda, Mitsubishi e Isuzu avevano partnership congiunte rispettivamente con Ford, Chrysler e GM. In seguito i produttori americani introdussero le loro sostituzioni nazionali (Ford Ranger, Dodge Dakota e la Chevrolet S10/GMC S-15), ponendo fine alla loro politica di importazione vincolata."
     ]
 }
-sample_qg_dict_lmqg = {
+sample_lmqg_dict = {
     "en": ["William Turner was an English painter who specialised in watercolour landscapes", "William Turner"],
     "ja": ["フェルメールの作品では、17世紀のオランダの画家、ヨハネス・フェルメールの作品について記述する。フェルメールの作品は、疑問作も含め30数点しか現存しない。現存作品はすべて油彩画で、版画、下絵、素描などは残っていない。", "30数点"],
     "ru": ["Нелишним будет отметить, что, развивая это направление, Д. И. Менделеев, поначалу априорно выдвинув идею о температуре, при которой высота мениска будет нулевой, в мае 1860 года провёл серию опытов.", "в мае 1860 года"],
@@ -159,7 +157,7 @@ language_dict = {
 }
 
 
-def format_metric(dataset, dataset_type, metric, metric_qag):
+def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, is_multitask, is_end2end, is_qa):
     tmp = f"""  - task:
       name: Text2text Generation
       type: text2text-generation
@@ -183,122 +181,157 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
     - name: MoverScore
       type: moverscore
       value: {metric["test"]["MoverScore"]}"""
+    if "AnswerF1Score" in metric['test']:
+        tmp += f"""
+    - name: AnswerF1Score ({"Question Answering" if is_qa else "Answer Extraction"})
+      type: answer_f1_score_{"question_answering" if is_qa else "answer_extraction"}
+      value: {metric["test"]["AnswerF1Score"]}"""
+    if "AnswerExactMatch" in metric['test']:
+        tmp += f"""
+    - name: AnswerExactMatch ({"Question Answering" if is_qa else "Answer Extraction"})
+      type: answer_exact_match_{"question_answering" if is_qa else "answer_extraction"}
+      value: {metric["test"]["AnswerExactMatch"]}"""
     if "QAAlignedF1Score (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedF1Score (BERTScore)
-      type: qa_aligned_f1_score_bertscore
+    - name: QAAlignedF1Score (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
     if "QAAlignedRecall (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedRecall (BERTScore)
-      type: qa_aligned_recall_bertscore
+    - name: QAAlignedRecall (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedRecall (BERTScore)"]}"""
     if "QAAlignedPrecision (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedPrecision (BERTScore)
-      type: qa_aligned_precision_bertscore
+    - name: QAAlignedPrecision (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedPrecision (BERTScore)"]}"""
-
     if "QAAlignedF1Score (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedF1Score (MoverScore)
-      type: qa_aligned_f1_score_moverscore
+    - name: QAAlignedF1Score (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedF1Score (MoverScore)"]}"""
     if "QAAlignedRecall (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedRecall (MoverScore)
-      type: qa_aligned_recall_moverscore
+    - name: QAAlignedRecall (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedRecall (MoverScore)"]}"""
     if "QAAlignedPrecision (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedPrecision (MoverScore)
-      type: qa_aligned_precision_moverscore
+    - name: QAAlignedPrecision (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedPrecision (MoverScore)"]}"""
 
     if metric_qag is not None:
-        if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedF1Score (BERTScore)
-      type: qa_aligned_f1_score_bertscore
+        tmp += f"""
+    - name: QAAlignedF1Score (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
-        if "QAAlignedRecall (BERTScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedRecall (BERTScore)
-      type: qa_aligned_recall_bertscore
+        tmp += f"""
+    - name: QAAlignedRecall (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedRecall (BERTScore)"]}"""
-        if "QAAlignedF1Score (BERTScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedPrecision (BERTScore)
-      type: qa_aligned_precision_bertscore
+        tmp += f"""
+    - name: QAAlignedPrecision (BERTScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedPrecision (BERTScore)"]}"""
-
-        if "QAAlignedF1Score (MoverScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedF1Score (MoverScore)
-      type: qa_aligned_f1_score_moverscore
+        tmp += f"""
+    - name: QAAlignedF1Score (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
-        if "QAAlignedRecall (MoverScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedRecall (MoverScore)
-      type: qa_aligned_recall_moverscore
+        tmp += f"""
+    - name: QAAlignedRecall (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedRecall (MoverScore)"]}"""
-        if "QAAlignedPrecision (MoverScore)" in metric_qag['test']:
-            tmp += f"""
-    - name: QAAlignedPrecision (MoverScore)
-      type: qa_aligned_precision_moverscore
+        tmp += f"""
+    - name: QAAlignedPrecision (MoverScore){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric_qag["test"]["QAAlignedPrecision (MoverScore)"]}"""
-
+    if metric_qa is not None:
+        tmp += f"""
+    - name: AnswerF1Score (Question Answering)
+      type: answer_f1_score_question_answering
+      value: {metric_qa["test"]["AnswerF1Score"]}"""
+        tmp += f"""
+    - name: AnswerExactMatch (Question Answering)
+      type: answer_exact_match_question_answering
+      value: {metric_qa["test"]["AnswerExactMatch"]}"""
+    if metric_ae is not None:
+        tmp += f"""
+    - name: AnswerF1Score (Answer Extraction)
+      type: answer_f1_score_answer_extraction
+      value: {metric_qa["test"]["AnswerF1Score"]}"""
+        tmp += f"""
+    - name: AnswerExactMatch (Answer Extraction)
+      type: answer_exact_match_answer_extraction
+      value: {metric_qa["test"]["AnswerExactMatch"]}"""
     return tmp
 
 
-def format_usage(model_name, sample_qg, sample_ae):
-    if len(sample_ae) > 0:
+def format_usage(model_name, sample, sample_ae):
+    if sample_ae is not None:
         return f"""
 from transformers import pipeline
-# initialize model
+
 pipe = pipeline("text2text-generation", '{model_name}')
+
 # answer extraction
-answer = pipe('{sample_ae[0]}')
+answer = pipe('{sample[0]}')
+
 # question generation
-question = pipe('{sample_qg[0]}')
+question = pipe('{sample_ae[0]}')
 """
     else:
         return f"""
 from transformers import pipeline
-# initialize model
+
 pipe = pipeline("text2text-generation", '{model_name}')
-# question generation
-question = pipe('{sample_qg[0]}')
+output = pipe('{sample[0]}')
 """
 
 
-def format_usage_lmqg(model_name, answer_extraction, language, qag_model):
-    sample = sample_qg_dict_lmqg[language]
-    if qag_model:
-        return f"""
+def format_usage_lmqg(model_name, language, is_multitask, is_end2end, is_qa, is_ae):
+    desc = f"""
 from lmqg import TransformersQG
+
 # initialize model
 model = TransformersQG(language='{language}', model='{model_name}')
+"""
+    if is_multitask or is_end2end:
+        desc += f"""
 # model prediction
-question = model.generate_qa("{sample[0]}")
-        """
-    if not answer_extraction:
-        return f"""
-from lmqg import TransformersQG
-# initialize model
-model = TransformersQG(language='{language}', model='{model_name}')
+question_answer_pairs = model.generate_qa("{sample_lmqg_dict[language][0]}")
+"""
+    elif is_qa:
+        _tmp = sample_qa_dict[language][0]
+        __q, __c = _tmp.split(', context:')
+        __q = __q.replace("question: ", '')
+        desc += f"""
 # model prediction
-question = model.generate_q(list_context=["{sample[0]}"], list_answer=["{sample[1]}"])
+answers = model.answer_q(list_question="{__q}", list_context="{__c}")
+"""
+    elif is_ae:
+        desc += f"""
+# model prediction
+answers = model.generate_a("{sample_lmqg_dict[language][0]}")
 """
     else:
-        return f"""
-from lmqg import TransformersQG
-# initialize model
-model = TransformersQG(language='{language}', model='{model_name}')
+        desc += f"""
 # model prediction
-question_answer = model.generate_qa("{sample[0]}")
+questions = model.generate_q(list_context="{sample_lmqg_dict[language][0]}", list_answer="{sample_lmqg_dict[language][1]}")
 """
+    return desc
 
+
+# def get_markdown_table(title, metric):
+#     _dataset = f"[{metric[0]}](https://huggingface.co/datasets/{metric[0]})"
+#     markdown_table = f"""
+#     ### Metrics ({title})
+#
+#     | Dataset | Type | BLEU4 | ROUGE-L | METEOR | BERTScore | MoverScore | Link |
+#     |:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
+#     | {_dataset} | {metric_main[1]} | {round(metric_main[2]['test']['Bleu_4'], 3)} | {round(metric_main[2]['test']['ROUGE_L'], 3)} | {round(metric_main[2]['test']['METEOR'], 3)} | {round(metric_main[2]['test']['BERTScore'], 3)} | {round(metric_main[2]['test']['MoverScore'], 3)} | [link]({link}) |
+#     """
 
 def get_readme(model_name: str, model_checkpoint: str):
     with open(pj(model_checkpoint, "trainer_config.json")) as f:
@@ -311,106 +344,96 @@ def get_readme(model_name: str, model_checkpoint: str):
     dataset_alias = os.path.basename(dataset)
     la = language_dict[dataset_alias] if dataset_alias in language_dict else 'en'
     header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-    qg_multitask_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-    ae_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for answer extraction on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-    qa_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question answering task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-    qag_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question & answer pair generation task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-
+    metric_title = "Question Generation"
     # model_version
     eval_file = "metric.first.sentence.paragraph_answer.question"
     eval_file_qag = "metric.first.answer.paragraph.questions_answers"
+    eval_file_qa = "metric.first.answer.paragraph_question.answer"
+    eval_file_ae = "metric.first.answer.paragraph_sentence.answer"
     add_info = []
-    _sample_qg = sample_qg_dict[la]
+    _sample = sample_qg_dict[la]
     _is_qag = False
     _is_qa = False
     _is_ae = False
-    if model_name.endswith('no-answer'):
-        _sample_qg = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample_qg]
-        add_info.append(version_description['no-answer'])
-        eval_file = "metric.first.sentence.paragraph_sentence.question"
-    elif model_name.endswith('no-paragraph'):
-        add_info.append(version_description['no-paragraph'])
-        eval_file = "metric.first.sentence.sentence_answer.question"
-    elif model_name.endswith('default'):
-        add_info.append(version_description['default'])
+    _is_multitask = False
 
-    elif model_name.endswith('multitask'):
-        header = qg_multitask_header
-
-    elif 'qag' in model_name.split('-'):
-        _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
+    # E2E QAG Models
+    if 'qag' in model_name.split('-'):
+        _sample = [re.sub(r'\s+', ' ', _sample[0].replace('<hl>', ''))]
         eval_file = "metric.first.answer.paragraph.questions_answers"
-        eval_file_qag = None
-        header = qag_header
+        metric_title = "Question & Answer Generation"
+        eval_file_qag = eval_file_ae = None
+        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question & answer pair generation task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         _is_qag = True
-
+        if 'np' in model_name.split('-'):
+            add_info.append("This model is fine-tuned without a task prefix.")
+    # QA Models
     elif "question-answering" in model_name:
-        _sample_qg = sample_qa_dict[la]
+        _sample = sample_qa_dict[la]
         eval_file = "metric.first.answer.paragraph_question.answer"
-        eval_file_qag = None
-        header = qa_header
+        metric_title = "Question Answering"
+        eval_file_qa = eval_file_qag = eval_file_ae = None
+        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question answering task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         _is_qa = True
-
+    # Answer Extraction Models
     elif "answer-extraction" in model_name:
-        _sample_qg = sample_ae_dict[la]
+        _sample = sample_ae_dict[la]
         eval_file = "metric.first.answer.paragraph_question.answer"
-        eval_file_qag = None
-        header = ae_header
+        metric_title = "Answer Extraction"
+        eval_file_qa = eval_file_qag = eval_file_ae = None
+        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for answer extraction on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         _is_ae = True
-
+    # QG Models
+    else:
+        if model_name.endswith('multitask'):
+            _is_multitask = True
+            header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+        else:
+            if model_name.endswith('no-answer'):
+                _sample = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample]
+                add_info.append(version_description['no-answer'])
+                eval_file = "metric.first.sentence.paragraph_sentence.question"
+            elif model_name.endswith('no-paragraph'):
+                add_info.append(version_description['no-paragraph'])
+                eval_file = "metric.first.sentence.sentence_answer.question"
+            elif model_name.endswith('default'):
+                add_info.append(version_description['default'])
 
     if dataset_alias in ['qg_subjqa', 'qg_squadshifts'] and 'vanilla' not in model_name:
         add_info.append(f"This model is continuously fine-tuned with [{language_model}](https://huggingface.co/{language_model}).")
-    _sample_qg = [re.sub(r"\A\s+", "", i) for i in _sample_qg]
+
+    _sample = [re.sub(r"\A\s+", "", i) for i in _sample]
     add_info = ' '.join(add_info)
 
     # get widget
-    sample_qa = []
-    answer_extraction = False
+    _sample_ae = None
     if _is_qag:
         tags = "- questions and answers generation"
-        if prefix_types is not None:
-            sample_qg = [f'{TASK_PREFIX["qag"]}: {i}' for i in _sample_qg]
-        else:
-            sample_qg = _sample_qg
-        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Questions & Answers Generation Example {n + 1}" """ for n, i in
-                            enumerate(sample_qg)])
+        _sample = _sample if prefix_types is None else [f'{TASK_PREFIX["qag"]}: {i}' for i in _sample]
+        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Questions & Answers Generation Example {n + 1}" """ for n, i in enumerate(_sample)])
     elif _is_qa:
         tags = "- question answering"
-        if prefix_types is not None:
-            sample_qg = [f'{TASK_PREFIX["qa"]}: {i}' for i in _sample_qg]
-        else:
-            sample_qg = _sample_qg
-        widget = '\n'.join(
-            [f"""- text: "{i}"\n  example_title: "Question Answering Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+        _sample = _sample if prefix_types is None else [f'{TASK_PREFIX["qa"]}: {i}' for i in _sample]
+        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Answering Example {n + 1}" """ for n, i in enumerate(_sample)])
     elif _is_ae:
         tags = "- answer extraction"
-        if prefix_types is not None:
-            sample_qg = [f'{TASK_PREFIX["ae"]}: {i}' for i in _sample_qg]
-        else:
-            sample_qg = _sample_qg
-        widget = '\n'.join(
-            [f"""- text: "{i}"\n  example_title: "Answering Extraction Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+        _sample = _sample if prefix_types is None else [f'{TASK_PREFIX["ae"]}: {i}' for i in _sample]
+        widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Answering Extraction Example {n + 1}" """ for n, i in enumerate(_sample)])
     else:
-        if prefix_types is not None and len(prefix_types) > 1:  # multitask
-            answer_extraction = True
+        if _is_multitask:  # multitask
             tags = "- question generation\n- answer extraction"
-            sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
-            sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_ae_dict[la]]
-            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
-            widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(sample_ae_dict[la])])
-        elif prefix_types is not None:
-            tags = "- question generation"
-            sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
-            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+            _sample = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample]
+            _sample_ae = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_ae_dict[la]]
+            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(_sample)])
+            widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(_sample_ae)])
         else:
             tags = "- question generation"
-            sample_qg = _sample_qg
-            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+            _sample = _sample if prefix_types is None else [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample]
+            widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(_sample)])
 
     # usage
-    usage = format_usage(model_name, sample_qg, sample_qa)
-    usage_lmqg = format_usage_lmqg(model_name, answer_extraction=answer_extraction, language=la, qag_model=_is_qag)
+    usage = format_usage(model_name, _sample, _sample_ae)
+    usage_lmqg = format_usage_lmqg(model_name, la, _is_multitask, _is_qag, _is_qa, _is_ae)
 
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
@@ -423,7 +446,22 @@ def get_readme(model_name: str, model_checkpoint: str):
             with open(tmp_path) as f:
                 metric_qag = json.load(f)
 
-    metric_main = [dataset, dataset_name, metric, metric_qag]
+    metric_qa = None
+    if eval_file_qa is not None:
+        tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qa}.{dataset.replace('/', '_')}.{dataset_name}.json")
+        if os.path.exists(tmp_path):
+            with open(tmp_path) as f:
+                metric_qa = json.load(f)
+
+    metric_ae = None
+    if eval_file_ae is not None:
+        tmp_path = pj(model_checkpoint, "eval", f"{eval_file_ae}.{dataset.replace('/', '_')}.{dataset_name}.json")
+        if os.path.exists(tmp_path):
+            with open(tmp_path) as f:
+                metric_ae = json.load(f)
+
+    metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae]
+
     # metric for ood
     metrics_ood = []
     for i in glob(pj(model_checkpoint, "eval_ood", f"{eval_file}.*.json")):
@@ -447,51 +485,76 @@ def get_readme(model_name: str, model_checkpoint: str):
                 raise ValueError(f"dataset {_dataset} is not found")
         with open(i) as f:
             metric = json.load(f)
-            metrics_ood.append([_dataset, _dataset_name, metric, None])
-    metrics = '\n'.join([format_metric(d, t, m, m_qag) for d, t, m, m_qag in [metric_main] + metrics_ood])
+            metrics_ood.append([_dataset, _dataset_name, metric, None, None, None])
+
+    metrics_text = '\n'.join([
+        format_metric(
+            dataset=d,
+            dataset_type=t,
+            metric=m,
+            metric_qag=m_qag,
+            metric_qa=m_qa,
+            metric_ae=m_ae,
+            is_multitask=_is_multitask,
+            is_end2end=_is_qag,
+            is_qa=_is_qa
+        ) for d, t, m, m_qag, m_qa, m_ae in [metric_main] + metrics_ood])
     # readme table
-    link = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
+    df_main = pd.DataFrame(*list(zip(*list(metric_main[2]["test"].items())))[::-1], columns=["Score"])
+    df_main['Type'] = metric_main[1]
+    df_main['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
+    df_main['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
+    df_main = df_main.sort_index()
     markdown_table = f"""
-### Metrics
+### Metric ({metric_title})
 
-| Dataset | Type | BLEU4 | ROUGE-L | METEOR | BERTScore | MoverScore | Link |
-|:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
-| [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']['Bleu_4'], 3)} | {round(metric_main[2]['test']['ROUGE_L'], 3)} | {round(metric_main[2]['test']['METEOR'], 3)} | {round(metric_main[2]['test']['BERTScore'], 3)} | {round(metric_main[2]['test']['MoverScore'], 3)} | [link]({link}) | 
-"""
-    if "QAAlignedF1Score (BERTScore)" in metric_main[2]['test'] and "QAAlignedF1Score (MoverScore)" in metric_main[2]['test']:
-        markdown_table += f"""
-
-### Metrics (QAG)
-
-| Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
-|:--------|:-----|--------------------------------:|---------------------------------:|-----:|
-| [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[2]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[2]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link}) | 
+{df_main.to_markdown()}
 """
     if metric_main[3] is not None:
-        link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        df_qag = pd.DataFrame(*list(zip(*list(metric_main[3]["test"].items())))[::-1], columns=["Score"])
+        df_qag['Type'] = metric_main[1]
+        df_qag['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
+        df_qag['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        df_qag = df_qag.sort_index()
         markdown_table += f"""
+### Metric (Question & Answer Generation))
 
-### Metrics (QAG)
+{df_qag.to_markdown()}
+"""
+    if metric_main[4] is not None:
+        df_qa = pd.DataFrame(*list(zip(*list(metric_main[4]["test"].items())))[::-1], columns=["Score"])
+        df_qa['Type'] = metric_main[1]
+        df_qa['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
+        df_qa['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qa}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        df_qa = df_qa.sort_index()
+        markdown_table += f"""
+### Metric (Question Answering))
 
-| Dataset | Type | QA Aligned F1 Score (BERTScore) | QA Aligned F1 Score (MoverScore) | Link |
-|:--------|:-----|--------------------------------:|---------------------------------:|-----:|
-| [{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]}) | {metric_main[1]} | {round(metric_main[3]['test']["QAAlignedF1Score (BERTScore)"], 3)} | {round(metric_main[3]['test']["QAAlignedF1Score (MoverScore)"], 3)} | [link]({link_qag}) | 
-    """
+{df_qa.to_markdown()}
+"""
+    if metric_main[5] is not None:
+        df_ae = pd.DataFrame(*list(zip(*list(metric_main[5]["test"].items())))[::-1], columns=["Score"])
+        df_ae['Type'] = metric_main[1]
+        df_ae['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
+        df_ae['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_ae}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        df_ae = df_ae.sort_index()
+        markdown_table += f"""
+### Metric (Answer Generation))
+
+{df_ae.to_markdown()}
+"""
     if len(metrics_ood) != 0:
         content = "\n".join([
-                      f"| [{d}](https://huggingface.co/datasets/{d}) | {t} | {round(m['test']['Bleu_4'], 3)} | {round(m['test']['ROUGE_L'], 3)} | {round(m['test']['METEOR'], 3)} | {round(m['test']['BERTScore'], 3)} | {round(m['test']['MoverScore'], 3)} | "
+                      f"| [{d}](https://huggingface.co/datasets/{d}) | {t} | {m['test']['BERTScore']} | {m['test']['Bleu_4']} | {m['test']['METEOR']} | {m['test']['MoverScore']} | {m['test']['ROUGE_L']} | "
                       f"[link](https://huggingface.co/{model_name}/raw/main/eval_ood/{eval_file}.{d.replace('/', '_')}.{t}.json) |"
                       for d, t, m, _ in metrics_ood])
-        markdown_table_ood = f"""
-### Out-of-domain Metrics
+        markdown_table += f"""
+### Metrics ({metric_title}, Out-of-Domain)
         
-| Dataset | Type | BLEU4 | ROUGE-L | METEOR | BERTScore | MoverScore | Link |
-|:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
+| Dataset | Type | BERTScore| Bleu_4 | METEOR | MoverScore | ROUGE_L | Link |
+|:--------|:-----|---------:|-------:|-------:|----------:|-----------:|-----:|
 {content}
 """
-    else:
-        markdown_table_ood = ''
-
     return f"""
 ---
 license: cc-by-4.0
@@ -512,18 +575,12 @@ widget:
 model-index:
 - name: {model_name}
   results:
-{metrics}
+{metrics_text}
 ---
 
 # Model Card of `{model_name}`
 {header}
 {add_info}
-
-Please cite our paper if you use the model ({paper_link}).
-
-```
-{bib}
-```
 
 ### Overview
 - **Language model:** [{language_model}](https://huggingface.co/{language_model})   
@@ -547,8 +604,6 @@ Please cite our paper if you use the model ({paper_link}).
 ## Evaluation Metrics
 
 {markdown_table}
-
-{markdown_table_ood}
 
 ## Training hyperparameters
 
