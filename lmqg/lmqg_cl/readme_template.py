@@ -7,8 +7,7 @@ import pandas as pd
 from lmqg.language_model import TASK_PREFIX
 from datasets import load_dataset
 
-bib = """
-@inproceedings{ushio-etal-2022-generative,
+bib = """@inproceedings{ushio-etal-2022-generative,
     title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
@@ -269,8 +268,7 @@ def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_a
 
 def format_usage(model_name, sample, sample_ae):
     if sample_ae is not None:
-        return f"""
-from transformers import pipeline
+        return f"""from transformers import pipeline
 
 pipe = pipeline("text2text-generation", "{model_name}")
 
@@ -281,8 +279,7 @@ answer = pipe("{sample[0]}")
 question = pipe("{sample_ae[0]}")
 """
     else:
-        return f"""
-from transformers import pipeline
+        return f"""from transformers import pipeline
 
 pipe = pipeline("text2text-generation", "{model_name}")
 output = pipe("{sample[0]}")
@@ -290,8 +287,7 @@ output = pipe("{sample[0]}")
 
 
 def format_usage_lmqg(model_name, language, is_multitask, is_end2end, is_qa, is_ae):
-    desc = f"""
-from lmqg import TransformersQG
+    desc = f"""from lmqg import TransformersQG
 
 # initialize model
 model = TransformersQG(language="{language}", model="{model_name}")
