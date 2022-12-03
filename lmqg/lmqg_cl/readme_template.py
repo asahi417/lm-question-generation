@@ -503,7 +503,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
         markdown_table += f"""
-- ***Metric (Question & Answer Generation)***: [raw metric file]({link_qag})
+- ***Metric (Question & Answer Generation)***: {"" if _is_multitask else "QAG metrics are computed with *the gold answer* and generated question on it for this model, as the model cannot provide an answer."} [raw metric file]({link_qag})
 
 {df_qag.to_markdown()}
 
@@ -538,7 +538,7 @@ def get_readme(model_name: str, model_checkpoint: str):
                       f"[link](https://huggingface.co/{model_name}/raw/main/eval_ood/{eval_file}.{d.replace('/', '_')}.{t}.json) |"
                       for d, t, m, _, _, _ in metrics_ood])
         markdown_table += f"""
-- ***Metrics ({metric_title}, Out-of-Domain) ***
+- ***Metrics ({metric_title}, Out-of-Domain)***
         
 | Dataset | Type | BERTScore| Bleu_4 | METEOR | MoverScore | ROUGE_L | Link |
 |:--------|:-----|---------:|-------:|-------:|-----------:|--------:|-----:|
