@@ -258,11 +258,11 @@ def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_a
         tmp += f"""
     - name: AnswerF1Score (Answer Extraction)
       type: answer_f1_score_answer_extraction
-      value: {metric_qa["test"]["AnswerF1Score"]}"""
+      value: {metric_ae["test"]["AnswerF1Score"]}"""
         tmp += f"""
     - name: AnswerExactMatch (Answer Extraction)
       type: answer_exact_match_answer_extraction
-      value: {metric_qa["test"]["AnswerExactMatch"]}"""
+      value: {metric_ae["test"]["AnswerExactMatch"]}"""
     return tmp
 
 
