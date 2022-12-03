@@ -38,7 +38,6 @@ def main():
     opt = get_options()
     assert opt.model_checkpoint or opt.hyp_test or opt.hyp_dev
     assert opt.prediction_aggregation in ['first', 'last', 'long', 'short', 'middle']
-    assert opt.prediction_level in ['answer', 'sentence', 'paragraph']
     metric = evaluate(
         export_dir=opt.export_dir,
         batch_size=opt.batch_size,
