@@ -435,7 +435,7 @@ class TransformersQG:
         """
         assert not self.end2end_qag_model, "end2end qag model can not generate answer only"
         if answer_model is None:
-            answer_model = 'language_model' if self.multitask_qag_model else 'keyword_extraction'
+            answer_model = 'language_model' if self.multitask_qag_model or self.answer_extraction_model else 'keyword_extraction'
 
         logging.info(f'running model for `answer_extraction`: {answer_model}')
         if answer_model == 'keyword_extraction':

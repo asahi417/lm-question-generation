@@ -45,3 +45,10 @@ lmqg-eval -m "lmqg_output/t5-small-squad-answer-extraction/best_model" -e "lmqg_
 lmqg-eval-qa -m "lmqg_output/t5-small-squad-answer-extraction/best_model" -e "lmqg_output/t5-small-squad-answer-extraction/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/t5-small-squad-answer-extraction/best_model" -a "t5-small-squad-answer-extraction" -o "lmqg"
 
+lmqg-train-search -m "facebook/bart-large" -b 4 -g 16 32 -c "lmqg_output/bart-large-squad-answer-extraction" -i 'paragraph_sentence' -o 'answer' -p 'ae'
+lmqg-eval -m "lmqg_output/bart-large-squad-answer-extraction/best_model" -e "lmqg_output/bart-large-squad-answer-extraction/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "lmqg_output/bart-large-squad-answer-extraction/best_model" -a "bart-large-squad-answer-extraction" -o "lmqg"
+
+lmqg-train-search -m "facebook/bart-base" -b 16 -g 4 8 -c "lmqg_output/bart-base-squad-answer-extraction" -i 'paragraph_sentence' -o 'answer' -p 'ae'
+lmqg-eval -m "lmqg_output/bart-base-squad-answer-extraction/best_model" -e "lmqg_output/bart-base-squad-answer-extraction/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "lmqg_output/bart-base-squad-answer-extraction/best_model" -a "bart-base-squad-answer-extraction" -o "lmqg"
