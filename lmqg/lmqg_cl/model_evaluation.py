@@ -45,7 +45,7 @@ def main():
         prediction_level = 'answer'
     prediction_level = opt.prediction_level if opt.prediction_level is not None else prediction_level
     assert opt.model_checkpoint or opt.hyp_test or opt.hyp_dev
-    assert opt.prediction_aggregation in ['first', 'last', 'long', 'short', 'middle']
+    assert prediction_aggregation in ['first', 'last', 'long', 'short', 'middle']
     metric = evaluate(
         export_dir=opt.export_dir,
         batch_size=opt.batch_size,
