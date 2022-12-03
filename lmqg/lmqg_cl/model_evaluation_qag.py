@@ -15,7 +15,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 
 def get_options():
-    parser = argparse.ArgumentParser(description='QG evaluation on SQuAD.')
+    parser = argparse.ArgumentParser(description='QAG evaluation.')
     parser.add_argument('-m', '--model-checkpoint', default=None, type=str)
     parser.add_argument('--max-length', default=512, type=int, help='')
     parser.add_argument('--max-length-output', default=256, type=int, help='')

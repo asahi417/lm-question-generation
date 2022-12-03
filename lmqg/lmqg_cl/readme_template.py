@@ -26,6 +26,41 @@ version_description = {
     'no-paragraph': "This model is fine-tuned without pargraph information but only the sentence that contains the answer.",
     'multitask': "This model is fine-tuned on the answer extraction task as well as the question generation.",
     "qag": "This model is fine-tuned on the end-to-end question and answer generation.",
+    "qa": "This model is fine-tuned on question answering.",
+}
+sample_qa_dict = {
+    "en": [
+        "question: What is a person called is practicing heresy?, context: Heresy is any provocative belief or theory that is strongly at variance with established beliefs or customs. A heretic is a proponent of such claims or beliefs. Heresy is distinct from both apostasy, which is the explicit renunciation of one's religion, principles or cause, and blasphemy, which is an impious utterance or action concerning God or sacred things.",
+        """"question: who created the post as we know it today?, context:"So much of The Post is Ben," Mrs. Graham said in 1994, three years after Bradlee retired as editor. "He created it as we know it today."— Ed O'Keefe (@edatpost) October 21, 2014"""],
+    "ja": [
+        "question: 新型車両として6000系が構想されたのは、製造費用のほか、どんな費用を抑えるためだったの?, context: 三多摩地区開発による沿線人口の増加、相模原線延伸による多摩ニュータウン乗り入れ、都営地下鉄10号線(現都営地下鉄新宿線、以下新宿線と表記する)乗入構想により、京王線の利用客増加が見込まれ、相当数の車両を準備する必要に迫られるなか、製造費用、保守費用を抑えた新型車両として6000系が構想された。新宿線建設に際してはすでに1号線(後の浅草線)を1,435mm軌間で開業させていた東京都は京成電鉄と1号線との乗り入れにあたり京成電鉄の路線を1,372mmから1,435mmに改軌させた事例や、1,372mm軌間の特殊性から運輸省(当時、2001年から国土交通省)と共に京王にも改軌を求めたが、改軌工事中の輸送力確保が困難なことを理由に改軌しないことで決着している。",
+        "question: 1968年に開催されたオリンピックの名前は何ですか?, context: オリンピックが世界的大イベントに成長するに従って政治に左右されるようになると、1968年のメキシコシティ大会では黒人差別を訴える場と化し、1972年のミュンヘン大会ではアラブのゲリラによるイスラエル選手に対するテロ事件まで起きた(ミュンヘンオリンピック事件)。1976年のモントリオール大会になると、ニュージーランドのラグビーチームの南アフリカ遠征に反対してアフリカの諸国22ヶ国がボイコットを行った。そして、1980年のモスクワ大会ではソ連のアフガニスタン侵攻に反発したアメリカ・西ドイツ・日本などの西側諸国が相次いでボイコットを行った。1984年ロサンゼルス大会ではソ連と東側諸国が報復ボイコットを行ない、参加したのはソ連と対立していた中国とルーマニアだけだった。中でも、イラン革命後のイラン・イスラム共和国はモスクワとロサンゼルス双方のオリンピックをボイコットしている。オリンピックが巨大化するに従って財政負担の増大が大きな問題となり、1976年の夏季大会では大幅な赤字を出し、その後夏季・冬季とも立候補都市が1〜2都市だけという状態が続いた。"
+    ],
+    "ru": [
+        "question: чем соответствует абсолютная погрешность скорости света ?, context: Наивысшая точность измерений была достигнута в начале 1970-х. В 1975 году XV Генеральная конференция по мерам и весам зафиксировала это положение и рекомендовала считать скорость света, равной 299 792 458 м/с с относительной погрешностью 4•10−9, что соответствует абсолютной погрешности 1,1 м/с. Впоследствии это значение скорости света было положено в основу определения метра в Международной системе единиц (СИ), а сама скорость света стала рассматриваться как фундаментальная физическая постоянная, по определению равная указанному значению точно.",
+        "question: Какие начинания предпринял Lloyds в начале 1970-х годов?, context: В начале 1970-х Lloyds начал расширять деятельность на международной арене, для чего был создан Lloyds Bank International. География его деятельности включала ФРГ, Швейцарию, Ближний Восток, Австралию, Канаду и США; к 1978 году Lloyds был представлен в 43 странах. В 1972 году было создано подразделение страхования, а в 1973 году была основана лизинговая компания Lloyds Leasing. В 1979 году банк начал предоставлять услуги ипотечного кредитования (при покупке недвижимости стоимостью от £25 000 до £150 000). В 1982 году начало работу агентство недвижимости Blackhorse Agencies, к 1989 году у него было 563 отделения. В 1986 году сфера деятельности Lloyds Bank PLC ещё больше расширилась с учреждением брокерской конторы и торгового банка Lloyds Merchant Bank. В 1988 году была поглощена страховая компания Abbey Life Group PLC; после объединения с ней всей своей страховой деятельности была образована дочерняя компания Lloyds Abbey Life. В 1995 году Lloyds Bank Plc объединился с TSB Group plc (группой, образованной в 1986 году из четырёх сберегательных банков Trustee Savings Banks) под названием Lloyds TSB Bank plc. В 2000 году за £7 млрд была поглощена шотландская взаимная страховая компания Scottish Widows."
+    ],
+    "ko": [
+        "question: 매드 클라운이 참가해 큰 화제를 모았던 프로그램은?, context: 과거 소울 컴퍼니 소속으로 소울 컴퍼니 해체 후 현재의 소속사는 스타쉽 엑스이다. Mad Clown vs Crucial Star (매드 클라운 vs 크루셜 스타)라는 프로젝트 그룹으로 크루셜 스타와 함께 활동하기도 하였으며, 2013년부터는 MC인 저스디스와 팀을 이루어 랩 듀오 커먼콜드로 활동하고 있다. 또한 Mnet 《쇼미더머니 2》에서 참가자로 참가하여 큰 화제를 모았으며, 《쇼미더머니 5》에서는 길 & 매드 클라운 팀으로 프로듀서로 출연하였다., 재발매 물량도 완판되어 추가 제작에 들어갔다. 2016년 4월, 소속사와 자신의 SNS를 통해 2016년 5월 15일 현재 교제 중인 일반인 여자친구와의 결혼을 공식발표하였다.",
+        "question: 1913년 필라델피아 애슬레틱스의 개막전 상대는?, context: 1913년 시즌을 앞두고 스프링 트레이닝에서 잭 쿰스는 앨라배마 주 몽고메리에서 고열로 힘들어했는데, 당시에는 식중독 및 늑막염 진단을 받고 휴식을 취했다. 4월 10일, 보스턴 레드삭스를 상대로 치러진 개막전에서 잭 쿰스는 선발투수로 내정되었다. 그는 3이닝을 노히트로 막고 6회 치프 벤더와 교체되었으며, 경기는 10-5로 애슬레틱스가 승리했다. 이틀 뒤에 다시 선발 등판에 나섰으나 ⁄3이닝 동안 2피안타 1볼넷, 4실점만을 기록하고 강판되었다. 쿰스는 보스턴에서의 시리즈를 끝내고 팀 동료들과 함께 워싱턴으로 향했지만, 고통이 심해지자 구단은 그를 필라델피아로 돌려보냈다. 그곳에서 그는 장티푸스 진단을 받고 휴식을 취했으며, 8월에 다시 팀에 복귀하려고 했지만 정상적인 회복을 위해서 다시 병원에 들어갔다. 이 기간 몸무게가 25 kg 가량이나 감소했다. 이 해 필라델피아 애슬레틱스는 월드 시리즈에서 2년만에 다시 뉴욕 자이언츠와 맞붙었고, 우승을 차지했다. 쿰스의 공백기는 다음해인 1914년 시즌까지 길어졌다. 이 해 시즌에는 팀 순위가 정해진 시즌 막판에야 두 경기에 선발 출전해서, 도합 8이닝 8피안타 4실점, 4.50의 평균자책점을 기록했다. 시즌 후인 12월 9일, 애슬레틱스에서 방출되었다."
+    ],
+    "es": [
+        "question: ¿Cuál es la población de Nueva York a partir de 2014?, context: Situada en uno de los mayores puertos naturales del mundo, la ciudad de Nueva York consta de cinco municipios, cada uno de los cuales es un condado separado del estado de Nueva York. Los cinco distritos - Brooklyn, Queens, Manhattan, el Bronx y Staten Island - se consolidaron en una sola ciudad en 1898. Con una población censada estimada en 2014 de 8.491.079 habitantes distribuidos en una superficie de solo 790 km ², Nueva York es la ciudad más densamente poblada de los Estados Unidos. Hasta 800 idiomas se hablan en Nueva York, por lo que es la ciudad más lingüísticamente diversa del mundo. Según estimaciones del censo de 2014, la región metropolitana de la ciudad de Nueva York sigue siendo por un margen significativo la más poblada de los Estados Unidos, según lo definido tanto por el Área Estadística Metropolitana (20,1 millones de residentes). En 2013, el MSA produjo un producto metropolitano bruto (GMP) de casi US $1,39 billones, mientras que en 2012, el CSA generó un GMP de más de US $1,55 billones, ambos clasificados en primer lugar.",
+        "question: ¿Cómo se llama el ejército personal de Sassou?, context: El progreso democrático del Congo se descarriló en 1997, cuando Lissouba y Sassou comenzaron a luchar por el poder en la guerra civil. A medida que se acercaban las elecciones presidenciales de julio de 1997, las tensiones entre los campos de Lissouba y Sassou aumentaron. El 5 de junio, las fuerzas del gobierno del presidente Lissouba rodearon el complejo de Sassou en Brazzaville y Sassou ordenó a los miembros de su milicia privada (conocida como Cobras) resistir. Así comenzó un conflicto de cuatro meses que destruyó o dañó gran parte de Brazzaville y causó decenas de miles de muertes civiles. A principios de octubre, el régimen socialista angoleño comenzó una invasión del Congo para instalar a Sassou en el poder. A mediados de octubre, el gobierno de Lissouba cayó. Poco después, Sassou se declaró presidente."
+    ],
+    "fr": [
+        "question: En quelle année a-t-on trouvé trace d'un haut fourneau similaire?, context: Cette technologie ne disparaît qu'au début du XXe siècle. On retrouve vers 1900 un haut fourneau similaire dans le Bulacan, aux Philippines. Plus tard encore, le « haut fourneau dans la cour » prôné par Mao Zedong pendant le Grand Bond en avant est de ce type. L'expérience n'est un échec technique que dans les régions où le savoir-faire n'existe pas, ou a disparu.",
+        "question: Comment appelle-t-on la Guerre de 14-18 ?, context: Ce black dog peut être lié à des évènements traumatisants issus du monde extérieur, tels que son renvoi de l'Amirauté après la catastrophe des Dardanelles, lors de la Grande Guerre de 14-18, ou son rejet par l'électorat en juillet 1945. On sait également que dans ces deux cas, la guérison, certes lente et douloureuse et jamais complète ni définitive, se fera grâce à la peinture. D'un autre côté, étant donnés les symptômes de ce mal que Churchill éprouvait de plus en plus, il ne pouvait rien moins qu'être purement associé à de telles causes extrinsèques, ce qui correspond au profil classique de la dépression majeure unipolaire ou bipolaire."
+
+    ],
+    "de": [
+        "question: Welche Auszeichnung hat die Wartburg 1999 erhalten?, context: Thüringen == Kultur == Die Kulturlandschaft Thüringens ist bedingt durch die lange politische Zersplitterung (bis 1920) recht vielfältig. Diese Vielfalt hat sich bis heute erhalten und findet in den verschiedenen ehemaligen Residenzen im Land mit ihren historisch gewachsenen Museen und Theatern Ausdruck. Parallel zur Vielfalt der Landesteile verbinden aber vor allem die ähnliche Küche sowie ähnlichen Feste und Bräuche. Prägend für die Kultur sind nach wie vor die zahlreichen Stätten der klassischen Hochkultur von der Reformation bis zum Bauhaus hinter denen die Orte der Gegenwartskultur ein Stück weit zurückfallen. Zum UNESCO-Welterbe in Thüringen gehören seit 1996 die Bauhaus-Stätten in Weimar mit dem zwischen 1904 und 1911 nach Plänen von Henry van de Velde errichteten Hauptgebäude der Bauhaus-Universität, der Kunstgewerbeschule Weimar und dem Musterhaus Am Horn, seit 1998 die elf Stätten des Klassischen Weimars (Goethes Wohnhaus, Schillers Wohnhaus, Herderkirche und Herder-Stätten, Weimarer Stadtschloss, Wittumspalais, Herzogin Anna Amalia Bibliothek, Park an der Ilm mit Goethes Gartenhaus und Römischem Haus, Schloss Belvedere, Schloss Ettersburg, Schloss Tiefurt, Historischer Friedhof Weimar), seit 1999 die Wartburg bei Eisenach und seit 2011 der Nationalpark Hainich als Teil der Europäischen Buchenurwälder." ,
+        "question: Wann endete die Aberdeen Regierung? , context: Krimkrieg === Großbritannien === Der Krimkrieg zeigte, dass es erhebliche Missstände im britischen Militär gab. Dadurch verlor die Regierung Aberdeen erheblich an Ansehen. Im Februar 1855 wurde sie zum Rücktritt gezwungen, und Palmerston übernahm die Bildung eines neuen Kabinetts. Der spätere britische Premierminister Disraeli erklärte den Krieg aus einer von Südasien eingenommenen Perspektive zu einem „indischen Krieg“, da es zuvor (irreale) Befürchtungen gegeben hatte, dass Russland durch eine Expansion nach Süden das britische Indien in Gefahr bringen könnte. Das Verhältnis zwischen Großbritannien und Russland blieb bis ins 20. Jahrhundert aus ideologischen und weltmachtpolitischen Gründen angespannt. Der Krieg führte in Großbritannien zur Bildung eines modernen Nationalmythos des die Ehre der Nation verteidigenden „gemeinen“ Soldaten, anstelle des Aristokraten früherer Kriege. In der Mittelklasse kam es zu einem neuen Gefühl des Selbstbewusstseins im Zusammenhang von Ideen wie professioneller Fähigkeit und dem Leistungsprinzip. Die Mittelklasse erkannte sich in einer Florence Nightingale wieder, die zur Nationalheldin aufstieg. Die Königin stiftete 1857 das Victoria-Kreuz, mit dem erstmals Nichtoffiziere ausgezeichnet werden konnten."
+    ],
+    "it": [
+        "question: Quale batterio ha il nome del paese che colpisce di più nel suo nome?, context: Il complesso M. tubercolosi (MTBC) comprende altri quattro micobatteri causa di tubercolosi: M. bovis, M. africanum, M. canetti e M. microti. M. africanum non è molto diffuso, ma è una causa significativa di tubercolosi in alcune parti dell' Africa. M. bovis era una volta una causa comune della tubercolosi, ma l' introduzione del latte pastorizzato ha quasi completamente eliminato questo problema di salute pubblica nei paesi sviluppati. M. canetti è raro e sembra essere limitato al Corno d' Africa, anche se alcuni casi sono stati osservati negli emigranti africani. M. microti è anche raro ed è visto quasi solo in persone immunodeficienti, anche se la sua prevalenza può essere significativamente sottovalutata.",
+        """question: Chi era il rivale di Disraeli?, context: Palmerston morì nel 1865, e dopo un breve ministero guidato da Russell, Derby tornò al potere. Nel 1866, Victoria partecipò all' apertura del Parlamento per la prima volta dalla morte di Albert. L' anno successivo sostenne l' approvazione della legge di riforma del 1867, che raddoppiava l' elettorato estendendo la franchigia a molti uomini che lavorano nelle città, anche se non era favorevole ai voti per le donne. Derby si dimise nel 1868, per essere sostituito da Benjamin Disraeli, che affascinò Victoria. "Ognuno ama l' adulazione", disse,"e quando si arriva alla regalità si dovrebbe posarla con una cazzuola". Con la frase "noi autori, Ma' am", si complimentò con lei. Il ministero di Disraeli durò solo qualche mese, e alla fine dell' anno il suo rivale liberale, William Ewart Gladstone, fu nominato primo ministro."""
+    ]
 }
 sample_qg_dict = {
     "en": [
@@ -69,7 +104,7 @@ sample_qg_dict = {
         "il <hl> Giappone <hl> è stato il paese più dipendente dal petrolio arabo."
     ]
 }
-sample_qa_dict = {
+sample_ae_dict = {
     "en": [
         "<hl> Beyonce further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records. <hl> Her performance in the film received praise from critics, and she garnered several nominations for her portrayal of James, including a Satellite Award nomination for Best Supporting Actress, and a NAACP Image Award nomination for Outstanding Supporting Actress.",
         "Beyonce further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records. <hl> Her performance in the film received praise from critics, and she garnered several nominations for her portrayal of James, including a Satellite Award nomination for Best Supporting Actress, and a NAACP Image Award nomination for Outstanding Supporting Actress. <hl>"
@@ -216,14 +251,14 @@ def format_metric(dataset, dataset_type, metric, metric_qag):
     return tmp
 
 
-def format_usage(model_name, sample_qg, sample_qa):
-    if len(sample_qa) > 0:
+def format_usage(model_name, sample_qg, sample_ae):
+    if len(sample_ae) > 0:
         return f"""
 from transformers import pipeline
 # initialize model
 pipe = pipeline("text2text-generation", '{model_name}')
 # answer extraction
-answer = pipe('{sample_qa[0]}')
+answer = pipe('{sample_ae[0]}')
 # question generation
 question = pipe('{sample_qg[0]}')
 """
@@ -275,6 +310,11 @@ def get_readme(model_name: str, model_checkpoint: str):
     dataset_name = config['dataset_name']
     dataset_alias = os.path.basename(dataset)
     la = language_dict[dataset_alias] if dataset_alias in language_dict else 'en'
+    header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+    qg_multitask_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+    ae_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for answer extraction on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+    qa_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question answering task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+    qag_header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question & answer pair generation task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
 
     # model_version
     eval_file = "metric.first.sentence.paragraph_answer.question"
@@ -282,25 +322,45 @@ def get_readme(model_name: str, model_checkpoint: str):
     add_info = []
     _sample_qg = sample_qg_dict[la]
     _is_qag = False
+    _is_qa = False
+    _is_ae = False
     if model_name.endswith('no-answer'):
         _sample_qg = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample_qg]
         add_info.append(version_description['no-answer'])
         eval_file = "metric.first.sentence.paragraph_sentence.question"
-    elif 'qag' in model_name.split('-'):
-        add_info.append(version_description['qag'])
-        _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
-        eval_file = "metric.first.answer.paragraph.questions_answers"
-        _is_qag = True
-        eval_file_qag = None
     elif model_name.endswith('no-paragraph'):
         add_info.append(version_description['no-paragraph'])
         eval_file = "metric.first.sentence.sentence_answer.question"
     elif model_name.endswith('default'):
         add_info.append(version_description['default'])
+
+    elif model_name.endswith('multitask'):
+        header = qg_multitask_header
+
+    elif 'qag' in model_name.split('-'):
+        _sample_qg = [re.sub(r'\s+', ' ', _sample_qg[0].replace('<hl>', ''))]
+        eval_file = "metric.first.answer.paragraph.questions_answers"
+        eval_file_qag = None
+        header = qag_header
+        _is_qag = True
+
+    elif "question-answering" in model_name:
+        _sample_qg = sample_qa_dict[la]
+        eval_file = "metric.first.answer.paragraph_question.answer"
+        eval_file_qag = None
+        header = qa_header
+        _is_qa = True
+
+    elif "answer-extraction" in model_name:
+        _sample_qg = sample_ae_dict[la]
+        eval_file = "metric.first.answer.paragraph_question.answer"
+        eval_file_qag = None
+        header = ae_header
+        _is_ae = True
+
+
     if dataset_alias in ['qg_subjqa', 'qg_squadshifts'] and 'vanilla' not in model_name:
         add_info.append(f"This model is continuously fine-tuned with [{language_model}](https://huggingface.co/{language_model}).")
-    if model_name.endswith('multitask'):
-        add_info.append(version_description['multitask'])
     _sample_qg = [re.sub(r"\A\s+", "", i) for i in _sample_qg]
     add_info = ' '.join(add_info)
 
@@ -315,14 +375,30 @@ def get_readme(model_name: str, model_checkpoint: str):
             sample_qg = _sample_qg
         widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Questions & Answers Generation Example {n + 1}" """ for n, i in
                             enumerate(sample_qg)])
+    elif _is_qa:
+        tags = "- question answering"
+        if prefix_types is not None:
+            sample_qg = [f'{TASK_PREFIX["qa"]}: {i}' for i in _sample_qg]
+        else:
+            sample_qg = _sample_qg
+        widget = '\n'.join(
+            [f"""- text: "{i}"\n  example_title: "Question Answering Example {n + 1}" """ for n, i in enumerate(sample_qg)])
+    elif _is_ae:
+        tags = "- answer extraction"
+        if prefix_types is not None:
+            sample_qg = [f'{TASK_PREFIX["ae"]}: {i}' for i in _sample_qg]
+        else:
+            sample_qg = _sample_qg
+        widget = '\n'.join(
+            [f"""- text: "{i}"\n  example_title: "Answering Extraction Example {n + 1}" """ for n, i in enumerate(sample_qg)])
     else:
         if prefix_types is not None and len(prefix_types) > 1:  # multitask
             answer_extraction = True
             tags = "- question generation\n- answer extraction"
             sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
-            sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_qa_dict[la]]
+            sample_qa = [f'{TASK_PREFIX["ae"]}: {i}' for i in sample_ae_dict[la]]
             widget = '\n'.join([f"""- text: "{i}"\n  example_title: "Question Generation Example {n + 1}" """ for n, i in enumerate(sample_qg)])
-            widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(sample_qa_dict[la])])
+            widget += '\n' + '\n'.join([f"""- text: "{i}"\n  example_title: "Answer Extraction Example {n + 1}" """ for n, i in enumerate(sample_ae_dict[la])])
         elif prefix_types is not None:
             tags = "- question generation"
             sample_qg = [f'{TASK_PREFIX["qg"]}: {i}' for i in _sample_qg]
@@ -440,8 +516,7 @@ model-index:
 ---
 
 # Model Card of `{model_name}`
-This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task on the 
-[{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation).
+{header}
 {add_info}
 
 Please cite our paper if you use the model ({paper_link}).

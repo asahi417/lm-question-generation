@@ -41,8 +41,6 @@ class SpacyPipeline:
             import pytextrank
             self.nlp.add_pipe(algorithm)
             self.library = 'pytextrank'
-        elif self.algorithm == 'ner':
-            pass
         else:
             raise ValueError(f'unknown algorithm: {self.algorithm}')
 
@@ -68,9 +66,11 @@ class SpacyPipeline:
         return [str(i) for i in self.nlp.tokenizer(string)]
 
     def keyword(self, string: str, n: int = 10):
-        if self.algorithm == 'ner':
-            return self.nlp(string).ents
         return self._get_keyword(self.nlp(string), string, n)
+
+    def ner(self, string: str, n: int = None):
+        keywords = self.nlp(string).ents
+        return keywords[:min(len(keywords), n)] if n is not None else keywords
 
     @property
     def language(self):

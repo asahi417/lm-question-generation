@@ -240,7 +240,9 @@ class TransformersQG:
                  keyword_extraction_model: str = 'positionrank',
                  use_auth_token: bool = False,
                  end2end_qag_model: bool = None,
-                 multitask_model: bool = None):
+                 qa_model: bool = None,
+                 answer_extraction_model: bool = None,
+                 multitask_qag_model: bool = None):
         """ Transformers Language Model for Question Generation.
 
         @param model: Model alias or path to local model file.
@@ -260,15 +262,30 @@ class TransformersQG:
                                                       f"Please choose language from '{DEFAULT_MODELS.keys()}'," \
                                                       f"or specify 'model'."
             model = DEFAULT_MODELS[language]
+
+        # flag if the model is end2end QA generation
         if end2end_qag_model is None:
             self.end2end_qag_model = 'qag' in model.split('-')
         else:
             self.end2end_qag_model = end2end_qag_model
 
-        if multitask_model is None:
-            self.multitask_model = 'multitask' in model.split('-')
+        # flag if the model is question answering model
+        if qa_model is None:
+            self.qa_model = 'question-answering' in model
         else:
-            self.multitask_model = multitask_model
+            self.qa_model = qa_model
+
+        # flag if the model is multitask QA generation
+        if multitask_qag_model is None:
+            self.multitask_qag_model = 'multitask' in model.split('-')
+        else:
+            self.multitask_qag_model = multitask_qag_model
+
+        # flag if the model is answer extraction model
+        if answer_extraction_model is None:
+            self.answer_extraction_model = 'answer-extraction' in model
+        else:
+            self.answer_extraction_model = answer_extraction_model
 
         self.model_name = model
         self.max_length = max_length
@@ -282,7 +299,6 @@ class TransformersQG:
             self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
         self.add_prefix = config.add_prefix if 'add_prefix' in config.to_dict().keys() else add_prefix
         assert self.add_prefix is not None, '`add_prefix` is required for non-fine-tuned models'
-        # assert self.add_prefix and self.multitask_model, 'multitask model should be with prefix'
         self.spacy_module = SpacyPipeline(language, keyword_extraction_model)
         # GPU setup
         self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
@@ -310,6 +326,7 @@ class TransformersQG:
         @param cache_path: Path to pre-compute features.
         @return: List of generated sentences.
         """
+        assert self.end2end_qag_model, "`generate_qa_end2end` is available for end2end_qag_model"
         splitting_symbol = '|'
         question_prefix = "question: "
         answer_prefix = ", answer: "
@@ -412,34 +429,35 @@ class TransformersQG:
         @param num_questions: Max number of questions.
         @param answer_model: Type of answer prediction model (`keyword_extraction`. `language_model`).
             - `keyword`: Keyword extraction model extracts top-n keyword.
+            - `ner`: Named-entity recognition.
             - `language_model`: LM predicts answers (Model should have been finetuned on `answer_extraction`.
         @return: List of generated answers.
         """
         assert not self.end2end_qag_model, "end2end qag model can not generate answer only"
         if answer_model is None:
-            if self.multitask_model:
-                answer_model = 'language_model'
-            else:
-                answer_model = 'keyword_extraction'
+            answer_model = 'language_model' if self.multitask_qag_model else 'keyword_extraction'
 
         logging.info(f'running model for `answer_extraction`: {answer_model}')
         if answer_model == 'keyword_extraction':
             num_questions = 10 if num_questions is None else num_questions
             return self.spacy_module.keyword(context, num_questions)
+        elif answer_model == 'ner':
+            return self.spacy_module.ner(context, num_questions)
         elif answer_model == 'language_model':
-            assert self.multitask_model, "`language_model` is available only for multitask models"
+            assert self.multitask_qag_model or self.answer_extraction_model,\
+                f"The model {self.model_name} is not fine-tuned for answer extraction, " \
+                f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead."
+
             list_sentence = self.spacy_module.sentence(context)  # split into sentence
-
-            if not self.add_prefix:
-                raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
-                                 f"and not able to get answer. Try `answer_model = 'keyword_extraction'` instead.")
-
-            prefix_type = 'ae'
             list_input = [context] * len(list_sentence)
             if sentence_level:
                 list_input = list_sentence
             answer = self.generate_prediction(
-                list_input, highlights=list_sentence, prefix_type=prefix_type, cache_path=cache_path, num_beams=num_beams,
+                list_input,
+                highlights=list_sentence,
+                prefix_type='ae' if self.add_prefix else None,
+                cache_path=cache_path,
+                num_beams=num_beams,
                 batch_size=batch_size)
             answer = [clean(i) for i in answer]
             answer = list(filter(None, answer))  # remove None
@@ -473,7 +491,8 @@ class TransformersQG:
         @return: List of generated sentences.
         """
         assert not self.end2end_qag_model, "end2end qag model can not generate question only"
-        prefix_type = 'qg' if self.add_prefix else None
+        assert not self.answer_extraction_model, "model is not fine-tuned for QG"
+        assert not self.qa_model, "model is not fine-tuned for QG"
         single_input = False
         if type(list_context) is str:
             list_context = [list_context]
@@ -481,11 +500,35 @@ class TransformersQG:
         output = self.generate_prediction(
             list_context,
             highlights=list_answer,
-            prefix_type=prefix_type,
+            prefix_type='qg' if self.add_prefix else None,
             cache_path=cache_path,
             num_beams=num_beams,
             batch_size=batch_size,
             sentence_level=sentence_level
+        )
+        if single_input:
+            return output[0]
+        return output
+
+    def answer_question(self,
+                        list_context: str or List,
+                        list_question: str or List,
+                        batch_size: int = None,
+                        num_beams: int = 4,
+                        cache_path: str = None):
+        assert self.qa_model, "model is not fine-tuned for QA"
+        assert type(list_context) is type(list_question), "invalid input"
+        single_input = False
+        if type(list_context) is str:
+            list_context = [list_context]
+            list_question = [list_question]
+            single_input = True
+        output = self.generate_prediction(
+            [f"question: {q}, context: {c}" for q, c in zip(list_question, list_context)],
+            prefix_type='qa' if self.add_prefix else None,
+            cache_path=cache_path,
+            num_beams=num_beams,
+            batch_size=batch_size,
         )
         if single_input:
             return output[0]
@@ -652,7 +695,6 @@ class TransformersQG:
                        list_question: List = None,
                        list_questions_answers: List = None,
                        batch_size: int = None,
-                       # fill_error=None,
                        target_output: str = 'answer'):
         if target_output == 'questions_answers':
             assert self.end2end_qag_model, "this method is for end2end QAG model"
@@ -672,9 +714,6 @@ class TransformersQG:
             for context, answer in zip(list_context, list_answer):
                 position = context.find(answer)
                 if position == -1:
-                    # if fill_error is not None:
-                    #     list_input.append(fill_error)
-                    #     continue
                     raise HighlightNotFoundError(answer, context)
                 tmp = '{0}{1} {2} {1}{3}'.format(
                     context[:position], ADDITIONAL_SP_TOKENS['hl'], answer, context[position + len(answer):])
@@ -684,7 +723,7 @@ class TransformersQG:
                     list_input.append(f'{TASK_PREFIX[prefix_type]}: {tmp}')
         elif target_output == 'answer':
             assert not self.end2end_qag_model, "this method is not for end2end QAG model"
-            assert self.multitask_model, "perplexity on answer is available only for multitask models"
+            assert self.multitask_qag_model, "perplexity on answer is available only for multitask models"
             assert list_answer is not None
             if not self.add_prefix:
                 raise ValueError(f"The model {self.model_name} is not fine-tuned for answer extraction, "
@@ -703,9 +742,6 @@ class TransformersQG:
                     sentence = sentences[0]
                 position = context.find(sentence)
                 if position == -1:
-                    # if fill_error is not None:
-                    #     list_input.append(fill_error)
-                    #     continue
                     raise HighlightNotFoundError(sentence, context)
                 tmp = '{0}{1} {2} {1}{3}'.format(
                     context[:position], ADDITIONAL_SP_TOKENS['hl'], sentence, context[position + len(sentence):])
@@ -725,7 +761,6 @@ class TransformersQG:
         self.eval()
         single_input = False
 
-        # loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
         loss_fct = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id, reduction='none')
 
         if type(src_texts) == str:
@@ -749,7 +784,6 @@ class TransformersQG:
 
                 model_inputs["labels"] = labels["input_ids"]
                 out = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
-                # batch, length = out['logits'].size()
                 loss = loss_fct(
                     out['logits'].view(-1, out['logits'].size(-1)),
                     model_inputs["labels"].view(-1).to(self.device)
