@@ -496,11 +496,10 @@ def get_readme(model_name: str, model_checkpoint: str):
     link_main = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
     df_main = df_main.sort_index()
     markdown_table = f"""
-### Metric ({metric_title})
+- ***Metric ({metric_title})***: [raw metric file]({link_main}) 
 
 {df_main.to_markdown()}
 
-- [raw metric file]({link_main})
 """
     if metric_main[3] is not None:
         df_qag = pd.DataFrame(*list(zip(*list(metric_main[3]["test"].items())))[::-1], columns=["Score"])
@@ -509,11 +508,10 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
         markdown_table += f"""
-### Metric (Question & Answer Generation))
+- ***Metric (Question & Answer Generation)***: [raw metric file]({link_qag})
 
 {df_qag.to_markdown()}
 
-- [raw metric file]({link_qag})
 """
     if metric_main[4] is not None:
         df_qa = pd.DataFrame(*list(zip(*list(metric_main[4]["test"].items())))[::-1], columns=["Score"])
@@ -522,11 +520,10 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qa = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qa}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qa = df_qa.sort_index()
         markdown_table += f"""
-### Metric (Question Answering))
+- ***Metric (Question Answering)***: [raw metric file]({link_qa})
 
 {df_qa.to_markdown()}
 
-- [raw metric file]({link_qa})
 """
     if metric_main[5] is not None:
         df_ae = pd.DataFrame(*list(zip(*list(metric_main[5]["test"].items())))[::-1], columns=["Score"])
@@ -535,11 +532,10 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_ae = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_ae}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_ae = df_ae.sort_index()
         markdown_table += f"""
-### Metric (Answer Generation))
+- ***Metric (Answer Generation)***: [raw metric file]({link_ae})
 
 {df_ae.to_markdown()}
 
-- [raw metric file]({link_ae})
 """
     if len(metrics_ood) != 0:
         content = "\n".join([
@@ -547,7 +543,7 @@ def get_readme(model_name: str, model_checkpoint: str):
                       f"[link](https://huggingface.co/{model_name}/raw/main/eval_ood/{eval_file}.{d.replace('/', '_')}.{t}.json) |"
                       for d, t, m, _ in metrics_ood])
         markdown_table += f"""
-### Metrics ({metric_title}, Out-of-Domain)
+- ***Metrics ({metric_title}, Out-of-Domain) ***
         
 | Dataset | Type | BERTScore| Bleu_4 | METEOR | MoverScore | ROUGE_L | Link |
 |:--------|:-----|---------:|-------:|-------:|-----------:|--------:|-----:|
@@ -599,7 +595,7 @@ model-index:
 {usage}
 ```
 
-## Evaluation Metrics
+## Evaluation
 
 {markdown_table}
 
