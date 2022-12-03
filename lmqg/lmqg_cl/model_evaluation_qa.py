@@ -68,7 +68,6 @@ def main():
         if _split not in output:
             output[_split] = {}
 
-        opt.dataset_name = None if opt.dataset_name == 'default' else opt.dataset_name
         data_in, gold_reference = get_dataset(
             opt.dataset_path,
             opt.dataset_name,

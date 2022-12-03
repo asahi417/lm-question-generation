@@ -323,16 +323,6 @@ questions = model.generate_q(list_context="{sample_lmqg_dict[language][0]}", lis
     return desc
 
 
-# def get_markdown_table(title, metric):
-#     _dataset = f"[{metric[0]}](https://huggingface.co/datasets/{metric[0]})"
-#     markdown_table = f"""
-#     ### Metrics ({title})
-#
-#     | Dataset | Type | BLEU4 | ROUGE-L | METEOR | BERTScore | MoverScore | Link |
-#     |:--------|:-----|------:|--------:|-------:|----------:|-----------:|-----:|
-#     | {_dataset} | {metric_main[1]} | {round(metric_main[2]['test']['Bleu_4'], 3)} | {round(metric_main[2]['test']['ROUGE_L'], 3)} | {round(metric_main[2]['test']['METEOR'], 3)} | {round(metric_main[2]['test']['BERTScore'], 3)} | {round(metric_main[2]['test']['MoverScore'], 3)} | [link]({link}) |
-#     """
-
 def get_readme(model_name: str, model_checkpoint: str):
     with open(pj(model_checkpoint, "trainer_config.json")) as f:
         config = json.load(f)
@@ -437,28 +427,28 @@ def get_readme(model_name: str, model_checkpoint: str):
 
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
-        metric = json.load(f)
+        metric = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_qag = None
     if eval_file_qag is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qag}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_qag = json.load(f)
+                metric_qag = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_qa = None
     if eval_file_qa is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qa}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_qa = json.load(f)
+                metric_qa = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_ae = None
     if eval_file_ae is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_ae}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_ae = json.load(f)
+                metric_ae = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae]
 
@@ -503,45 +493,53 @@ def get_readme(model_name: str, model_checkpoint: str):
     df_main = pd.DataFrame(*list(zip(*list(metric_main[2]["test"].items())))[::-1], columns=["Score"])
     df_main['Type'] = metric_main[1]
     df_main['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
-    df_main['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
+    link_main = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
     df_main = df_main.sort_index()
     markdown_table = f"""
 ### Metric ({metric_title})
 
 {df_main.to_markdown()}
+
+- [raw metric file]({link_main})
 """
     if metric_main[3] is not None:
         df_qag = pd.DataFrame(*list(zip(*list(metric_main[3]["test"].items())))[::-1], columns=["Score"])
         df_qag['Type'] = metric_main[1]
         df_qag['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
-        df_qag['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
         markdown_table += f"""
 ### Metric (Question & Answer Generation))
 
 {df_qag.to_markdown()}
+
+- [raw metric file]({link_qag})
 """
     if metric_main[4] is not None:
         df_qa = pd.DataFrame(*list(zip(*list(metric_main[4]["test"].items())))[::-1], columns=["Score"])
         df_qa['Type'] = metric_main[1]
         df_qa['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
-        df_qa['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qa}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        link_qa = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qa}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qa = df_qa.sort_index()
         markdown_table += f"""
 ### Metric (Question Answering))
 
 {df_qa.to_markdown()}
+
+- [raw metric file]({link_qa})
 """
     if metric_main[5] is not None:
         df_ae = pd.DataFrame(*list(zip(*list(metric_main[5]["test"].items())))[::-1], columns=["Score"])
         df_ae['Type'] = metric_main[1]
         df_ae['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
-        df_ae['Link'] = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_ae}.{dataset.replace("/", "_")}.{dataset_name}.json'
+        link_ae = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_ae}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_ae = df_ae.sort_index()
         markdown_table += f"""
 ### Metric (Answer Generation))
 
 {df_ae.to_markdown()}
+
+- [raw metric file]({link_ae})
 """
     if len(metrics_ood) != 0:
         content = "\n".join([
@@ -552,7 +550,7 @@ def get_readme(model_name: str, model_checkpoint: str):
 ### Metrics ({metric_title}, Out-of-Domain)
         
 | Dataset | Type | BERTScore| Bleu_4 | METEOR | MoverScore | ROUGE_L | Link |
-|:--------|:-----|---------:|-------:|-------:|----------:|-----------:|-----:|
+|:--------|:-----|---------:|-------:|-------:|-----------:|--------:|-----:|
 {content}
 """
     return f"""

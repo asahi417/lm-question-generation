@@ -81,10 +81,8 @@ def main():
         if _split not in output:
             output[_split] = {}
 
-        if opt.dataset_name == 'default' or opt.dataset_name is None:
-            dataset = load_dataset(opt.dataset_path, split=_split, use_auth_token=opt.use_auth_token)
-        else:
-            dataset = load_dataset(opt.dataset_path, opt.dataset_name, split=_split, use_auth_token=opt.use_auth_token)
+        dataset = load_dataset(opt.dataset_path, None if opt.dataset_name == 'default' else opt.dataset_name,
+                               split=_split, use_auth_token=opt.use_auth_token)
         df = dataset.to_pandas()
 
         # formatting data into qag format
