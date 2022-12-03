@@ -14,7 +14,7 @@ def get_options():
     parser.add_argument('-m', '--model-checkpoint', default=None, type=str)
     parser.add_argument('--batch-size', default=16, type=int)
     parser.add_argument('--prediction-aggregation', help='', default='first', type=str)
-    parser.add_argument('--prediction-level', help="'sentence', 'context', 'answer'", default='sentence', type=str)
+    parser.add_argument('--prediction-level', help="'sentence', 'context', 'answer'", default=None, type=str)
     parser.add_argument('--n-beams', default=4, type=int)
     parser.add_argument('-e', '--export-dir', required=True, type=str)
     parser.add_argument('--hyp-test', default=None, type=str)

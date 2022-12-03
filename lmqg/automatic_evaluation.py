@@ -156,7 +156,7 @@ def evaluate(export_dir: str = '.',
              input_type: str = 'paragraph_answer',
              output_type: str = 'question',
              prediction_aggregation: str = 'first',
-             prediction_level: str = 'sentence',
+             prediction_level: str = None,
              data_caches: Dict = None,
              bleu_only: bool = False,
              overwrite: bool = False,
@@ -165,6 +165,12 @@ def evaluate(export_dir: str = '.',
              test_split: str = 'test',
              validation_split: str = 'validation'):
     """ Evaluate question-generation model """
+    reference_files = get_reference_files(dataset_path, dataset_name)
+    if prediction_level is None:
+        valid_prediction_level = [k.split('-')[0] for k in reference_files.keys()]
+        if 'sentence' in valid_prediction_level:
+            prediction_level = 'sentence'
+        prediction_level = 'answer'
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
     if not overwrite and os.path.exists(path_metric):
@@ -173,7 +179,7 @@ def evaluate(export_dir: str = '.',
             if bleu_only:
                 return metric
     os.makedirs(export_dir, exist_ok=True)
-    reference_files = get_reference_files(dataset_path, dataset_name)
+
 
     if model is not None:
         lm = TransformersQG(model,

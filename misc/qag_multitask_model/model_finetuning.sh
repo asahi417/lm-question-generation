@@ -36,11 +36,11 @@ evaluate_ae_only () { # CKPT LANG DATA
 }
 
 lmqg-train-search -m t5-large -b 4 -g 16 32 -c lmqg_output/t5-large-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
-evaluate t5-large-squad-answer-extraction en qg_squad
+evaluate_ae_only t5-large-squad-answer-extraction en qg_squad
 
 lmqg-train-search -m t5-base -b 16 -g 4 8 -c lmqg_output/t5-base-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
-evaluate t5-base-squad-answer-extraction en qg_squad
+evaluate_ae_only t5-base-squad-answer-extraction en qg_squad
 
 lmqg-train-search -m t5-small -b 64 -g 1 2 -c lmqg_output/t5-small-squad-answer-extraction -i 'paragraph_sentence' -o 'answer' -p 'ae'
-evaluate t5-small-squad-answer-extraction en qg_squad
+evaluate_ae_only t5-small-squad-answer-extraction en qg_squad
 
