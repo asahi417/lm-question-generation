@@ -156,16 +156,16 @@ language_dict = {
 
 
 def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, is_multitask, is_end2end, is_qa, is_ae):
-    metric_label = '(Question Generation)'
+    metric_label = 'Question Generation'
     metric_label_type = "question_generation"
     if is_qa:
-        metric_label = '(Question Answering)'
+        metric_label = 'Question Answering'
         metric_label_type = "question_answering"
     elif is_ae:
-        metric_label = '(Answer Extraction)'
+        metric_label = 'Answer Extraction'
         metric_label_type = "answer_extraction"
     elif is_end2end:
-        metric_label = '(Question & Answer Generation)'
+        metric_label = 'Question & Answer Generation'
         metric_label_type = "question_answer_generation"
     tmp = f"""  - task:
       name: Text2text Generation
