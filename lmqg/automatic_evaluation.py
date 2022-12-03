@@ -170,7 +170,12 @@ def evaluate(export_dir: str = '.',
         valid_prediction_level = [k.split('-')[0] for k in reference_files.keys()]
         if 'sentence' in valid_prediction_level:
             prediction_level = 'sentence'
-        prediction_level = 'answer'
+        elif 'answer' in valid_prediction_level:
+            prediction_level = 'answer'
+        elif "questions_answers" in valid_prediction_level:
+            prediction_level = 'questions_answers'
+        else:
+            raise ValueError(f"unexpected error: {valid_prediction_level}")
     path_metric = pj(export_dir, f'metric.{prediction_aggregation}.{prediction_level}.{input_type}.{output_type}.{dataset_path.replace("/", "_")}.{dataset_name}.json')
     metric = {}
     if not overwrite and os.path.exists(path_metric):
