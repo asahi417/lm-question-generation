@@ -427,28 +427,28 @@ def get_readme(model_name: str, model_checkpoint: str):
 
     # metric
     with open(pj(model_checkpoint, "eval", f"{eval_file}.{dataset.replace('/', '_')}.{dataset_name}.json")) as f:
-        metric = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
+        metric = {k: {_k: round(_v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_qag = None
     if eval_file_qag is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qag}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_qag = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
+                metric_qag = {k: {_k: round(_v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_qa = None
     if eval_file_qa is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_qa}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_qa = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
+                metric_qa = {k: {_k: round(_v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_ae = None
     if eval_file_ae is not None:
         tmp_path = pj(model_checkpoint, "eval", f"{eval_file_ae}.{dataset.replace('/', '_')}.{dataset_name}.json")
         if os.path.exists(tmp_path):
             with open(tmp_path) as f:
-                metric_ae = {k: {_k: _v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v for _k, _v in v.items()} for k, v in json.load(f).items()}
+                metric_ae = {k: {_k: round(_v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
 
     metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae]
 
