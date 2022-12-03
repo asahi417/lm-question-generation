@@ -449,7 +449,7 @@ def get_readme(model_name: str, model_checkpoint: str):
 
     # metric for ood
     metrics_ood = []
-    for i in glob(pj(model_checkpoint, "eval_ood", f"{eval_file}.*.json")):
+    for i in glob(sorted(pj(model_checkpoint, "eval_ood", f"{eval_file}.*.json"))):
         ood_data = os.path.basename(i).split(f"{eval_file}.")[-1].replace('.json', '')
         _dataset, _dataset_name = ood_data.split(".")
         try:
