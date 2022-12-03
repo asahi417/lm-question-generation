@@ -493,9 +493,12 @@ class TransformersQG:
         assert not self.end2end_qag_model, "end2end qag model can not generate question only"
         assert not self.answer_extraction_model, "model is not fine-tuned for QG"
         assert not self.qa_model, "model is not fine-tuned for QG"
+        if list_answer is not None:
+            assert type(list_context) is type(list_answer), f"{type(list_context)} != {type(list_answer)}"
         single_input = False
         if type(list_context) is str:
             list_context = [list_context]
+            list_answer = [list_answer] if list_answer is not None else None
             single_input = True
         output = self.generate_prediction(
             list_context,
