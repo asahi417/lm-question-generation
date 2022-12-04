@@ -157,7 +157,9 @@ language_dict = {
 
 
 def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end):
-    tmp = "    metrics:"
+    tmp = """
+    metrics:
+    """
     if "Bleu_4" in metric["test"]:
         tmp += f"""
     - name: BLEU4 ({metric_label})
