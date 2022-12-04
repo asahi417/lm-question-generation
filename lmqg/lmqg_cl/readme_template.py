@@ -195,7 +195,7 @@ def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_en
       value: {metric["test"]["AnswerExactMatch"]}"""
     if "QAAlignedF1Score (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedF1Score-BERTScore ({metric_label}) {"" if is_multitask or is_end2end else " [Gold Answer]"}
+    - name: QAAlignedF1Score-BERTScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
       type: qa_aligned_f1_score_bertscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
     if "QAAlignedRecall (BERTScore)" in metric['test']:
