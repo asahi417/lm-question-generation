@@ -10,7 +10,7 @@ import numpy as np
 from pyemd import emd_with_flow
 from transformers import AutoTokenizer, AutoModel
 
-MOVERSCORE_BATCH = int(os.getenv('MOVERSCORE_BATCH', '256'))
+MOVERSCORE_BATCH = int(os.getenv('MOVERSCORE_BATCH', '32'))
 # lang2model = defaultdict(lambda: "bert-base-multilingual-cased")
 # lang2model.update(
 #     {

@@ -515,7 +515,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_ae = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_ae}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_ae = df_ae.sort_index()
         markdown_table += f"""
-- ***Metric (Answer Generation)***: [raw metric file]({link_ae})
+- ***Metric (Answer Extraction)***: [raw metric file]({link_ae})
 
 {df_ae.to_markdown()}
 

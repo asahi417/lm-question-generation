@@ -1,4 +1,6 @@
 # Multitask QAG Model
+# train, eval QG, eval AE, eval AR (answer metric), eval QAG, push-to-hub
+
 lmqg-train-search -m "t5-large" -b 16 -g 4 8 -c "lmqg_output/t5-large-squad-multitask" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval -m "lmqg_output/t5-large-squad-multitask/best_model" -e "lmqg_output/t5-large-squad-multitask/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
 lmqg-eval -m "lmqg_output/t5-large-squad-multitask/best_model" -e "lmqg_output/t5-large-squad-multitask/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'

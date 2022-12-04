@@ -4,9 +4,9 @@ qag_metric () {
   MODEL=${1}
   DATA=${2}
   LA=${3}
-  git clone "https://huggingface.co/lmqg/${MODEL}"
-#  lmqg-eval-qag --use-auth-token -m "lmqg/${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}"
-  lmqg-push-to-hf -m "${MODEL}" -a "${MODEL}" -o "lmqg"
+#  git clone "https://huggingface.co/lmqg/${MODEL}"
+  lmqg-eval-qag --use-auth-token -m "${MODEL}" -e "${MODEL}/eval" -d "${DATA}" --language "${LA}"
+#  lmqg-push-to-hf -m "${MODEL}" -a "${MODEL}" -o "lmqg"
 }
 
 # QG models
@@ -38,5 +38,6 @@ qag_metric 'mt5-base-esquad-qg' 'lmqg/qg_esquad' "es"
 qag_metric 'mt5-base-dequad-qg' 'lmqg/qg_dequad' "de"
 qag_metric 'mt5-base-itquad-qg' 'lmqg/qg_itquad' "it"
 qag_metric 'mt5-base-koquad-qg' 'lmqg/qg_koquad' "ko"
+
 qag_metric 'mt5-base-ruquad-qg' 'lmqg/qg_ruquad' "ru"
 qag_metric 'mt5-base-frquad-qg' 'lmqg/qg_frquad' "fr"

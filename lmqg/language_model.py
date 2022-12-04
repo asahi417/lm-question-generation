@@ -29,14 +29,14 @@ ADDITIONAL_SP_TOKENS = {'hl': '<hl>'}
 NUM_WORKERS = int(os.getenv('NUM_WORKERS', '0'))
 PARALLEL_PROCESSING = bool(int(os.getenv('PARALLEL_PROCESSING', '0')))
 DEFAULT_MODELS = {
-    'en': 'lmqg/t5-small-squad-multitask',
-    'ja': 'lmqg/mt5-small-jaquad-multitask',
-    'de': 'lmqg/mt5-small-dequad-multitask',
-    'es': 'lmqg/mt5-small-esquad-multitask',
-    'ko': 'lmqg/mt5-small-koquad-multitask',
-    'ru': 'lmqg/mt5-small-ruquad-multitask',
-    'it': 'lmqg/mt5-small-itquad-multitask',
-    'fr': 'lmqg/mt5-small-frquad-multitask',
+    'en': 'lmqg/t5-small-squad-qg-ae',
+    'ja': 'lmqg/mt5-small-jaquad-qg-ae',
+    'de': 'lmqg/mt5-small-dequad-qg-ae',
+    'es': 'lmqg/mt5-small-esquad-qg-ae',
+    'ko': 'lmqg/mt5-small-koquad-qg-ae',
+    'ru': 'lmqg/mt5-small-ruquad-qg-ae',
+    'it': 'lmqg/mt5-small-itquad-qg-ae',
+    'fr': 'lmqg/mt5-small-frquad-qg-ae'
 }
 
 
@@ -277,7 +277,7 @@ class TransformersQG:
 
         # flag if the model is multitask QA generation
         if multitask_qag_model is None:
-            self.multitask_qag_model = 'multitask' in model.split('-') or '-qg-ae-' in model
+            self.multitask_qag_model = 'multitask' in model.split('-') or '-qg-ae' in model
         else:
             self.multitask_qag_model = multitask_qag_model
 

@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from .bert_score import score
-BERTSCORE_BATCH = int(os.getenv('BERTSCORE_BATCH', '64'))
+BERTSCORE_BATCH = int(os.getenv('q', '32'))
 
 
 class BERTScore:
