@@ -156,25 +156,8 @@ language_dict = {
 }
 
 
-def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, is_multitask, is_end2end, is_qa, is_ae):
-    metric_label = 'Question Generation'
-    metric_label_type = "question_generation"
-    if is_qa:
-        metric_label = 'Question Answering'
-        metric_label_type = "question_answering"
-    elif is_ae:
-        metric_label = 'Answer Extraction'
-        metric_label_type = "answer_extraction"
-    elif is_end2end:
-        metric_label = 'Question & Answer Generation'
-        metric_label_type = "question_answer_generation"
-    tmp = f"""  - task:
-      name: Text2text Generation
-      type: text2text-generation
-    dataset:
-      name: {dataset}
-      type: {dataset_type}
-      args: {dataset_type}
+def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end):
+    tmp = f"""
     metrics:
     - name: BLEU4 ({metric_label})
       type: bleu4_{metric_label_type}
@@ -231,50 +214,35 @@ def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_a
     - name: QAAlignedPrecision-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
       type: qa_aligned_precision_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedPrecision (MoverScore)"]}"""
+    return tmp
 
+
+def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, is_multitask, is_end2end, is_qa, is_ae):
+    metric_label = 'Question Generation'
+    metric_label_type = "question_generation"
+    if is_qa:
+        metric_label = 'Question Answering'
+        metric_label_type = "question_answering"
+    elif is_ae:
+        metric_label = 'Answer Extraction'
+        metric_label_type = "answer_extraction"
+    elif is_end2end:
+        metric_label = 'Question & Answer Generation'
+        metric_label_type = "question_answer_generation"
+    tmp = f"""  - task:
+      name: Text2text Generation
+      type: text2text-generation
+    dataset:
+      name: {dataset}
+      type: {dataset_type}
+      args: {dataset_type}"""
+    tmp += __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end)
     if metric_qag is not None:
-        tmp += f"""
-    - name: QAAlignedF1Score-BERTScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_f1_score_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedF1Score (BERTScore)"]}"""
-        tmp += f"""
-    - name: QAAlignedRecall-BERTScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_recall_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedRecall (BERTScore)"]}"""
-        tmp += f"""
-    - name: QAAlignedPrecision-BERTScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_precision_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedPrecision (BERTScore)"]}"""
-        tmp += f"""
-    - name: QAAlignedF1Score-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_f1_score_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedF1Score (MoverScore)"]}"""
-        tmp += f"""
-    - name: QAAlignedRecall-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_recall_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedRecall (MoverScore)"]}"""
-        tmp += f"""
-    - name: QAAlignedPrecision-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_precision_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
-      value: {metric_qag["test"]["QAAlignedPrecision (MoverScore)"]}"""
-    if metric_qa is not None:
-        tmp += f"""
-    - name: AnswerF1Score (Question Answering)
-      type: answer_f1_score_question_answering
-      value: {metric_qa["test"]["AnswerF1Score"]}"""
-        tmp += f"""
-    - name: AnswerExactMatch (Question Answering)
-      type: answer_exact_match_question_answering
-      value: {metric_qa["test"]["AnswerExactMatch"]}"""
-    if metric_ae is not None:
-        tmp += f"""
-    - name: AnswerF1Score (Answer Extraction)
-      type: answer_f1_score_answer_extraction
-      value: {metric_ae["test"]["AnswerF1Score"]}"""
-        tmp += f"""
-    - name: AnswerExactMatch (Answer Extraction)
-      type: answer_exact_match_answer_extraction
-      value: {metric_ae["test"]["AnswerExactMatch"]}"""
+        tmp += __format_metric(metric_qag, 'Question & Answer Generation', "question_answer_generation", is_multitask, is_end2end)
+    if metric_qa:
+        tmp += __format_metric(metric_qa, 'Question Answering', "question_answering", is_multitask, is_end2end)
+    if metric_ae:
+        tmp += __format_metric(metric_ae, 'Answer Extraction', "answer_extraction", is_multitask, is_end2end)
     return tmp
 
 

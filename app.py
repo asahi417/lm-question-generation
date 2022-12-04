@@ -18,45 +18,45 @@ API_TOKEN = os.getenv("API_TOKEN")
 KEYWORD_EXTRACTOR = os.getenv('KEYWORD_EXTRACTOR', 'positionrank')
 
 QG_PRETTY_NAME = {
-    'T5 SMALL': 'lmqg/t5-small-squad-multitask',
-    'T5 BASE': 'lmqg/t5-base-squad-multitask',
-    'T5 LARGE': 'lmqg/t5-large-squad-multitask',
-    'BART BASE': 'lmqg/bart-base-squad',
-    'BART LARGE': 'lmqg/bart-large-squad',
-    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-multitask',
-    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-multitask',
-    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-multitask',
-    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-multitask',
-    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-multitask',
-    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-multitask',
-    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-multitask',
-    'mT5 BASE (JA)': 'lmqg/mt5-base-jaquad',
-    'mT5 BASE (DE)': 'lmqg/mt5-base-dequad',
-    'mT5 BASE (ES)': 'lmqg/mt5-base-esquad',
-    'mT5 BASE (KO)': 'lmqg/mt5-base-koquad',
-    'mT5 BASE (RU)': 'lmqg/mt5-base-ruquad',
-    'mT5 BASE (IT)': 'lmqg/mt5-base-itquad',
-    'mT5 BASE (FR)': 'lmqg/mt5-base-frquad',
-    'mBART LARGE (JA)': 'lmqg/mbart-large-cc25-jaquad',
-    'mBART LARGE (DE)': 'lmqg/mbart-large-cc25-dequad',
-    'mBART LARGE (ES)': 'lmqg/mbart-large-cc25-esquad',
-    'mBART LARGE (KO)': 'lmqg/mbart-large-cc25-koquad',
-    'mBART LARGE (RU)': 'lmqg/mbart-large-cc25-ruquad',
-    'mBART LARGE (IT)': 'lmqg/mbart-large-cc25-itquad',
-    'mBART LARGE (FR)': 'lmqg/mbart-large-cc25-frquad'
+    'T5 SMALL': 'lmqg/t5-small-squad-qg-ae',
+    'T5 BASE': 'lmqg/t5-base-squad-qg-ae',
+    'T5 LARGE': 'lmqg/t5-large-squad-qg-ae',
+    'BART BASE': 'lmqg/bart-base-squad-qg',
+    'BART LARGE': 'lmqg/bart-large-squad-qg',
+    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-qg-ae',
+    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-qg-ae',
+    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-qg-ae',
+    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-qg-ae',
+    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-qg-ae',
+    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-qg-ae',
+    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-qg-ae',
+    'mT5 BASE (JA)': 'lmqg/mt5-base-jaquad-qg',
+    'mT5 BASE (DE)': 'lmqg/mt5-base-dequad-qg',
+    'mT5 BASE (ES)': 'lmqg/mt5-base-esquad-qg',
+    'mT5 BASE (KO)': 'lmqg/mt5-base-koquad-qg',
+    'mT5 BASE (RU)': 'lmqg/mt5-base-ruquad-qg',
+    'mT5 BASE (IT)': 'lmqg/mt5-base-itquad-qg',
+    'mT5 BASE (FR)': 'lmqg/mt5-base-frquad-qg',
+    'mBART LARGE (JA)': 'lmqg/mbart-large-cc25-jaquad-qg',
+    'mBART LARGE (DE)': 'lmqg/mbart-large-cc25-dequad-qg',
+    'mBART LARGE (ES)': 'lmqg/mbart-large-cc25-esquad-qg',
+    'mBART LARGE (KO)': 'lmqg/mbart-large-cc25-koquad-qg',
+    'mBART LARGE (RU)': 'lmqg/mbart-large-cc25-ruquad-qg',
+    'mBART LARGE (IT)': 'lmqg/mbart-large-cc25-itquad-qg',
+    'mBART LARGE (FR)': 'lmqg/mbart-large-cc25-frquad-qg'
 }
 QG_PREFIX_INFO = {k: AutoConfig.from_pretrained(v).add_prefix for k, v in QG_PRETTY_NAME.items()}
 AE_PRETTY_NAME = {
-    'T5 SMALL': 'lmqg/t5-small-squad-multitask',
-    'T5 BASE': 'lmqg/t5-base-squad-multitask',
-    'T5 LARGE': 'lmqg/t5-large-squad-multitask',
-    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-multitask',
-    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-multitask',
-    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-multitask',
-    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-multitask',
-    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-multitask',
-    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-multitask',
-    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-multitask',
+    'T5 SMALL': 'lmqg/t5-small-squad-qg-ae',
+    'T5 BASE': 'lmqg/t5-base-squad-qg-ae',
+    'T5 LARGE': 'lmqg/t5-large-squad-qg-ae',
+    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-qg-ae',
+    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-qg-ae',
+    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-qg-ae',
+    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-qg-ae',
+    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-qg-ae',
+    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-qg-ae',
+    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-qg-ae',
     'Keyword': None
 }
 AE_PREFIX_INFO = {k: AutoConfig.from_pretrained(v).add_prefix if v is not None else None
@@ -77,8 +77,8 @@ LANGUAGE_MAP = {
 class ModelInput(BaseModel):
     input_text: str
     language: str = 'en'
-    answer_model: str = 'lmqg/t5-small-squad-multitask'  # 'keyword_extraction'
-    qg_model: str = 'lmqg/t5-small-squad'
+    answer_model: str = 'lmqg/t5-small-squad-qg-ae'  # 'keyword_extraction'
+    qg_model: str = 'lmqg/t5-small-squad-qg'
     highlight: str or List = None
     num_beams: int = 4
     num_questions: int = 5

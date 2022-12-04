@@ -56,7 +56,7 @@ See [MODEL CARD](https://github.com/asahi417/lm-question-generation/blob/master/
 ```python
 from lmqg import TransformersQG
 # initialize model
-model = TransformersQG(language='en', model='lmqg/t5-large-squad-multitask')
+model = TransformersQG(language='en', model='lmqg/t5-large-squad-qg')
 # a list of paragraph
 context = [
     "William Turner was an English painter who specialised in watercolour landscapes",
@@ -82,7 +82,7 @@ This functionality is only available for the QG models fine-tuned with answer ex
 ```python
 from lmqg import TransformersQG
 # initialize model
-model = TransformersQG(language='en', model='lmqg/t5-large-squad-multitask')
+model = TransformersQG(language='en', model='lmqg/t5-large-squad-qg-ae')
 # paragraph to generate pairs of question and answer
 context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
 # model prediction
@@ -102,7 +102,7 @@ print(question_answer)
 The evaluation tool reports `BLEU4`, `ROUGE-L`, `METEOR`, `BERTScore`, and `MoverScore` following [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
 From command line, run following command 
 ```shell
-lmqg-eval -m "lmqg/t5-large-squad" -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
+lmqg-eval -m "lmqg/t5-large-squad-qg" -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
 ```
 where `-m` is a model alias on huggingface or path to local checkpoint, `-e` is the directly to export the metric file, `-d` is the dataset to evaluate, and `-l` is the language of the test set.
 Instead of running model prediction, you can provide a prediction file instead to avoid computing it each time.

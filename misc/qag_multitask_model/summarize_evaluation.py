@@ -37,6 +37,7 @@ def get_metric(account: str = 'lmqg',
                train_data_type: str = None,
                test_data: str = None,
                test_data_type: str = 'default',
+               answer_model: bool = False,
                additional_prefix: str = None,
                suffix: str = None):
     model = os.path.basename(model)
@@ -45,7 +46,10 @@ def get_metric(account: str = 'lmqg',
         model = f'{model}-{additional_prefix}'
     if train_data_type is not None and train_data_type != 'default':
         model = f'{model}-{train_data_type}'
-    model = f'{model}-qg'
+    if answer_model:
+        model = f'{model}-multitask'
+    else:
+        model = f'{model}-qg'
     if suffix is not None:
         model = f'{model}-{suffix}'
     evl = 'eval'
@@ -67,43 +71,67 @@ def get_metric(account: str = 'lmqg',
     return {k: 100 * v for k, v in tmp['test'].items()}, config, model_link
 
 
-def summary_ml():
+def summary_ml(multi_task: bool = False):
     output = []
     configs = []
-    target_lms = ML_LM
+    if multi_task:
+        target_lms = ML_LM_MULTITASK
+    else:
+        target_lms = ML_LM
     for lm in target_lms:
         for data in ML:
+            if data == 'squad' and multi_task:
+                continue
+            print(data, lm, multi_task)
             # supervised result
-            _metric, config, model_link = get_metric(model=lm, train_data=data)
+            _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=multi_task)
             metric = {
                 "model": f"{model_link}",
                 "language model": f"[`{lm}`](https://huggingface.co/{lm})",
                 'training data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
                 'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
+                # 'answer_model': False
             }
             configs.append(config)
             metric.update(_metric)
             output.append(metric)
-            if data != 'squad':
+            if data != 'squad' and not multi_task:
+                # if lm in ML_LM_MULTITASK:
+                #     # model with answer extraction
+                #     _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=True)
+                #     metric = {
+                #         "model": f"{model_link}",
+                #         "language model": f"[`{lm}`](https://huggingface.co/{lm})",
+                #         'training data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
+                #         'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
+                #         'answer_model': True
+                #     }
+                #     metric.update(_metric)
+                #     output.append(metric)
+                #     configs.append(config)
                 _metric, _, model_link = get_metric(model=lm, train_data='squad', test_data=data)
                 metric = {
                     "model": f"{model_link}",
                     "language model": f"[`{lm}`](https://huggingface.co/{lm})",
                     'training data': f"[`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad)",
                     'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
+                    # 'answer_model': False
                 }
                 metric.update(_metric)
                 output.append(metric)
     return pd.DataFrame(output), configs
 
 
-def summary():
+def summary(multi_task: bool = False):
     output = []
     configs = []
     data = 'squad'
-    target_lms = LM
+    if multi_task:
+        target_lms = LM_MULTITASK
+    else:
+        target_lms = LM
     for lm in target_lms:
-        _metric, config, model_link = get_metric(model=lm, train_data=data)
+        _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=multi_task)
         metric = {
             "model": f"{model_link}",
             "language model": f"[`{lm}`](https://huggingface.co/{lm})",
@@ -157,7 +185,8 @@ def summary_ood():
                     train_data=k,
                     train_data_type=_v,
                     additional_prefix='vanilla',
-                    test_data_type=_v)
+                    test_data_type=_v,
+                    suffix='qg')
                 metric = {
                     "model": f"{model_link}",
                     "language model": f"[`{lm}`](https://huggingface.co/{lm})",
@@ -184,21 +213,21 @@ def summary_squad_ablation():
         output.append(metric)
 
         # sentence-level
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='no-paragraph')
+        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-no-paragraph')
         metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'sentence-level'}
         metric.update(_metric)
         output.append(metric)
         configs.append(config)
 
         # answer-free
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='no-answer')
+        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-no-answer')
         metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'answer-free'}
         metric.update(_metric)
         output.append(metric)
         configs.append(config)
 
         # no-parameter optimization
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='default')
+        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-default')
         metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'no-parameter-optimization'}
         metric.update(_metric)
         output.append(metric)
@@ -253,8 +282,16 @@ if __name__ == '__main__':
 
     all_config = []
 
+    df, c = summary(multi_task=True)
+    df.round(2).to_csv(pj('summary', 'squad_multitask.csv'), index=False)
+    all_config += c
+
     df, c = summary()
     df.round(2).to_csv(pj('summary', 'squad.csv'), index=False)
+    all_config += c
+
+    df, c = summary_ml(multi_task=True)
+    df.round(2).to_csv(pj('summary', 'mlqg_multitask.csv'), index=False)
     all_config += c
 
     df, c = summary_ml()
