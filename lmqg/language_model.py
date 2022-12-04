@@ -283,7 +283,10 @@ class TransformersQG:
 
         # flag if the model is answer extraction model
         if answer_extraction_model is None:
-            self.answer_extraction_model = 'answer-extraction' in model or 'ae' in model.split('-')
+            if "answer-extraction" in model or ('ae' in model.split('-') and 'qg' not in model.split('-')):
+                self.answer_extraction_model = True
+            else:
+                self.answer_extraction_model = False
         else:
             self.answer_extraction_model = answer_extraction_model
 

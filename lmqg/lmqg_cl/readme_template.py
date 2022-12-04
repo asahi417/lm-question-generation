@@ -341,7 +341,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question answering task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         _is_qa = True
     # Answer Extraction Models
-    elif "answer-extraction" in model_name or 'ae' in model_name.split('-'):
+    elif "answer-extraction" in model_name or ('ae' in model_name.split('-') and 'qg' not in model_name.split('-')):
         _sample = sample_ae_dict[la]
         eval_file = "metric.first.answer.paragraph_sentence.answer"
         metric_title = "Answer Extraction"
