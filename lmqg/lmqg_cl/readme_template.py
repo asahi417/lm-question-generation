@@ -149,6 +149,7 @@ language_dict = {
     "qg_frquad": 'fr',
     "qg_itquad": 'it',
     "qg_koquad": 'ko',
+    "qg_dequad": 'de',
     "qg_jaquad": 'ja',
     "qg_ruquad": 'ru',
     "qg_esquad": 'es',
