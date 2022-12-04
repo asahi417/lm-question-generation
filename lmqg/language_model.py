@@ -271,19 +271,19 @@ class TransformersQG:
 
         # flag if the model is question answering model
         if qa_model is None:
-            self.qa_model = 'question-answering' in model
+            self.qa_model = 'question-answering' in model or 'qa' in model.split('-')
         else:
             self.qa_model = qa_model
 
         # flag if the model is multitask QA generation
         if multitask_qag_model is None:
-            self.multitask_qag_model = 'multitask' in model.split('-')
+            self.multitask_qag_model = 'multitask' in model.split('-') or '-qg-ae-' in model
         else:
             self.multitask_qag_model = multitask_qag_model
 
         # flag if the model is answer extraction model
         if answer_extraction_model is None:
-            self.answer_extraction_model = 'answer-extraction' in model
+            self.answer_extraction_model = 'answer-extraction' in model or 'ae' in model.split('-')
         else:
             self.answer_extraction_model = answer_extraction_model
 

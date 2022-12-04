@@ -185,7 +185,6 @@ def evaluate(export_dir: str = '.',
                 return metric
     os.makedirs(export_dir, exist_ok=True)
 
-
     if model is not None:
         lm = TransformersQG(model,
                             max_length=max_length,

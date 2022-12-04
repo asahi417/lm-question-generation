@@ -365,7 +365,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         if 'np' in model_name.split('-'):
             add_info.append("This model is fine-tuned without a task prefix.")
     # QA Models
-    elif "question-answering" in model_name:
+    elif "question-answering" in model_name or 'qa' in model_name.split('-'):
         _sample = sample_qa_dict[la]
         eval_file = "metric.first.answer.paragraph_question.answer"
         metric_title = "Question Answering"
@@ -373,7 +373,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question answering task on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         _is_qa = True
     # Answer Extraction Models
-    elif "answer-extraction" in model_name:
+    elif "answer-extraction" in model_name or 'ae' in model_name.split('-'):
         _sample = sample_ae_dict[la]
         eval_file = "metric.first.answer.paragraph_sentence.answer"
         metric_title = "Answer Extraction"
@@ -382,7 +382,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         _is_ae = True
     # QG Models
     else:
-        if model_name.endswith('multitask'):
+        if model_name.endswith('multitask') or all(i in model_name.split('-') for i in ['qg' 'ae']):
             _is_multitask = True
             header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
         else:
@@ -396,8 +396,8 @@ def get_readme(model_name: str, model_checkpoint: str):
             elif model_name.endswith('default'):
                 add_info.append(version_description['default'])
 
-    if dataset_alias in ['qg_subjqa', 'qg_squadshifts'] and 'vanilla' not in model_name:
-        add_info.append(f"This model is continuously fine-tuned with [{language_model}](https://huggingface.co/{language_model}).")
+    # if dataset_alias in ['qg_subjqa', 'qg_squadshifts'] and 'vanilla' not in model_name:
+    #     add_info.append(f"This model is continuously fine-tuned  [{language_model}](https://huggingface.co/{language_model}).")
 
     _sample = [re.sub(r"\A\s+", "", i) for i in _sample]
     add_info = ' '.join(add_info)

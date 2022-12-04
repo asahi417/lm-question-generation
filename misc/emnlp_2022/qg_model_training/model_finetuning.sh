@@ -79,26 +79,26 @@ mlqg "mbart_large_cc25" "facebook/mbart-large-cc25" "4"
 finetuning_ss () {
   for DATA_TYPE in "new_wiki" "nyt" "reddit" "amazon"
   do
-    CKPT_FILE="lmqg_output/${2}_squadshifts_${DATA_TYPE}"
+    CKPT_FILE="lmqg_output/${2}-squadshifts-${DATA_TYPE}"
     lmqg-train-search -b "${3}" -g "${4}" "${5}" -d "lmqg/qg_squadshifts" --dataset-name "${DATA_TYPE}" -m "${1}" -c "${CKPT_FILE}" --n-max-config 1 --epoch-partial 1 -e 4
     lmqg-eval -m "${CKPT_FILE}/best_model" -e "${CKPT_FILE}/best_model/eval" --language "en" -d "lmqg/qg_squadshifts" -i "paragraph_answer" --prediction-aggregation "first" --prediction-level sentence --dataset-name "${DATA_TYPE}"
-    lmqg-push-to-hf -m "${CKPT_FILE}/best_model" -a "${6}-${DATA_TYPE}" -o "lmqg"
+    lmqg-push-to-hf -m "${CKPT_FILE}/best_model" -a "${6}-${DATA_TYPE}" -o "${7}"
     rm -rf "${6}-${DATA_TYPE}"
   done
   }
 
-finetuning_ss "lmqg/t5-large-squad" "qg_squadshifts/t5_large" "16" "4" "8" "t5-large-squadshifts"
-finetuning_ss "lmqg/t5-base-squad" "qg_squadshifts/t5_base" "8" "8" "16" "t5-base-squadshifts"
-finetuning_ss "lmqg/t5-small-squad" "qg_squadshifts/t5_small" "32" "2" "4" "t5-small-squadshifts"
-finetuning_ss "lmqg/bart-large-squad" "qg_squadshifts/bart_large" "32" "2" "4" "bart-large-squadshifts"
-finetuning_ss "lmqg/bart-base-squad" "qg_squadshifts/bart_base" "8" "8" "16" "bart-base-squadshifts"
+finetuning_ss "lmqg/t5-large-squad" "qg_squadshifts/t5-large" "16" "4" "8" "t5-large-squadsquadshifts" "lmqg"
+finetuning_ss "lmqg/t5-base-squad" "qg_squadshifts/t5-base" "8" "8" "16" "t5-base-squadshifts" "lmqg"
+finetuning_ss "lmqg/t5-small-squad" "qg_squadshifts/t5-small" "32" "2" "4" "t5-small-squadshifts" "lmqg"
+finetuning_ss "lmqg/bart-large-squad" "qg_squadshifts/bart-large" "32" "2" "4" "bart-large-squadshifts" "lmqg"
+finetuning_ss "lmqg/bart-base-squad" "qg_squadshifts/bart-base" "8" "8" "16" "bart-base-squadshifts" "lmqg"
 
-finetuning_ss "t5-large" "qg_squadshifts_vanilla/t5_large" "16" "4" "8" "t5-large-squadshifts-vanilla"
-finetuning_ss "t5-base" "qg_squadshifts_vanilla/t5_base" "8" "8" "16" "t5-base-squadshifts-vanilla"
-finetuning_ss "t5-small" "qg_squadshifts_vanilla/t5_small" "32" "2" "4" "t5-small-squadshifts-vanilla"
-finetuning_ss "facebook/bart-large" "qg_squadshifts_vanilla/bart_large" "32" "2" "4" "bart-large-squadshifts-vanilla"
-finetuning_ss "facebook/bart-base" "qg_squadshifts_vanilla/bart_base" "8" "8" "16" "bart-base-squadshifts-vanilla"
 
+finetuning_ss "t5-large" "qg_squadshifts_vanilla/t5-large" "16" "4" "8" "t5-large-squadshifts-vanilla-qg" "research-backup"
+finetuning_ss "t5-base" "qg_squadshifts_vanilla/t5-base" "8" "8" "16" "t5-base-squadshifts-vanilla-qg" "research-backup"
+finetuning_ss "t5-small" "qg_squadshifts_vanilla/t5-small" "32" "2" "4" "t5-small-squadshifts-vanilla-qg" "research-backup"
+finetuning_ss "facebook/bart-large" "qg_squadshifts_vanilla/bart-large" "32" "2" "4" "bart-large-squadshifts-vanilla-qg" "research-backup"
+finetuning_ss "facebook/bart-base" "qg_squadshifts_vanilla/bart-base" "8" "8" "16" "bart-base-squadshifts-vanilla-qg" "research-backup"
 
 ##########
 # SUBJQA #
@@ -109,22 +109,22 @@ finetuning_subjqa () {
     CKPT_FILE="lmqg_output/${2}_subjqa_${DATA_TYPE}"
     lmqg-train-search -b "${3}" -g "${4}" "${5}" -d "lmqg/qg_subjqa" --dataset-name "${DATA_TYPE}" -m "${1}" -p qg -c "${CKPT_FILE}" --n-max-config 1 --epoch-partial 1 -e 4
     lmqg-eval -m "${CKPT_FILE}/best_model" -e "${CKPT_FILE}/best_model/eval" --language "en" -d "lmqg/qg_subjqa" -i "paragraph_answer" --prediction-aggregation "first" --prediction-level sentence --dataset-name "${DATA_TYPE}"
-    lmqg-push-to-hf -m "${CKPT_FILE}/best_model" -a "${6}-${DATA_TYPE}" -o "lmqg"
+    lmqg-push-to-hf -m "${CKPT_FILE}/best_model" -a "${6}-${DATA_TYPE}" -o "${7}"
     rm -rf "${6}-${DATA_TYPE}"
   done
   }
 
-finetuning_subjqa "lmqg/t5-large-squad" "qg_subjqa/t5_large" "16" "4" "8" "t5-large-subjqa"
-finetuning_subjqa "lmqg/t5-base-squad" "qg_subjqa/t5_base" "16" "4" "8" "t5-base-subjqa"
-finetuning_subjqa "lmqg/t5-small-squad" "qg_subjqa/t5_small" "32" "2" "4" "t5-small-subjqa"
-finetuning_subjqa "lmqg/bart-large-squad" "qg_subjqa/bart_large" "8" "8" "16" "bart-large-subjqa"
-finetuning_subjqa "lmqg/bart-base-squad" "qg_subjqa/bart_base" "32" "2" "4" "bart-base-subjqa"
+finetuning_subjqa "lmqg/t5-large-squad" "qg_subjqa/t5_large" "16" "4" "8" "t5-large-subjqa" "lmqg"
+finetuning_subjqa "lmqg/t5-base-squad" "qg_subjqa/t5_base" "16" "4" "8" "t5-base-subjqa" "lmqg"
+finetuning_subjqa "lmqg/t5-small-squad" "qg_subjqa/t5_small" "32" "2" "4" "t5-small-subjqa" "lmqg"
+finetuning_subjqa "lmqg/bart-large-squad" "qg_subjqa/bart_large" "8" "8" "16" "bart-large-subjqa" "lmqg"
+finetuning_subjqa "lmqg/bart-base-squad" "qg_subjqa/bart_base" "32" "2" "4" "bart-base-subjqa" "lmqg"
 
-finetuning_subjqa "t5-large" "qg_subjqa_vanilla/t5_large" "16" "4" "8" "t5-large-subjqa-vanilla"
-finetuning_subjqa "t5-base" "qg_subjqa_vanilla/t5_base" "16" "4" "8" "t5-base-subjqa-vanilla"
-finetuning_subjqa "t5-small" "qg_subjqa_vanilla/t5_small" "32" "2" "4" "t5-small-subjqa-vanilla"
-finetuning_subjqa "facebook/bart-large" "qg_subjqa_vanilla/bart_large" "8" "8" "16" "bart-large-subjqa-vanilla"
-finetuning_subjqa "facebook/bart-base" "qg_subjqa_vanilla/bart_base" "8" "8" "16" "bart-base-subjqa-vanilla"
+finetuning_subjqa "t5-large" "qg_subjqa_vanilla/t5_large" "16" "4" "8" "t5-large-subjqa-vanilla-qg" "research-backup"
+finetuning_subjqa "t5-base" "qg_subjqa_vanilla/t5_base" "16" "4" "8" "t5-base-subjqa-vanilla-qg" "research-backup"
+finetuning_subjqa "t5-small" "qg_subjqa_vanilla/t5_small" "32" "2" "4" "t5-small-subjqa-vanilla-qg" "research-backup"
+finetuning_subjqa "facebook/bart-large" "qg_subjqa_vanilla/bart_large" "8" "8" "16" "bart-large-subjqa-vanilla-qg" "research-backup"
+finetuning_subjqa "facebook/bart-base" "qg_subjqa_vanilla/bart_base" "8" "8" "16" "bart-base-subjqa-vanilla-qg" "research-backup"
 
 
 ##################
@@ -134,18 +134,18 @@ for MODEL in "t5-small" "t5-base" "t5-large" "bart-base" "bart-large"
 do
 
   # Finetuning without paragraph
-  lmqg-train-search --max-length 128 --max-length-eval 128 -m "${MODEL}" -p qg -i 'sentence_answer' -o 'question' -b 2 -g 32 64 128 256 -c "lmqg_output/${MODEL}_squad_sentence_answer"
-  lmqg-eval -m "lmqg_output/${MODEL}_squad_sentence_answer/best_model" -e "lmqg_output/${MODEL}_squad_sentence_answer/best_model/eval" -d "lmqg/qg_squad" -i "sentence_answer" --prediction-aggregation "first" --prediction-level "sentence"
-  lmqg-push-to-hf -m "lmqg_output/${MODEL}_squad_sentence_answer/best_model" -a "${MODEL}-squad-no-paragraph" -o "lmqg"
+  lmqg-train-search --max-length 128 --max-length-eval 128 -m "${MODEL}" -p qg -i 'sentence_answer' -o 'question' -b 2 -g 32 64 128 256 -c "lmqg_output/${MODEL}-squad-qg-no-paragraph"
+  lmqg-eval -m "lmqg_output/${MODEL}-squad-qg-no-paragraph/best_model" -e "lmqg_output/${MODEL}-squad-qg-no-paragraph/best_model/eval" -d "lmqg/qg_squad" -i "sentence_answer" --prediction-aggregation "first" --prediction-level "sentence"
+  lmqg-push-to-hf -m "lmqg_output/${MODEL}-squad-qg-no-paragraph/best_model" -a "${MODEL}-squad-qg-no-paragraph" -o "research-backup"
 
   # Finetuning without answer
-  lmqg-train-search --max-length 128 --max-length-eval 128 -m "${MODEL}" -p qg -i 'paragraph_sentence' -o 'question' -b 2 -g 32 64 128 256 -c "lmqg_output/${MODEL}_squad_paragraph_sentence"
-  lmqg-eval -m "lmqg_output/${MODEL}_squad_paragraph_sentence/best_model" -e "lmqg_output/${MODEL}_squad_paragraph_sentence/best_model/eval" -d "lmqg/qg_squad" -i "paragraph_sentence" --prediction-aggregation "first" --prediction-level "sentence"
-  lmqg-push-to-hf -m "lmqg_output/${MODEL}_squad_paragraph_sentence/best_model" -a "${MODEL}-squad-no-answer" -o "lmqg"
+  lmqg-train-search --max-length 128 --max-length-eval 128 -m "${MODEL}" -p qg -i 'paragraph_sentence' -o 'question' -b 2 -g 32 64 128 256 -c "lmqg_output/${MODEL}-squad-qg-no-answer"
+  lmqg-eval -m "lmqg_output/${MODEL}-squad-qg-no-answer/best_model" -e "lmqg_output/${MODEL}-squad-qg-no-answer/best_model/eval" -d "lmqg/qg_squad" -i "paragraph_sentence" --prediction-aggregation "first" --prediction-level "sentence"
+  lmqg-push-to-hf -m "lmqg_output/${MODEL}-squad-qg-no-answer/best_model" -a "${MODEL}-squad-qg-no-answer" -o "research-backup"
 
   # Finetuning without parameter optimization
-  lmqg-train --epoch 10 -l 1.25e-5 --label-smoothing 0.1 -b 32 -g 1 -m "${MODEL}" -p qg -c "lmqg_output/${MODEL}_squad_default"
-  lmqg-eval -m "lmqg_output/${MODEL}_squad_default/best_model" -e "lmqg_output/${MODEL}_squad_default/best_model/eval" -d "lmqg/qg_squad" -i "paragraph_sentence" --prediction-aggregation "first" --prediction-level "sentence"
-  lmqg-push-to-hf -m "lmqg_output/${MODEL}_squad_default/best_model" -a "${MODEL}-squad-default" -o "lmqg"
+  lmqg-train --epoch 10 -l 1.25e-5 --label-smoothing 0.1 -b 32 -g 1 -m "${MODEL}" -p qg -c "lmqg_output/${MODEL}-squad-qg-default"
+  lmqg-eval -m "lmqg_output/${MODEL}-squad-qg-default/best_model" -e "lmqg_output/${MODEL}-squad-qg-default/best_model/eval" -d "lmqg/qg_squad" -i "paragraph_sentence" --prediction-aggregation "first" --prediction-level "sentence"
+  lmqg-push-to-hf -m "lmqg_output/${MODEL}-squad-qg-default/best_model" -a "${MODEL}-squad-qg-default" -o "research-backup"
 
 done
