@@ -195,33 +195,33 @@ def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_en
       value: {metric["test"]["AnswerExactMatch"]}"""
     if "QAAlignedF1Score (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedF1Score-BERTScore {"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_f1_score_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedF1Score-BERTScore ({metric_label}) {"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_bertscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedF1Score (BERTScore)"]}"""
     if "QAAlignedRecall (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedRecall-BERTScore {"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_recall_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedRecall-BERTScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_bertscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedRecall (BERTScore)"]}"""
     if "QAAlignedPrecision (BERTScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedPrecision-BERTScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_precision_bertscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedPrecision-BERTScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_bertscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedPrecision (BERTScore)"]}"""
     if "QAAlignedF1Score (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedF1Score-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_f1_score_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedF1Score-MoverScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_f1_score_moverscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedF1Score (MoverScore)"]}"""
     if "QAAlignedRecall (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedRecall-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_recall_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedRecall-MoverScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_recall_moverscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedRecall (MoverScore)"]}"""
     if "QAAlignedPrecision (MoverScore)" in metric['test']:
         tmp += f"""
-    - name: QAAlignedPrecision-MoverScore{"" if is_multitask or is_end2end else " (Gold Answer)"}
-      type: qa_aligned_precision_moverscore{"" if is_multitask or is_end2end else "_gold_answer"}
+    - name: QAAlignedPrecision-MoverScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
+      type: qa_aligned_precision_moverscore_{metric_label_type}{"" if is_multitask or is_end2end else "_gold_answer"}
       value: {metric["test"]["QAAlignedPrecision (MoverScore)"]}"""
     return tmp
 
