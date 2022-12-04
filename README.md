@@ -77,7 +77,7 @@ print(question)
 ```
 
 - ***Generate Question & Answer Pairs:*** Instead of specifying an answer, user can let QG model to generate an answer on the paragraph, and generate question on it sequentially.
-This functionality is only available for the QG models fine-tuned with answer extraction see [MODEL CARD](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction) for the full list of models with answer extraction (model alias usually has a suffix of `-multitask`).
+This functionality is only available for the QG models fine-tuned with answer extraction see [MODEL CARD](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md#models-with-answer-extraction) for the full list of models with answer extraction (model alias usually has a suffix of `-qg-ae`).
   
 ```python
 from lmqg import TransformersQG
