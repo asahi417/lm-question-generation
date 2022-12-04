@@ -332,8 +332,12 @@ def get_readme(model_name: str, model_checkpoint: str):
     _is_ae = False
     _is_multitask = False
 
+    # Multitask QAG Models
+    if model_name.endswith('multitask') or '-qg-ae' in model_name:
+        _is_multitask = True
+        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
     # E2E QAG Models
-    if 'qag' in model_name.split('-'):
+    elif 'qag' in model_name.split('-'):
         _sample = [re.sub(r'\s+', ' ', _sample[0].replace('<hl>', ''))]
         eval_file = "metric.first.answer.paragraph.questions_answers"
         metric_title = "Question & Answer Generation"
@@ -360,22 +364,15 @@ def get_readme(model_name: str, model_checkpoint: str):
         _is_ae = True
     # QG Models
     else:
-        if model_name.endswith('multitask') or all(i in model_name.split('-') for i in ['qg' 'ae']):
-            _is_multitask = True
-            header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
-        else:
-            if model_name.endswith('no-answer'):
-                _sample = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample]
-                add_info.append(version_description['no-answer'])
-                eval_file = "metric.first.sentence.paragraph_sentence.question"
-            elif model_name.endswith('no-paragraph'):
-                add_info.append(version_description['no-paragraph'])
-                eval_file = "metric.first.sentence.sentence_answer.question"
-            elif model_name.endswith('default'):
-                add_info.append(version_description['default'])
-
-    # if dataset_alias in ['qg_subjqa', 'qg_squadshifts'] and 'vanilla' not in model_name:
-    #     add_info.append(f"This model is continuously fine-tuned  [{language_model}](https://huggingface.co/{language_model}).")
+        if model_name.endswith('no-answer'):
+            _sample = ["<hl> " + re.sub(r'\s+', ' ', i.replace('<hl>', '')) + " <hl>" for i in _sample]
+            add_info.append(version_description['no-answer'])
+            eval_file = "metric.first.sentence.paragraph_sentence.question"
+        elif model_name.endswith('no-paragraph'):
+            add_info.append(version_description['no-paragraph'])
+            eval_file = "metric.first.sentence.sentence_answer.question"
+        elif model_name.endswith('default'):
+            add_info.append(version_description['default'])
 
     _sample = [re.sub(r"\A\s+", "", i) for i in _sample]
     add_info = ' '.join(add_info)
