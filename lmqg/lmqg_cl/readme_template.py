@@ -157,9 +157,7 @@ language_dict = {
 
 
 def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end):
-    tmp = """
-    metrics:
-    """
+    tmp = ""
     if "Bleu_4" in metric["test"]:
         tmp += f"""
     - name: BLEU4 ({metric_label})
@@ -246,7 +244,8 @@ def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_a
     dataset:
       name: {dataset}
       type: {dataset_type}
-      args: {dataset_type}"""
+      args: {dataset_type}
+    metrics:"""
     tmp += __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end)
     if metric_qag is not None:
         tmp += __format_metric(metric_qag, 'Question & Answer Generation', "question_answer_generation", is_multitask, is_end2end)
