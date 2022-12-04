@@ -335,7 +335,7 @@ def get_readme(model_name: str, model_checkpoint: str):
     # Multitask QAG Models
     if model_name.endswith('multitask') or '-qg-ae' in model_name:
         _is_multitask = True
-        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation task and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
+        header = f"This model is fine-tuned version of [{language_model}](https://huggingface.co/{language_model}) for question generation and answer extraction jointly on the [{dataset}](https://huggingface.co/datasets/{dataset}) (dataset_name: {dataset_name}) via [`lmqg`](https://github.com/asahi417/lm-question-generation)."
     # E2E QAG Models
     elif 'qag' in model_name.split('-'):
         _sample = [re.sub(r'\s+', ' ', _sample[0].replace('<hl>', ''))]
