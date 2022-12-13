@@ -1,0 +1,6 @@
+dataset_path,dataset_name,input_types,output_types,prefix_types,model,max_length,max_length_output,epoch,batch,lr,fp16,random_seed,gradient_accumulation_steps,label_smoothing
+lmqg/qg_tweetqa,default,['paragraph_question'],['answer'],,t5-small,512,32,7,64,0.0001,False,1,1,0.0
+lmqg/qg_tweetqa,default,['paragraph_question'],['answer'],,t5-base,512,32,10,32,0.0001,False,1,2,0.15
+lmqg/qg_tweetqa,default,['paragraph_question'],['answer'],,t5-large,512,32,6,16,5e-05,False,1,4,0.15
+lmqg/qg_tweetqa,default,['paragraph_question'],['answer'],,facebook/bart-base,512,32,3,32,0.0001,False,1,2,0.15
+lmqg/qg_tweetqa,default,['paragraph_question'],['answer'],,facebook/bart-large,512,32,6,32,1e-05,False,1,2,0.15

@@ -14,8 +14,8 @@ lmqg-eval -m "lmqg_output/bart-base-tweetqa-qa/best_model" -e "lmqg_output/bart-
 lmqg-eval-qa -m "lmqg_output/bart-base-tweetqa-qa/best_model" -e "lmqg_output/bart-base-tweetqa-qa/best_model/eval" -d "lmqg/qg_tweetqa" --language "en"
 lmqg-push-to-hf -m "lmqg_output/bart-base-tweetqa-qa/best_model" -a "bart-base-tweetqa-qa" -o "lmqg"
 
-# TODO
-lmqg-train-search -m "t5-large" -d "lmqg/qg_tweetqa" -b 32 -g 2 4 -c "lmqg_output/t5-large-tweetqa-qa" -i 'paragraph_question' -o 'answer'
+
+lmqg-train-search -m "t5-large" -d "lmqg/qg_tweetqa" -b 16 -g 4 8 -c "lmqg_output/t5-large-tweetqa-qa" -i 'paragraph_question' -o 'answer'
 lmqg-eval -m "lmqg_output/t5-large-tweetqa-qa/best_model" -e "lmqg_output/t5-large-tweetqa-qa/best_model/eval" -d "lmqg/qg_tweetqa" -i 'paragraph_question' -o 'answer'
 lmqg-eval-qa -m "lmqg_output/t5-large-tweetqa-qa/best_model" -e "lmqg_output/t5-large-tweetqa-qa/best_model/eval" -d "lmqg/qg_tweetqa" --language "en"
 lmqg-push-to-hf -m "lmqg_output/t5-large-tweetqa-qa/best_model" -a "t5-large-tweetqa-qa" -o "lmqg"
