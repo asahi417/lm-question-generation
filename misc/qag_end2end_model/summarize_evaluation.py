@@ -8,12 +8,12 @@ import pandas as pd
 
 LM = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
 DATA = ['tweetqa']
-METRIC_PERC = ["AnswerF1Score", "AnswerExactMatch"]
 TMP_DIR = 'metric_files'
 EXPORT_DIR = "summary"
 os.makedirs(TMP_DIR, exist_ok=True)
 os.makedirs(EXPORT_DIR, exist_ok=True)
-def url_pattern(x): return f"metric.first.answer.paragraph_question.answer.lmqg_qg_{x}.default.json"
+def url_pattern(m, d): return f"https://huggingface.co/lmqg/{m}-{d}-qag/raw/main/eval/metric.first.answer.paragraph.questions_answers.lmqg_qag_{d}.default.json"
+def url_pattern_config(m, d): return f"https://huggingface.co/lmqg/{m}-{d}-qag/raw/main/trainer_config.json"
 
 
 def download(filename, url):
@@ -22,6 +22,7 @@ def download(filename, url):
             json.load(f)
     except Exception:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
+        print(url)
         with open(filename, "wb") as f:
             r = requests.get(url)
             f.write(r.content)
@@ -30,20 +31,15 @@ def download(filename, url):
     return tmp
 
 
-def get_qa_metric(account: str = 'lmqg', model: str = 't5-small', data: str = 'tweetqa'):
-    model = f'{model}-{data}-qa'
-    url = f"https://huggingface.co/{account}/{model}/raw/main/eval/{url_pattern(data)}"
-    print(url)
-    tmp = download(pj(TMP_DIR, f'{account}.{model}.{data}.json'), url)
-    url = f"https://huggingface.co/{account}/{model}/raw/main/trainer_config.json"
-    config = download(pj(TMP_DIR, f'config.{account}.{model}.{data}.json'), url)
+def get_qag_metric(account: str = 'lmqg', model: str = 't5-small', data: str = 'tweetqa'):
+    tmp = download(pj(TMP_DIR, f'{account}.{model}.{data}.json'), url_pattern(model, data))
     metric = {
-        "Model": f"[`{account}/{model}`](https://huggingface.co/{account}/{model})",
-        "Data": f"[`{account}/qg_{data}`](https://huggingface.co/datasets/{account}/qag_{data})"
+        "Model": f"[`{account}/{model}-{data}-qag`](https://huggingface.co/{account}/{model}-{data}-qag)",
+        "Data": f"[`{account}/qag_{data}`](https://huggingface.co/datasets/{account}/qag_{data})"
     }
     metric.update(
-        {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in sorted(tmp['test'].keys())})
-
+        {k: 100 * tmp['test'][k] for k in sorted(tmp['test'].keys())})
+    config = download(pj(TMP_DIR, f'config.{account}.{model}.{data}.json'), url_pattern_config(model, data))
     return metric, config
 
 
@@ -52,7 +48,7 @@ if __name__ == '__main__':
     configs = []
     for _lm in LM:
         for _d in DATA:
-            _metric, _config = get_qa_metric(model=os.path.basename(_lm), data=_d)
+            _metric, _config = get_qag_metric(model=os.path.basename(_lm), data=_d)
             _metric['BLEU-1'] = _metric.pop('Bleu_1')
             _metric['BLEU-2'] = _metric.pop('Bleu_2')
             _metric['BLEU-3'] = _metric.pop('Bleu_3')

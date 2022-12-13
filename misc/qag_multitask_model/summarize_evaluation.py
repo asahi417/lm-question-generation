@@ -1,3 +1,4 @@
+""" Get Basic Evaluation Metric for QG/AE/QA """
 import os
 import json
 import requests
@@ -15,6 +16,7 @@ TYPES = {
     'squadshifts': ["new_wiki", "nyt", "reddit", "amazon"]
 }
 TMP_DIR = 'metric_files'
+EXPORT_DIR = "summary"
 
 
 def download(filename, url):
@@ -37,7 +39,9 @@ def get_metric(account: str = 'lmqg',
                train_data_type: str = None,
                test_data: str = None,
                test_data_type: str = 'default',
-               answer_model: bool = False,
+               ae_mode: bool = False,
+               qg_mode: bool = False,
+               vanilla_mode: bool = False,
                additional_prefix: str = None,
                suffix: str = None):
     model = os.path.basename(model)
@@ -47,7 +51,7 @@ def get_metric(account: str = 'lmqg',
     if train_data_type is not None and train_data_type != 'default':
         model = f'{model}-{train_data_type}'
     if answer_model:
-        model = f'{model}-multitask'
+        model = f'{model}-qg-ae'
     else:
         model = f'{model}-qg'
     if suffix is not None:
@@ -126,10 +130,7 @@ def summary(multi_task: bool = False):
     output = []
     configs = []
     data = 'squad'
-    if multi_task:
-        target_lms = LM_MULTITASK
-    else:
-        target_lms = LM
+    target_lms = LM_MULTITASK if multi_task else LM
     for lm in target_lms:
         _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=multi_task)
         metric = {
@@ -278,32 +279,32 @@ def config_formatting(df_config):
 
 
 if __name__ == '__main__':
-    os.makedirs('summary', exist_ok=True)
+    os.makedirs(EXPORT_DIR, exist_ok=True)
 
     all_config = []
 
     df, c = summary(multi_task=True)
-    df.round(2).to_csv(pj('summary', 'squad_multitask.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_multitask.csv'), index=False)
     all_config += c
 
     df, c = summary()
-    df.round(2).to_csv(pj('summary', 'squad.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'squad.csv'), index=False)
     all_config += c
 
     df, c = summary_ml(multi_task=True)
-    df.round(2).to_csv(pj('summary', 'mlqg_multitask.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'mlqg_multitask.csv'), index=False)
     all_config += c
 
     df, c = summary_ml()
-    df.round(2).to_csv(pj('summary', 'mlqg.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'mlqg.csv'), index=False)
     all_config += c
 
     df, c = summary_ood()
-    df.round(2).to_csv(pj('summary', 'squad_ood.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_ood.csv'), index=False)
     all_config += c
 
     df, c = summary_squad_ablation()
-    df.round(2).to_csv(pj('summary', 'squad_ablation.csv'), index=False)
+    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_ablation.csv'), index=False)
     all_config += c
 
     os.makedirs('config', exist_ok=True)
