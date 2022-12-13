@@ -39,7 +39,7 @@ def get_qa_metric(account: str = 'lmqg', model: str = 't5-small', data: str = 't
     config = download(pj(TMP_DIR, f'config.{account}.{model}.{data}.json'), url)
     metric = {
         "Model": f"[`{account}/{model}`](https://huggingface.co/{account}/{model})",
-        "Data": f"[`{account}/qag_{data}`](https://huggingface.co/datasets/{account}/qag_{data})"
+        "Data": f"[`{account}/qg_{data}`](https://huggingface.co/datasets/{account}/qag_{data})"
     }
     metric.update(
         {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in sorted(tmp['test'].keys())})
