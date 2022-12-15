@@ -7,7 +7,6 @@ import random
 from os.path import join as pj
 from glob import glob
 from typing import List
-import gc
 import torch
 
 from .language_model import TransformersQG

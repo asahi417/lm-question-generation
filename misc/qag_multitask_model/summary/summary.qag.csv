@@ -1,0 +1,21 @@
+Model,Data,Type,Language Model,QAAlignedF1Score (BERTScore),QAAlignedF1Score (MoverScore),QAAlignedPrecision (BERTScore),QAAlignedPrecision (MoverScore),QAAlignedRecall (BERTScore),QAAlignedRecall (MoverScore)
+lmqg/t5-small-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-small,91.74,63.23,91.49,63.26,92.01,63.29
+lmqg/t5-base-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-base,92.53,64.23,92.35,64.33,92.74,64.23
+lmqg/t5-large-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-large,92.87,64.67,92.72,64.82,93.04,64.63
+lmqg/t5-small-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-small,91.74,63.23,91.49,63.26,92.01,63.29
+lmqg/t5-base-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-base,92.53,64.23,92.35,64.33,92.74,64.23
+lmqg/t5-large-squad-qg-ae,lmqg/qg_squad,QG-AE,t5-large,92.87,64.67,92.72,64.82,93.04,64.63
+lmqg/mt5-small-ruquad-qg-ae,lmqg/qg_ruquad,QG-AE,mt5-small,79.74,56.69,76.15,54.11,83.83,59.79
+lmqg/mt5-base-ruquad-qg-ae,lmqg/qg_ruquad,QG-AE,mt5-base,80.21,57.17,76.48,54.4,84.49,60.55
+lmqg/mt5-small-jaquad-qg-ae,lmqg/qg_jaquad,QG-AE,mt5-small,80.51,56.28,80.51,56.28,80.51,56.28
+lmqg/mt5-base-jaquad-qg-ae,lmqg/qg_jaquad,QG-AE,mt5-base,80.35,56.23,77.28,54.02,83.79,58.81
+lmqg/mt5-small-itquad-qg-ae,lmqg/qg_itquad,QG-AE,mt5-small,81.81,56.02,81.17,55.76,82.51,56.32
+lmqg/mt5-base-itquad-qg-ae,lmqg/qg_itquad,QG-AE,mt5-base,81.98,56.35,81.19,56.0,82.83,56.75
+lmqg/mt5-small-koquad-qg-ae,lmqg/qg_koquad,QG-AE,mt5-small,80.36,82.55,77.34,78.93,83.72,86.69
+lmqg/mt5-base-koquad-qg-ae,lmqg/qg_koquad,QG-AE,mt5-base,80.28,81.97,77.03,78.1,83.91,86.43
+lmqg/mt5-small-esquad-qg-ae,lmqg/qg_esquad,QG-AE,mt5-small,79.06,54.49,76.46,52.96,81.94,56.21
+lmqg/mt5-base-esquad-qg-ae,lmqg/qg_esquad,QG-AE,mt5-base,79.67,54.82,77.14,53.27,82.44,56.56
+lmqg/mt5-small-dequad-qg-ae,lmqg/qg_dequad,QG-AE,mt5-small,80.02,53.99,78.91,53.77,81.23,54.27
+lmqg/mt5-base-dequad-qg-ae,lmqg/qg_dequad,QG-AE,mt5-base,6.11,4.24,6.3,4.34,5.95,4.15
+lmqg/mt5-small-frquad-qg-ae,lmqg/qg_frquad,QG-AE,mt5-small,79.7,54.22,77.29,52.84,82.36,55.76
+lmqg/mt5-base-frquad-qg-ae,lmqg/qg_frquad,QG-AE,mt5-base,79.16,53.9,76.69,52.57,81.87,55.36

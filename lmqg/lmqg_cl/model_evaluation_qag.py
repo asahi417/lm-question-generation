@@ -16,7 +16,8 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 
 def get_options():
     parser = argparse.ArgumentParser(description='QAG evaluation.')
-    parser.add_argument('-m', '--model-checkpoint', default=None, type=str)
+    parser.add_argument('-m', '--model', default=None, type=str)
+    parser.add_argument('--model-ae', default=None, type=str)
     parser.add_argument('--max-length', default=512, type=int, help='')
     parser.add_argument('--max-length-output', default=256, type=int, help='')
     parser.add_argument('-d', '--dataset-path', help='huggingface datasets alias', default='lmqg/qg_squad', type=str)
@@ -32,6 +33,7 @@ def get_options():
     parser.add_argument('--hyp-dev', default=None, type=str)
     parser.add_argument('--overwrite-prediction', help='', action='store_true')
     parser.add_argument('--overwrite-metric', help='', action='store_true')
+    parser.add_argument('--use-reference-answer', action='store_true')
     return parser.parse_args()
 
 
@@ -54,8 +56,9 @@ def main():
     ]
 
     def load_model():
-        if opt.model_checkpoint is not None:
-            _model = TransformersQG(opt.model_checkpoint,
+        if opt.model is not None:
+            _model = TransformersQG(opt.model,
+                                    model_ae=opt.model_ae,
                                     skip_overflow_error=True,
                                     drop_answer_error_text=True,
                                     language=opt.language,
@@ -64,10 +67,15 @@ def main():
                                     use_auth_token=opt.use_auth_token)
             _model.eval()
             return _model
-        raise ValueError(f"require `-m` or `--model-checkpoint`")
+        raise ValueError(f"require `-m` or `--model`")
 
-    metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
-                  f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.json"
+    if opt.model_ae is not None:
+        metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
+                      f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}." \
+                      f"{opt.model_ae.replace('/', '_')}.json"
+    else:
+        metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
+                      f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.json"
     if os.path.exists(metric_file):
         with open(metric_file) as f:
             output = json.load(f)
@@ -75,8 +83,15 @@ def main():
         output = {}
 
     for _split, _file in zip([opt.test_split, opt.validation_split], [opt.hyp_test, opt.hyp_dev]):
-        _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
-                f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.txt" if _file is None else _file
+        if _file is None:
+            if opt.model_ae is not None:
+                _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
+                        f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}." \
+                        f"{opt.model_ae.replace('/', '_')}.txt"
+            else:
+                _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
+                        f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.txt"
+
         logging.info(f'generate qa for split {_split}')
         if _split not in output:
             output[_split] = {}
@@ -107,7 +122,7 @@ def main():
         if prediction is None:
             model = load_model()
             # model prediction
-            if model.multitask_qag_model:
+            if not opt.use_reference_answer:
                 logging.info("model prediction: (multitask model)")
                 prediction = model.generate_qa(
                     list_context=model_input,

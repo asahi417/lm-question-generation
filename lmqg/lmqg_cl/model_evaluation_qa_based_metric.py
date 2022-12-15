@@ -60,12 +60,12 @@ def main_qa_model_training():
 
 def main_generate_qa_pair():
     parser = argparse.ArgumentParser(description='Generate QA pseudo dataset.')
-    parser.add_argument('-m', '--qg-model', default='lmqg/t5-small-squad-multitask', type=str)
+    parser.add_argument('-m', '--model-qg', default='lmqg/t5-small-squad-multitask', type=str)
+    parser.add_argument('--model-ae', default='lmqg/t5-small-squad-multitask', type=str)
     parser.add_argument('-l', '--language', default='en', type=str)
     parser.add_argument('-d', '--anchor-data', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--anchor-data-name', default='new_wiki', type=str)
-    parser.add_argument('--answer-model', default=None, type=str)
-    parser.add_argument('-a', '--answer-extraction', action='store_true')
+    parser.add_argument('--use-reference-answer', action='store_true')
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('-b', '--batch-size', default=256, type=int)
     parser.add_argument('-e', '--export-dir', default='tmp_output', type=str)
@@ -74,12 +74,12 @@ def main_generate_qa_pair():
     parser.add_argument('--compute-ppl', action='store_true')
     opt = parser.parse_args()
     qa_pairs = generate_qa_pairs(
-        qg_model=opt.qg_model,
+        model_qg=opt.model_qg,
+        model_ae=opt.model_ae,
         language=opt.language,
         anchor_data=opt.anchor_data,
         anchor_data_name=opt.anchor_data_name,
-        answer_extraction=opt.answer_extraction,
-        answer_model=opt.answer_model,
+        use_reference_answer=opt.use_reference_answer,
         batch_size=opt.batch_size,
         export_dir=opt.export_dir,
         overwrite=opt.overwrite,

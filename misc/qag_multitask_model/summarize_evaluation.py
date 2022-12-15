@@ -2,21 +2,28 @@
 import os
 import json
 import requests
+from itertools import product
 from os.path import join as pj
 import pandas as pd
 
+DATA = ['squad']
+LM_QG = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
+LM_AE = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
+LM_QG_AE = ['t5-small', 't5-base', 't5-large']
 
-LM = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
-LM_MULTITASK = ['t5-small', 't5-base', 't5-large']
-ML_LM = ['mt5-small', 'mt5-base', 'facebook/mbart-large-cc25']
-ML_LM_MULTITASK = ['mt5-small']
-ML = ['squad', 'ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
-TYPES = {
-    'subjqa': ["books", "electronics", "grocery", "movies", "restaurants", "tripadvisor"],
-    'squadshifts': ["new_wiki", "nyt", "reddit", "amazon"]
-}
+DATA_ML = ['ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
+LM_QG_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
+LM_AE_ML = []
+LM_QG_AE_ML = ['mt5-small', 'mt5-base']
+
+METRIC_PERC = ["AnswerF1Score", "AnswerExactMatch"]
 TMP_DIR = 'metric_files'
 EXPORT_DIR = "summary"
+os.makedirs(TMP_DIR, exist_ok=True)
+os.makedirs(EXPORT_DIR, exist_ok=True)
+def url_ae(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph_sentence.answer.lmqg_qg_{d}.default.json"
+def url_qg(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.sentence.paragraph_answer.question.lmqg_qg_{d}.default.json"
+def url_qag(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph.questions_answers.lmqg_qg_{d}.default.json"
 
 
 def download(filename, url):
@@ -25,292 +32,131 @@ def download(filename, url):
             json.load(f)
     except Exception:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
+        print(url)
         with open(filename, "wb") as f:
             r = requests.get(url)
             f.write(r.content)
     with open(filename) as f:
-        tmp = json.load(f)
-    return tmp
-
-
-def get_metric(account: str = 'lmqg',
-               model: str = 't5-small',
-               train_data: str = 'squad',
-               train_data_type: str = None,
-               test_data: str = None,
-               test_data_type: str = 'default',
-               ae_mode: bool = False,
-               qg_mode: bool = False,
-               vanilla_mode: bool = False,
-               additional_prefix: str = None,
-               suffix: str = None):
-    model = os.path.basename(model)
-    model = f'{model}-{train_data}'
-    if additional_prefix is not None:
-        model = f'{model}-{additional_prefix}'
-    if train_data_type is not None and train_data_type != 'default':
-        model = f'{model}-{train_data_type}'
-    if answer_model:
-        model = f'{model}-qg-ae'
-    else:
-        model = f'{model}-qg'
-    if suffix is not None:
-        model = f'{model}-{suffix}'
-    evl = 'eval'
-    test = f'qg_{train_data}'
-    if test_data is not None:
-        evl = f"{evl}_ood"
-        test = f'qg_{test_data}'
-
-    model_link = f"[`{account}/{model}`](https://huggingface.co/{account}/{model})"
-    url = f"https://huggingface.co/{account}/{model}/raw/main/{evl}/" \
-          f"metric.first.sentence.paragraph_answer.question.lmqg_{test}.{test_data_type}.json"
-    print(url)
-    filename = pj(TMP_DIR, f'{account}.{model}.{evl}.{test}.{test_data_type}.json')
-    tmp = download(filename, url)
-
-    url = f"https://huggingface.co/{account}/{model}/raw/main/trainer_config.json"
-    filename = pj(TMP_DIR, f'config.{account}.{model}.{evl}.{test}.{test_data_type}.json')
-    config = download(filename, url)
-    return {k: 100 * v for k, v in tmp['test'].items()}, config, model_link
-
-
-def summary_ml(multi_task: bool = False):
-    output = []
-    configs = []
-    if multi_task:
-        target_lms = ML_LM_MULTITASK
-    else:
-        target_lms = ML_LM
-    for lm in target_lms:
-        for data in ML:
-            if data == 'squad' and multi_task:
-                continue
-            print(data, lm, multi_task)
-            # supervised result
-            _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=multi_task)
-            metric = {
-                "model": f"{model_link}",
-                "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                'training data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-                'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-                # 'answer_model': False
-            }
-            configs.append(config)
-            metric.update(_metric)
-            output.append(metric)
-            if data != 'squad' and not multi_task:
-                # if lm in ML_LM_MULTITASK:
-                #     # model with answer extraction
-                #     _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=True)
-                #     metric = {
-                #         "model": f"{model_link}",
-                #         "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                #         'training data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-                #         'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-                #         'answer_model': True
-                #     }
-                #     metric.update(_metric)
-                #     output.append(metric)
-                #     configs.append(config)
-                _metric, _, model_link = get_metric(model=lm, train_data='squad', test_data=data)
-                metric = {
-                    "model": f"{model_link}",
-                    "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                    'training data': f"[`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad)",
-                    'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-                    # 'answer_model': False
-                }
-                metric.update(_metric)
-                output.append(metric)
-    return pd.DataFrame(output), configs
-
-
-def summary(multi_task: bool = False):
-    output = []
-    configs = []
-    data = 'squad'
-    target_lms = LM_MULTITASK if multi_task else LM
-    for lm in target_lms:
-        _metric, config, model_link = get_metric(model=lm, train_data=data, answer_model=multi_task)
-        metric = {
-            "model": f"{model_link}",
-            "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-            'training data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-            'test data': f"[`lmqg/qg_{data}`](https://huggingface.co/datasets/lmqg/qg_{data})",
-            'test data type': 'default'
-        }
-        metric.update(_metric)
-        output.append(metric)
-        configs.append(config)
-    return pd.DataFrame(output), configs
-
-
-def summary_ood():
-    output = []
-    configs = []
-    for lm in LM:
-        for k, v in TYPES.items():
-            for _v in v:
-
-                # squad zeroshot
-                _metric, config, model_link = get_metric(model=lm, train_data='squad', test_data=k, test_data_type=_v)
-                metric = {
-                    "model": f"{model_link}",
-                    "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                    'training data': f"[`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad)",
-                    'test data': f"[`lmqg/qg_{k}`](https://huggingface.co/datasets/lmqg/qg_{k})",
-                    'test data type': _v
-                }
-                metric.update(_metric)
-                output.append(metric)
-
-                # squad + in-domain
-                _metric, config, model_link = get_metric(
-                    account='lmqg', model=lm, train_data=k, train_data_type=_v, test_data_type=_v)
-                metric = {
-                    "model": f"{model_link}",
-                    "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                    'training data': f"[`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) + [`lmqg/qg_{k}`](https://huggingface.co/datasets/lmqg/qg_{k})",
-                    'test data': f"[`lmqg/qg_{k}`](https://huggingface.co/datasets/lmqg/qg_{k})",
-                    'test data type': _v
-                }
-                metric.update(_metric)
-                output.append(metric)
-                configs.append(config)
-
-                # in-domain
-                _metric, config, model_link = get_metric(
-                    account='research-backup',
-                    model=lm,
-                    train_data=k,
-                    train_data_type=_v,
-                    additional_prefix='vanilla',
-                    test_data_type=_v,
-                    suffix='qg')
-                metric = {
-                    "model": f"{model_link}",
-                    "language model": f"[`{lm}`](https://huggingface.co/{lm})",
-                    'training data': f"[`lmqg/qg_{k}`](https://huggingface.co/datasets/lmqg/qg_{k})",
-                    'test data': f"[`lmqg/qg_{k}`](https://huggingface.co/datasets/lmqg/qg_{k})",
-                    'test data type': _v
-                }
-                metric.update(_metric)
-                output.append(metric)
-                configs.append(config)
-
-    return pd.DataFrame(output), configs
-
-
-def summary_squad_ablation():
-    output = []
-    configs = []
-    for lm in LM:
-
-        # paragraph-level
-        _metric, config, model_link = get_metric(model=lm, train_data='squad')
-        metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'paragraph-level'}
-        metric.update(_metric)
-        output.append(metric)
-
-        # sentence-level
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-no-paragraph')
-        metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'sentence-level'}
-        metric.update(_metric)
-        output.append(metric)
-        configs.append(config)
-
-        # answer-free
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-no-answer')
-        metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'answer-free'}
-        metric.update(_metric)
-        output.append(metric)
-        configs.append(config)
-
-        # no-parameter optimization
-        _metric, config, model_link = get_metric(account='research-backup', model=lm, train_data='squad', suffix='qg-default')
-        metric = {"model": f"{model_link}", "language model": f"[`{lm}`](https://huggingface.co/{lm})", 'type': 'no-parameter-optimization'}
-        metric.update(_metric)
-        output.append(metric)
-
-    return pd.DataFrame(output), configs
-
-
-def config_formatting(df_config):
-    pretty_name = {
-        'lmqg/qg_squad': 'SQuAD', 'lmqg/qg_ruquad': 'MLQG-Ru', 'lmqg/qg_jaquad': 'MLQG-Ja',
-        'lmqg/qg_itquad': 'MLQG-It', 'lmqg/qg_koquad': 'MLQG-Ko', 'lmqg/qg_esquad': 'MLQG-Es',
-        'lmqg/qg_dequad': 'MLQG-De', 'lmqg/qg_frquad': 'MLQG-Fr', 'lmqg/qg_subjqa': 'SubjQA',
-        'lmqg/qg_squadshifts': 'SQuADShifts'
-    }
-    # print(df_config)
-    df_config.pop('fp16')
-    df_config.pop('max_length')
-    df_config.pop('max_length_output')
-    df_config.pop('prefix_types')
-    df_config.pop('random_seed')
-    df_config['type'] = 'paragraph-level QG'
-    df_config['Dataset'] = [pretty_name[i] for i in df_config.pop('dataset_path')]
-    input_types = df_config.pop('input_types')
-    output_types = df_config.pop('output_types')
-    df_config['type'][['sentence_answer' in i for i in input_types]] = 'sentence-level QG'
-    df_config['type'][['paragraph_sentence' in i and 'answer' not in o for i, o in zip(input_types, output_types)]] = 'answer-free QG'
-    df_config['type'][['answer' in i for i in output_types]] = 'multitask QG'
-    df_config = df_config[[i != 'multitask QG' for i in df_config['type']]]
-
-    # SQuAD/MLQG
-    df_config_mlqg = df_config[['MLQG' in i or 'SQuAD' == i for i in df_config['Dataset']]]
-    df_config_mlqg.pop('dataset_name')
-    df_config_mlqg = df_config_mlqg.sort_values(by=['Dataset', 'model', 'type'])
-
-    # SubjQA
-    df_config_subjqa = df_config[[i == 'SubjQA' for i in df_config['Dataset']]]
-    df_config_subjqa.pop('Dataset')
-    df_config_subjqa.pop('type')
-    df_config_subjqa = df_config_subjqa.sort_values(by=['model', 'dataset_name'])
-
-    # SQuADShifts
-    df_config_ss = df_config[[i == 'SQuADShifts' for i in df_config['Dataset']]]
-    df_config_ss.pop('Dataset')
-    df_config_ss.pop('type')
-    df_config_ss = df_config_ss.sort_values(by=['model', 'dataset_name'])
-
-    return df_config_mlqg, df_config_subjqa, df_config_ss
+        return json.load(f)
 
 
 if __name__ == '__main__':
-    os.makedirs(EXPORT_DIR, exist_ok=True)
 
-    all_config = []
+    metrics_ae = []
+    metrics_qg = []
+    metrics_qag = []
+    for _d, _lm in product(DATA, LM_AE):
+        _m = os.path.basename(_lm)
+        _metric = {
+            "Model": f"[`lmqg/{os.path.basename(_m)}-{_d}-ae`](https://huggingface.co/lmqg/{_m}-{_d}-ae)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "AE",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.ae.ae.json'), url_ae(_m, _d, 'ae'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_ae.append(_metric)
 
-    df, c = summary(multi_task=True)
-    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_multitask.csv'), index=False)
-    all_config += c
+    for _d, _lm in list(product(DATA, LM_QG)) + list(product(DATA_ML, LM_QG_ML)):
+        _m = os.path.basename(_lm)
+        _metric = {
+            "Model": f"[`lmqg/{_m}-{_d}-qg`](https://huggingface.co/lmqg/{_m}-{_d}-qg)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "QG",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg.qg.json'), url_qg(_m, _d, 'qg'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_qg.append(_metric)
 
-    df, c = summary()
-    df.round(2).to_csv(pj(EXPORT_DIR, 'squad.csv'), index=False)
-    all_config += c
+        if _m in LM_QG_AE:
+            _metric = {
+                "Model": f"[`lmqg/{_m}-{_d}-qg-ae`](https://huggingface.co/lmqg/{_m}-{_d}-qg-ae)",
+                "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+                "Type": "Multitask",
+                "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+            }
+            tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.qag.json'), url_qag(_m, _d, 'qg-ae'))
+            _metric.update(
+                {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+                 sorted(tmp['test'].keys())})
+            metrics_qag.append(_metric)
 
-    df, c = summary_ml(multi_task=True)
-    df.round(2).to_csv(pj(EXPORT_DIR, 'mlqg_multitask.csv'), index=False)
-    all_config += c
+    for _d, _lm in list(product(DATA, LM_QG_AE)) + list(product(DATA_ML, LM_QG_AE_ML)):
+        _m = os.path.basename(_lm)
 
-    df, c = summary_ml()
-    df.round(2).to_csv(pj(EXPORT_DIR, 'mlqg.csv'), index=False)
-    all_config += c
+        _metric = {
+            "Model": f"[`lmqg/{_m}-{_d}-qg-ae`](https://huggingface.co/lmqg/{_m}-{_d}-qg-ae)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "Multitask",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.ae.json'), url_ae(_m, _d, 'qg-ae'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_ae.append(_metric)
 
-    df, c = summary_ood()
-    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_ood.csv'), index=False)
-    all_config += c
+        _metric = {
+            "Model": f"[`lmqg/{_m}-{_d}-qg-ae`](https://huggingface.co/lmqg/{_m}-{_d}-qg-ae)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "Multitask",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.qg.json'), url_qg(_m, _d, 'qg-ae'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_qg.append(_metric)
 
-    df, c = summary_squad_ablation()
-    df.round(2).to_csv(pj(EXPORT_DIR, 'squad_ablation.csv'), index=False)
-    all_config += c
+        _metric = {
+            "Model": f"[`lmqg/{_m}-{_d}-qg-ae`](https://huggingface.co/lmqg/{_m}-{_d}-qg-ae)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "Multitask",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.qag.json'), url_qag(_m, _d, 'qg-ae'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_qag.append(_metric)
 
-    os.makedirs('config', exist_ok=True)
+    df = pd.DataFrame(metrics_ae).round(2)
+    df['BLEU-1'] = df.pop('Bleu_1')
+    df['BLEU-2'] = df.pop('Bleu_2')
+    df['BLEU-3'] = df.pop('Bleu_3')
+    df['BLEU-4'] = df.pop('Bleu_4')
+    df['ROUGE-L'] = df.pop('ROUGE_L')
+    print('- Answer Extraction\n')
+    print(df.to_markdown(index=False), '\n\n')
+    df['Model'] = [i.split("`")[1] for i in df['Model']]
+    df['Data'] = [i.split("`")[1] for i in df['Data']]
+    df['Language Model'] = [i.split("`")[1] for i in df['Language Model']]
+    df.to_csv(pj(EXPORT_DIR, "summary.ae.csv"), index=False)
 
-    df = pd.DataFrame(all_config)
-    c_ml, c_sub, c_ss = config_formatting(df)
-    c_ml.to_csv(pj('config', 'main.csv'), index=False)
-    c_sub.to_csv(pj('config', 'subjqa.csv'), index=False)
-    c_ss.to_csv(pj('config', 'squadshifts.csv'), index=False)
+    df = pd.DataFrame(metrics_qg).round(2)
+    df['BLEU-1'] = df.pop('Bleu_1')
+    df['BLEU-2'] = df.pop('Bleu_2')
+    df['BLEU-3'] = df.pop('Bleu_3')
+    df['BLEU-4'] = df.pop('Bleu_4')
+    df['ROUGE-L'] = df.pop('ROUGE_L')
+    print('- Question Generation\n')
+    print(df.to_markdown(index=False), '\n\n')
+    df['Model'] = [i.split("`")[1] for i in df['Model']]
+    df['Data'] = [i.split("`")[1] for i in df['Data']]
+    df['Language Model'] = [i.split("`")[1] for i in df['Language Model']]
+    df.to_csv(pj(EXPORT_DIR, "summary.qg.csv"), index=False)
+
+    df = pd.DataFrame(metrics_qag).round(2)
+    print('- Question & Answer Pairs Generation\n')
+    print(df.to_markdown(index=False), '\n\n')
+    df['Model'] = [i.split("`")[1] for i in df['Model']]
+    df['Data'] = [i.split("`")[1] for i in df['Data']]
+    df['Language Model'] = [i.split("`")[1] for i in df['Language Model']]
+    df.to_csv(pj(EXPORT_DIR, "summary.qag.csv"), index=False)
+
+

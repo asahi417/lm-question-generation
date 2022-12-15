@@ -1,4 +1,6 @@
-""" Language model for Huggingface inference API. """
+""" Language model for Huggingface inference API.
+TODO: enable pipeline & end2end methods, NER keywording
+"""
 import requests
 import json
 import logging
