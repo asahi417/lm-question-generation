@@ -437,8 +437,11 @@ class TransformersQG:
         list_question = [list_question[list_length[n - 1]:list_length[n]] for n in range(1, len(list_length))]
         list_answer = [qg_hl[list_length[n - 1]:list_length[n]] for n in range(1, len(list_length))]
         output_list = [None] * original_input_length
-        for n in valid_context_id:
-            output_list[n] = [(q, a) for q, a in zip(list_question[n], list_answer[n])]
+        print(len(valid_context_id), valid_context_id[:10], valid_context_id[-10:0])
+        print(original_input_length)
+        print(len(list_question), len(list_answer))
+        for n, _id in enumerate(valid_context_id):
+            output_list[_id] = [(q, a) for q, a in zip(list_question[n], list_answer[n])]
         return output_list[0] if single_input else output_list
 
     def generate_a(self,

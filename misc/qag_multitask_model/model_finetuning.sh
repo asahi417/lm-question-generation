@@ -82,4 +82,12 @@ lmqg-push-to-hf -m "lmqg_output/bart-base-squad-ae/best_model" -a "bart-base-squ
 # Evaluate pipeline QAG: QG + QA models
 git clone "https://huggingface.co/lmqg/t5-small-squad-qg"
 lmqg-eval-qag -m "t5-small-squad-qg" --model-ae "lmqg/t5-small-squad-ae" -e "t5-small-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
-cd t5-small-squad-qg && git add . && git commit -m "eval pipeline" && git push && cd ..
+cd "t5-small-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..
+
+git clone "https://huggingface.co/lmqg/t5-base-squad-qg"
+lmqg-eval-qag -m "t5-base-squad-qg" --model-ae "lmqg/t5-base-squad-ae" -e "t5-base-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
+cd "t5-base-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..
+
+git clone "https://huggingface.co/lmqg/t5-large-squad-qg"
+lmqg-eval-qag -m "t5-large-squad-qg" --model-ae "lmqg/t5-large-squad-ae" -e "t5-large-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
+cd "t5-large-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..
