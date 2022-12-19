@@ -86,9 +86,9 @@ def main_generate_qa_pair():
         max_length=opt.max_length,
         max_length_output=opt.max_length)
     if opt.compute_ppl:
-        logging.info(f"Perplexity: `{opt.qg_model}`, data: `{opt.anchor_data}`, data_name: `{opt.anchor_data_name}`")
+        logging.info(f"Perplexity: `{opt.model_qg}`, data: `{opt.anchor_data}`, data_name: `{opt.anchor_data_name}`")
         anchor_data = load_dataset(opt.anchor_data, opt.anchor_data_name)
-        model = TransformersQG(opt.qg_model, max_length=opt.max_length, max_length_output=opt.max_length)
+        model = TransformersQG(opt.model_qg, max_length=opt.max_length, max_length_output=opt.max_length)
 
         for _split, dataset_split in qa_pairs.items():
             df = pd.DataFrame(dataset_split)
