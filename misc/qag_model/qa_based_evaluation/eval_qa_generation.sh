@@ -1,3 +1,4 @@
+# --compute-ppl
 ##############################################################
 # Generate Pseudo QA Dataset on SQuADShifts (Gold reference) #
 ##############################################################
@@ -6,7 +7,7 @@ qa_generation_squadshifts_ref () {
   BATCH=16
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-generate-qa --overwrite --use-reference-answer -m "lmqg/${ANCHOR_MODEL}-qg" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.${NAME}" --compute-ppl
+    lmqg-generate-qa --use-reference-answer -m "lmqg/${ANCHOR_MODEL}-qg" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.qg_reference.${NAME}"
   done
 }
 
@@ -24,7 +25,7 @@ qa_generation_squadshifts_pipeline () {
   BATCH=16
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-generate-qa --overwrite -m "lmqg/${ANCHOR_MODEL}-qg" --model-ae "lmqg/${ANCHOR_MODEL}-ae" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.pipeline.${NAME}" --compute-ppl
+    lmqg-generate-qa -m "lmqg/${ANCHOR_MODEL}-qg" --model-ae "lmqg/${ANCHOR_MODEL}-ae" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.pipeline.${NAME}"
   done
 }
 
@@ -42,7 +43,7 @@ qa_generation_squadshifts_end2end () {
   BATCH=16
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-generate-qa --overwrite -m "lmqg/${ANCHOR_MODEL}-qag" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.end2end.${NAME}" --compute-ppl
+    lmqg-generate-qa -m "lmqg/${ANCHOR_MODEL}-qag" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.end2end.${NAME}"
   done
 }
 
@@ -61,7 +62,7 @@ qa_generation_squadshifts_multitask () {
   BATCH=16
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-generate-qa --overwrite -m "lmqg/${ANCHOR_MODEL}-qg-ae" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.end2end.${NAME}" --compute-ppl
+    lmqg-generate-qa -m "lmqg/${ANCHOR_MODEL}-qg-ae" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_pseudo/${ANCHOR_MODEL}.multitask.${NAME}"
   done
 }
 

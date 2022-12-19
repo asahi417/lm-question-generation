@@ -1,85 +1,58 @@
-
-
-LM="distilbert-base-uncased"
-# QAE with Gold QA dataset
+# QAEval on Gold QA dataset
 for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
 do
-  lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/${LM}.qa_squadshifts.${NAME}"
+  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
 done
+
+for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
+do
+  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
+done
+
 
 # QAE with Generated Pseudo QA dataset
 QAE () {
-  LM="distilbert-base-uncased"
-  MODEL=${1}
-  EVAL_STEP=${2}
+  ANCHOR_MODEL=${1}
+  QAG_TYPE=${2}
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}" --eval-step "${EVAL_STEP}"
+    lmqg-qae -d "lmqg/qa_squadshifts_pseudo" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
   done
 }
 
 QAE_LOCAL () {
   # Same function as `QAE` but for local file
-  LM="distilbert-base-uncased"
-  MODEL=${1}
-  EVAL_STEP=${2}
+  ANCHOR_MODEL=${1}
+  QAG_TYPE=${2}
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-qae -m "${LM}" -d "json" \
-      --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}/train.jsonl" \
-      --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}/validation.jsonl" \
-      --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
-    lmqg-qae --overwrite --skip-training -m "${LM}" -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}"
+    lmqg-qae -d "json" \
+      --dataset-train "qa_squadshifts_pseudo/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/train.jsonl" \
+      --dataset-validation "qa_squadshifts_pseudo/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/validation.jsonl" \
+      --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" \
+      --down-sample-size-train 1000 --down-sample-size-valid 500
+    lmqg-qae --overwrite --skip-training -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}"
   done
 }
 
-QAE "t5-large-squad" 50
-QAE "t5-base-squad" 50
-QAE "t5-small-squad" 50
-QAE "bart-base-squad" 50
-QAE "bart-large-squad" 50
-QAE "t5-large-squad-multitask-qg" 50
-QAE "t5-base-squad-multitask-qg" 50
-QAE "t5-small-squad-multitask-qg" 50
+QAE "t5-small-squad" "qg_reference"
+QAE "t5-base-squad" "qg_reference"
+QAE "t5-large-squad" "qg_reference"
+QAE "bart-base-squad" "qg_reference"
+QAE "bart-large-squad" "qg_reference"
 
-QAE "t5-large-squad-multitask" 250
-QAE "t5-base-squad-multitask" 250
-QAE "t5-small-squad-multitask" 250
+QAE "t5-small-squad" "multitask"
+QAE "t5-base-squad" "multitask"
+QAE "t5-large-squad" "multitask"
 
+QAE "t5-small-squad" "end2end"
+QAE "t5-base-squad" "end2end"
+QAE "t5-large-squad" "end2end"
+QAE "bart-base-squad" "end2end"
+QAE "bart-large-squad" "end2end"
 
-
-QAE_FILTERED () {
-  LM="distilbert-base-uncased"
-  MODEL=${1}
-  EVAL_STEP=${2}
-  FILTERING=${3}
-  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-  do
-    lmqg-qae -m "${LM}" -d "lmqg/qa_squadshifts_pseudo" -n "${NAME}.${MODEL}.${FILTERING}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}.${FILTERING}" --eval-step "${EVAL_STEP}"
-  done
-}
-
-QAE_FILTERED_LOCAL () {
-  # Same function as `QAE_FILTERED` but for local file
-  LM="distilbert-base-uncased"
-  MODEL=${1}
-  EVAL_STEP=${2}
-  FILTERING=${3}
-  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-  do
-    lmqg-qae -m "${LM}" -d "json" \
-      --dataset-train "qa_squadshifts_pseudo/${MODEL}.${NAME}.${FILTERING}/train.jsonl" \
-      --dataset-validation "qa_squadshifts_pseudo/${MODEL}.${NAME}.${FILTERING}/validation.jsonl" \
-      --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}.${FILTERING}"
-    lmqg-qae --overwrite --skip-training -m "${LM}" -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/silver_qa.${MODEL}/${LM}.qa_squadshifts.${NAME}.${FILTERING}"
-  done
-}
-
-
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_answer"
-QAE_FILTERED "t5-large-squad-multitask" 50 "perplexity_question"
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_answer"
-QAE_FILTERED "t5-base-squad-multitask" 50 "perplexity_question"
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_answer"
-QAE_FILTERED "t5-small-squad-multitask" 50 "perplexity_question"
-
+QAE "t5-small-squad" "pipeline"
+QAE "t5-base-squad" "pipeline"
+QAE "t5-large-squad" "pipeline"
+QAE "bart-base-squad" "pipeline"
+QAE "bart-large-squad" "pipeline"

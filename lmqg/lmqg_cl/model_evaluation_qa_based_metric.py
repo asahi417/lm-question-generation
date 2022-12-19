@@ -29,6 +29,8 @@ def main_qa_model_training():
     parser.add_argument('--output-dir', default='qa_eval_output', type=str)
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('--skip-training', action='store_true')
+    parser.add_argument('--down-sample-size-train', default=None, type=int)
+    parser.add_argument('--down-sample-size-validation', default=None, type=int)
     opt = parser.parse_args()
     if opt.dataset_train is not None and opt.dataset_validation is not None and opt.dataset_test is not None:
         dataset_files = {
@@ -54,7 +56,9 @@ def main_qa_model_training():
         ray_result_dir=opt.ray_result_dir,
         output_dir=opt.output_dir,
         overwrite=opt.overwrite,
-        skip_training=opt.skip_training
+        skip_training=opt.skip_training,
+        down_sample_size_train=opt.down_sample_size_train,
+        down_sample_size_validation=opt.down_sample_size_validation
     )
 
 
@@ -89,10 +93,15 @@ def main_generate_qa_pair():
         logging.info(f"Perplexity: `{opt.model_qg}`, data: `{opt.anchor_data}`, data_name: `{opt.anchor_data_name}`")
         anchor_data = load_dataset(opt.anchor_data, opt.anchor_data_name)
         model = TransformersQG(opt.model_qg, max_length=opt.max_length, max_length_output=opt.max_length)
+        if model.is_qag:
+            target_outputs = ['questions_answers']
+        else:
+            assert model.is_qg
+            target_outputs = ['answer', 'question'] if model.is_ae else ['question']
 
         for _split, dataset_split in qa_pairs.items():
             df = pd.DataFrame(dataset_split)
-            for target in ['answer', 'question']:
+            for target in target_outputs:
                 output_file = f"{opt.export_dir}/perplexity_{target}.{_split}.json"
                 if os.path.exists(output_file) and not opt.overwrite:
                     continue

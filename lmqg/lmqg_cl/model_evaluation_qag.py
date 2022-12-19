@@ -123,7 +123,7 @@ def main():
             model = load_model()
             # model prediction
             if not opt.use_reference_answer:
-                logging.info("model prediction: (multitask model)")
+                logging.info("model prediction: (qag model)")
                 prediction = model.generate_qa(
                     list_context=model_input,
                     num_beams=opt.n_beams,
