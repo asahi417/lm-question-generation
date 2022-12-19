@@ -1,0 +1,18 @@
+Model,Data,Type,Language Model,QAAlignedF1Score (BERTScore),QAAlignedF1Score (MoverScore),QAAlignedPrecision (BERTScore),QAAlignedPrecision (MoverScore),QAAlignedRecall (BERTScore),QAAlignedRecall (MoverScore)
+lmqg/bart-base-squad-qag,lmqg/qg_squad,End2end QAG,facebook/bart-base,84.49,57.46,85.64,60.01,83.38,55.26
+lmqg/bart-base-squad-qg,lmqg/qg_squad,Pipeline QAG,facebook/bart-base,92.84,64.24,92.75,64.46,92.95,64.11
+lmqg/bart-base-squad-qg,lmqg/qg_squad,QG,facebook/bart-base,95.49,70.38,95.55,70.67,95.44,70.1
+lmqg/bart-large-squad-qag,lmqg/qg_squad,End2end QAG,facebook/bart-large,92.16,63.79,93.21,66.71,91.17,61.32
+lmqg/bart-large-squad-qg,lmqg/qg_squad,Pipeline QAG,facebook/bart-large,93.23,64.76,93.13,64.98,93.35,64.63
+lmqg/bart-large-squad-qg,lmqg/qg_squad,QG,facebook/bart-large,95.54,70.82,95.59,71.13,95.49,70.54
+lmqg/t5-base-squad-qag,lmqg/qg_squad,End2end QAG,t5-base,93.34,65.78,93.18,65.96,93.51,65.68
+lmqg/t5-base-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-base,92.53,64.23,92.35,64.33,92.74,64.23
+lmqg/t5-base-squad-qg,lmqg/qg_squad,Pipeline QAG,t5-base,92.75,64.36,92.59,64.45,92.93,64.35
+lmqg/t5-base-squad-qg,lmqg/qg_squad,QG,t5-base,95.42,70.63,95.48,70.92,95.37,70.34
+lmqg/t5-large-squad-qag,lmqg/qg_squad,End2end QAG,t5-large,93.45,66.05,93.34,66.34,93.57,65.84
+lmqg/t5-large-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-large,92.87,64.67,92.72,64.82,93.04,64.63
+lmqg/t5-large-squad-qg,lmqg/qg_squad,QG,t5-large,95.57,71.1,95.62,71.41,95.51,70.8
+lmqg/t5-small-squad-qag,lmqg/qg_squad,End2end QAG,t5-small,92.76,64.59,92.87,65.3,92.68,63.99
+lmqg/t5-small-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-small,91.74,63.23,91.49,63.26,92.01,63.29
+lmqg/t5-small-squad-qg,lmqg/qg_squad,Pipeline QAG,t5-small,92.26,63.83,92.07,63.92,92.48,63.82
+lmqg/t5-small-squad-qg,lmqg/qg_squad,QG,t5-small,95.14,69.79,95.19,70.09,95.09,69.51

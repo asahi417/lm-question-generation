@@ -91,3 +91,11 @@ cd "t5-base-squad-qg" && git add . && git commit -m "eval pipeline" && git push 
 git clone "https://huggingface.co/lmqg/t5-large-squad-qg"
 lmqg-eval-qag -m "t5-large-squad-qg" --model-ae "lmqg/t5-large-squad-ae" -e "t5-large-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
 cd "t5-large-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..
+
+git clone "https://huggingface.co/lmqg/bart-base-squad-qg"
+lmqg-eval-qag -m "bart-base-squad-qg" --model-ae "lmqg/bart-base-squad-ae" -e "bart-base-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
+cd "bart-base-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..
+
+git clone "https://huggingface.co/lmqg/bart-large-squad-qg"
+lmqg-eval-qag -m "bart-large-squad-qg" --model-ae "lmqg/bart-large-squad-ae" -e "bart-large-squad-qg/eval_pipeline" -d "lmqg/qg_squad" --language "en"
+cd "bart-large-squad-qg" && git add . && git commit -m "eval pipeline" && git push && cd ..

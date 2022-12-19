@@ -13,7 +13,7 @@ See [model_ood_evaluation.sh](model_ood_evaluation.sh), which is the script to r
 ## Generate Summary
 Generate summary files by
 ```shell
-python summarize_evaluation.py
+python summarize_evaluation_tweetqa.py
 ```
 
 ## Generate Dataset Statistics

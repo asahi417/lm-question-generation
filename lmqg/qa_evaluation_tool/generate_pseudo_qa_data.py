@@ -8,7 +8,7 @@ from ..language_model import TransformersQG
 
 
 def generate_qa_pairs(
-        model_qg: str = 'lmqg/t5-small-squad-multitask',
+        model_qg: str = 'lmqg/t5-small-squad-qg-ae',
         model_ae: str = None,
         language: str = 'en',
         anchor_data: str = 'lmqg/qa_squadshifts',
@@ -82,8 +82,8 @@ def generate_qa_pairs(
                     _id += 1
                     output.append({
                         'id': str(_id),
-                        'title': df['title'],
-                        'context': df['context'],
+                        'title': df['title'].values[0],
+                        'context': df['context'].values[0],
                         'question': q,
                         'answers': {'text': [a], 'answer_start': [df['context'].values[0].index(a)]}
                     })

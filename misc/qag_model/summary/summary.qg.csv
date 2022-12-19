@@ -1,0 +1,9 @@
+Model,Data,Type,Language Model,BERTScore,METEOR,MoverScore,BLEU-1,BLEU-2,BLEU-3,BLEU-4,ROUGE-L
+lmqg/bart-base-squad-qg,lmqg/qg_squad,QG,facebook/bart-base,90.87,26.05,64.47,56.92,40.98,31.44,24.68,52.66
+lmqg/bart-large-squad-qg,lmqg/qg_squad,QG,facebook/bart-large,91.0,27.07,64.99,58.79,42.79,33.11,26.17,53.85
+lmqg/t5-base-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-base,90.58,27.0,64.72,58.59,42.6,32.91,26.01,53.4
+lmqg/t5-base-squad-qg,lmqg/qg_squad,QG,t5-base,90.6,26.97,64.74,58.69,42.66,32.99,26.13,53.33
+lmqg/t5-large-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-large,90.69,27.81,65.29,59.93,43.98,34.19,27.2,54.23
+lmqg/t5-large-squad-qg,lmqg/qg_squad,QG,t5-large,91.0,27.7,65.29,59.54,43.79,34.14,27.21,54.13
+lmqg/t5-small-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-small,90.18,25.58,63.72,56.54,40.31,30.8,24.18,51.12
+lmqg/t5-small-squad-qg,lmqg/qg_squad,QG,t5-small,90.2,25.84,63.89,56.86,40.59,31.05,24.4,51.43

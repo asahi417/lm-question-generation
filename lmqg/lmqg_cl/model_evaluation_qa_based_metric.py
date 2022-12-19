@@ -60,8 +60,8 @@ def main_qa_model_training():
 
 def main_generate_qa_pair():
     parser = argparse.ArgumentParser(description='Generate QA pseudo dataset.')
-    parser.add_argument('-m', '--model-qg', default='lmqg/t5-small-squad-multitask', type=str)
-    parser.add_argument('--model-ae', default='lmqg/t5-small-squad-multitask', type=str)
+    parser.add_argument('-m', '--model-qg', default='lmqg/t5-small-squad-qg', type=str)
+    parser.add_argument('--model-ae', default=None, type=str)
     parser.add_argument('-l', '--language', default='en', type=str)
     parser.add_argument('-d', '--anchor-data', default='lmqg/qa_squadshifts', type=str)
     parser.add_argument('-n', '--anchor-data-name', default='new_wiki', type=str)
