@@ -2,6 +2,7 @@
 ##############################################################
 # Generate Pseudo QA Dataset on SQuADShifts (Gold reference) #
 ##############################################################
+[DONE]
 qa_generation_squadshifts_ref () {
   ANCHOR_MODEL=${1}
   BATCH=16
@@ -20,6 +21,7 @@ qa_generation_squadshifts_ref "bart-large-squad"
 ########################################################
 # Generate Pseudo QA Dataset on SQuADShifts (Pipeline) #
 ########################################################
+[STONE]
 qa_generation_squadshifts_pipeline () {
   ANCHOR_MODEL=${1}
   BATCH=16
@@ -38,6 +40,7 @@ qa_generation_squadshifts_pipeline "bart-large-squad"
 ###################################################
 # Generate Pseudo QA Dataset on SQuADShifts (E2E) #
 ###################################################
+[UKRI]
 qa_generation_squadshifts_end2end () {
   ANCHOR_MODEL=${1}
   BATCH=16
@@ -57,6 +60,7 @@ qa_generation_squadshifts_end2end "bart-large-squad"
 #########################################################
 # Generate Pseudo QA Dataset on SQuADShifts (Multitask) #
 #########################################################
+[UKRI]
 qa_generation_squadshifts_multitask () {
   ANCHOR_MODEL=${1}
   BATCH=16

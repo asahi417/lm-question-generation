@@ -1,19 +1,8 @@
 # QAEval on Gold QA dataset
-#for NAME in 'amazon' 'new_wiki'
-#do
-#  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
-#done
-#
-#for NAME in 'nyt' 'reddit'
-#do
-#  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
-#done
-
 for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
 do
   lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
 done
-
 
 
 # QAE with Generated Pseudo QA dataset
@@ -22,7 +11,7 @@ QAE () {
   QAG_TYPE=${2}
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-qae -d "lmqg/qa_squadshifts_pseudo" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
+    lmqg-qae -d "lmqg/qa_squadshifts_synthetic" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
   done
 }
 
@@ -33,17 +22,18 @@ QAE_LOCAL () {
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
     lmqg-qae -d "json" \
-      --dataset-train "qa_squadshifts_pseudo/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/train.jsonl" \
-      --dataset-validation "qa_squadshifts_pseudo/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/validation.jsonl" \
+      --dataset-train "qa_squadshifts_synthetic/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/train.jsonl" \
+      --dataset-validation "qa_squadshifts_synthetic/${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}/validation.jsonl" \
       --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" \
       --down-sample-size-train 1000 --down-sample-size-valid 500
     lmqg-qae --overwrite --skip-training -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}"
   done
 }
-
+[RUNNING HAWK]
 QAE "t5-small-squad" "qg_reference"
 QAE "t5-base-squad" "qg_reference"
 QAE "t5-large-squad" "qg_reference"
+[TODO]
 QAE "bart-base-squad" "qg_reference"
 QAE "bart-large-squad" "qg_reference"
 

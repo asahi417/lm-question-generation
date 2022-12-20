@@ -25,7 +25,7 @@ def main_qa_model_training():
     parser.add_argument('--split-test', default='test', type=str)
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--n-trials', default=10, type=int)
-    parser.add_argument('--ray-result-dir', default='ray_result', type=str)
+    parser.add_argument('--ray-result-dir', default='ray_results', type=str)
     parser.add_argument('--output-dir', default='qa_eval_output', type=str)
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('--skip-training', action='store_true')
