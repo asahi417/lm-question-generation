@@ -33,7 +33,6 @@ QAE_LOCAL () {
 QAE "t5-small-squad" "qg_reference"
 QAE "t5-base-squad" "qg_reference"
 QAE "t5-large-squad" "qg_reference"
-[TODO]
 QAE "bart-base-squad" "qg_reference"
 QAE "bart-large-squad" "qg_reference"
 

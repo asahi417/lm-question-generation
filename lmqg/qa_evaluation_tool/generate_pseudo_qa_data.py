@@ -79,13 +79,16 @@ def generate_qa_pairs(
                 if _qa_pairs is None:
                     continue
                 for q, a in _qa_pairs:
+                    context = df['context'].values[0]
+                    if a not in context:
+                        continue
                     _id += 1
                     output.append({
                         'id': str(_id),
                         'title': df['title'].values[0],
-                        'context': df['context'].values[0],
+                        'context': context,
                         'question': q,
-                        'answers': {'text': [a], 'answer_start': [df['context'].values[0].index(a)]}
+                        'answers': {'text': [a], 'answer_start': [context.index(a)]}
                     })
 
         full_output[_split] = output
