@@ -365,7 +365,7 @@ class TransformersQG:
         def format_qa(list_raw_string):
             tmp = []
             for raw_string in list_raw_string:
-                if question_prefix not in raw_string or answer_prefix not in raw_string:
+                if len(raw_string.split(answer_prefix)) != 2 or question_prefix not in raw_string:
                     logging.info(f"invalid prediction: {raw_string}")
                 else:
                     q, a = raw_string.split(answer_prefix)

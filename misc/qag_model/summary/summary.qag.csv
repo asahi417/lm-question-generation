@@ -11,6 +11,7 @@ lmqg/t5-base-squad-qg,lmqg/qg_squad,Pipeline QAG,t5-base,92.75,64.36,92.59,64.45
 lmqg/t5-base-squad-qg,lmqg/qg_squad,QG,t5-base,95.42,70.63,95.48,70.92,95.37,70.34
 lmqg/t5-large-squad-qag,lmqg/qg_squad,End2end QAG,t5-large,93.45,66.05,93.34,66.34,93.57,65.84
 lmqg/t5-large-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-large,92.87,64.67,92.72,64.82,93.04,64.63
+lmqg/t5-large-squad-qg,lmqg/qg_squad,Pipeline QAG,t5-large,92.97,64.72,92.83,64.87,93.14,64.66
 lmqg/t5-large-squad-qg,lmqg/qg_squad,QG,t5-large,95.57,71.1,95.62,71.41,95.51,70.8
 lmqg/t5-small-squad-qag,lmqg/qg_squad,End2end QAG,t5-small,92.76,64.59,92.87,65.3,92.68,63.99
 lmqg/t5-small-squad-qg-ae,lmqg/qg_squad,Multitask QAG,t5-small,91.74,63.23,91.49,63.26,92.01,63.29

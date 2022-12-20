@@ -1,13 +1,19 @@
 # QAEval on Gold QA dataset
-for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-do
-  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
-done
+#for NAME in 'amazon' 'new_wiki'
+#do
+#  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
+#done
+#
+#for NAME in 'nyt' 'reddit'
+#do
+#  lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
+#done
 
 for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
 do
   lmqg-qae -d "lmqg/qa_squadshifts" -n "${NAME}" --output-dir "qa_eval_output/gold_qa/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
 done
+
 
 
 # QAE with Generated Pseudo QA dataset
