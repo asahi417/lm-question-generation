@@ -269,6 +269,7 @@ def run_qa_evaluation(dataset: str,
 
     train_example = raw_datasets[split_train]
     for examples in train_example:
+        print(examples)
         try:
             tokenized_examples = tokenizer(
                 examples[question_column_name if pad_on_right else context_column_name],
