@@ -312,9 +312,7 @@ def run_qa_evaluation(dataset: str,
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
     )
-    if down_sample_size_train is not None:
-        assert down_sample_size_train < len(train_example), \
-            f"{down_sample_size_train} should be less than {len(train_example)}"
+    if down_sample_size_train is not None and down_sample_size_train < len(train_example):
         train_example_search = train_example.shuffle(random_seed)
         train_example_search = train_example_search.select(list(range(down_sample_size_train)))
         train_dataset_search = train_example_search.map(
