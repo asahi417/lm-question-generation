@@ -132,21 +132,16 @@ def run_qa_evaluation(dataset: str,
         # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
         # in one example possible giving several features when a context is long, each of those features having a
         # context that overlaps a bit the context of the previous feature.
-        try:
-            tokenized_examples = tokenizer(
-                examples[question_column_name if pad_on_right else context_column_name],
-                examples[context_column_name if pad_on_right else question_column_name],
-                truncation="only_second" if pad_on_right else "only_first",
-                max_length=max_seq_length,
-                stride=doc_stride,
-                return_overflowing_tokens=True,
-                return_offsets_mapping=True,
-                padding="max_length"
-            )
-        except Exception:
-            print(examples[question_column_name if pad_on_right else context_column_name])
-            print(examples[context_column_name if pad_on_right else question_column_name])
-            exit()
+        tokenized_examples = tokenizer(
+            examples[question_column_name if pad_on_right else context_column_name],
+            examples[context_column_name if pad_on_right else question_column_name],
+            truncation="only_second" if pad_on_right else "only_first",
+            max_length=max_seq_length,
+            stride=doc_stride,
+            return_overflowing_tokens=True,
+            return_offsets_mapping=True,
+            padding="max_length"
+        )
 
         # Since one example might give us several features if it has a long context, we need a map from a feature to
         # its corresponding example. This key gives us just that.
@@ -273,6 +268,21 @@ def run_qa_evaluation(dataset: str,
     # Create train feature from dataset
 
     train_example = raw_datasets[split_train]
+    for examples in train_example:
+        try:
+            tokenized_examples = tokenizer(
+                examples[question_column_name if pad_on_right else context_column_name],
+                examples[context_column_name if pad_on_right else question_column_name],
+                truncation="only_second" if pad_on_right else "only_first",
+                max_length=max_seq_length,
+                stride=doc_stride,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length"
+            )
+        except Exception:
+            print(examples)
+
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
         remove_columns=train_example.column_names, desc="Running tokenizer on train dataset"
