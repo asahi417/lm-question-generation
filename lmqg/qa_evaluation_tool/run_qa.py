@@ -211,7 +211,9 @@ def run_qa_evaluation(dataset: str,
                         token_end_index -= 1
 
                 # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-                if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
+                if answers["text"][0] == "":
+                    pass
+                elif not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
                     logging.warning(f"answer not found:\n \t - answer: {answers}\n \t - context: "
                                     f"{tokenizer.decode(tokenized_examples['input_ids'][i])}")
                     tokenized_examples["start_positions"].append(cls_index)
