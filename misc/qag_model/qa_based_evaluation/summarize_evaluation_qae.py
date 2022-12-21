@@ -4,7 +4,6 @@ import json
 from glob import glob
 import pandas as pd
 os.makedirs('summary', exist_ok=True)
-
 output = []
 for _file in glob("qa_eval_output/*/*/test_result.json"):
     _file_name, _domain, _ = _file.split("/")[1:]
@@ -15,5 +14,11 @@ for _file in glob("qa_eval_output/*/*/test_result.json"):
     if tmp['model'] != 'gold':
         tmp['qag_type'] = _file_name.split('.')[-1]
     output.append(tmp)
-df = pd.DataFrame(output).sort_values(by=['domain', 'model', 'qag_type']).round(2)
+df = pd.DataFrame(output)
+model_order = ['gold', 'bart-base-squad', 'bart-large-squad', 't5-small-squad', 't5-base-squad', 't5-large-squad']
+qag_type_order = ['gold', 'qg_reference', 'pipeline', 'multitask', 'end2end']
+df['sort_model'] = [model_order.index(i) for i in df['model']]
+df['sort_qag_type'] = [qag_type_order.index(i) if type(i) is str else -1 for i in df['qag_type']]
+df = df.sort_values(by=['domain', 'sort_model', 'sort_qag_type']).round(2)
+
 # df.to_csv("summary/tmp.csv", index=False)

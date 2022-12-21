@@ -1,5 +1,6 @@
 import os
 import requests
+from itertools import product
 from statistics import mean
 from os.path import join as pj
 import pandas as pd
@@ -8,24 +9,22 @@ from datasets import load_dataset
 LMS = ["t5-small-squad",
        "t5-base-squad",
        "t5-large-squad",
-       "t5-small-squad-multitask",
-       "t5-base-squad-multitask",
-       "t5-large-squad-multitask",
        "bart-base-squad",
        "bart-large-squad"]
 DOMAINS = ["new_wiki", "reddit", "amazon", "nyt"]
+QAG_TYPES = ['qg_reference', 'pipeline', 'multitag', 'end2end']
 
 table = []
-for lm in LMS:
-    for d in DOMAINS:
-        tmp = {"lm": lm, "domain": d}
-        _data = load_dataset("lmqg/qa_squadshifts_pseudo", f"{d}.{lm}")
-        for _split in _data:
-            df = _data[_split].to_pandas()
-            length = [len(g) for _, g in df.groupby('context')]
-            tmp[f"{_split}/mean"] = mean(length)
-            tmp[f"{_split}/sum"] = sum(length)
-        table.append(tmp)
+for d, q, l in product(DOMAINS, QAG_TYPES, LMS):
+    tmp = {"domain": d, "qag_type": q, "lm": l}
+    _data = load_dataset("lmqg/qa_squadshifts_synthetic", f"{l}.{q}.{d}")
+    for _split in _data:
+        _data[_split].filter(lambda x: len(x['answers']['text']) > 0 and len(x['answers']['text'][0]) < 512)
+        df = .to_pandas()
+        length = [len(g) for _, g in df.groupby('context')]
+        tmp[f"{_split}/mean"] = mean(length)
+        tmp[f"{_split}/sum"] = sum(length)
+    table.append(tmp)
 pd.DataFrame(table).to_csv('summary.dataset.squadshifts.csv', index=False)
 TMP_DIR = 'metric'
 os.makedirs(TMP_DIR, exist_ok=True)
