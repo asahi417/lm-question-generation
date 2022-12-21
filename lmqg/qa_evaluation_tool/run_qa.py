@@ -268,22 +268,22 @@ def run_qa_evaluation(dataset: str,
     # Create train feature from dataset
 
     train_example = raw_datasets[split_train]
-    for examples in train_example:
-        print(examples)
-        try:
-            tokenized_examples = tokenizer(
-                examples[question_column_name if pad_on_right else context_column_name],
-                examples[context_column_name if pad_on_right else question_column_name],
-                truncation="only_second" if pad_on_right else "only_first",
-                max_length=max_seq_length,
-                stride=doc_stride,
-                return_overflowing_tokens=True,
-                return_offsets_mapping=True,
-                padding="max_length"
-            )
-        except Exception:
-            print(examples)
-            input()
+    # for examples in train_example:
+    #     print(examples)
+    #     try:
+    #         tokenized_examples = tokenizer(
+    #             examples[question_column_name if pad_on_right else context_column_name],
+    #             examples[context_column_name if pad_on_right else question_column_name],
+    #             truncation="only_second" if pad_on_right else "only_first",
+    #             max_length=max_seq_length,
+    #             stride=doc_stride,
+    #             return_overflowing_tokens=True,
+    #             return_offsets_mapping=True,
+    #             padding="max_length"
+    #         )
+    #     except Exception:
+    #         print(examples)
+    #         input()
 
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,

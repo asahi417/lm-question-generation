@@ -25,6 +25,7 @@ def main_qa_model_training():
     parser.add_argument('--split-test', default='test', type=str)
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--n-trials', default=10, type=int)
+    parser.add_argument('--max-seq-length', default=384, type=int)
     parser.add_argument('--ray-result-dir', default='ray_results', type=str)
     parser.add_argument('--output-dir', default='qa_eval_output', type=str)
     parser.add_argument('--overwrite', action='store_true')
@@ -48,6 +49,7 @@ def main_qa_model_training():
         language_model=opt.model,
         eval_step=opt.eval_step,
         random_seed=opt.random_seed,
+        max_seq_length=opt.max_seq_length,
         split_train=opt.split_train,
         split_validation=opt.split_validation,
         split_test=opt.split_test,
