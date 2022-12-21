@@ -222,13 +222,14 @@ def run_qa_evaluation(dataset: str,
                     while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
                         token_start_index += 1
                     tokenized_examples["start_positions"].append(token_start_index - 1)
-                    try:
-                        offsets[token_end_index][1]
-                    except Exception:
-                        print(offsets, token_end_index)
-                        exit()
+
                     while offsets[token_end_index][1] >= end_char:
                         token_end_index -= 1
+                        try:
+                            offsets[token_end_index][1]
+                        except Exception:
+                            print(offsets, token_end_index)
+                            exit()
                     tokenized_examples["end_positions"].append(token_end_index + 1)
                     answer_found = tokenizer.decode(
                         tokenized_examples["input_ids"][i][
