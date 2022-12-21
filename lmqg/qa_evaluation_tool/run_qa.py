@@ -282,6 +282,7 @@ def run_qa_evaluation(dataset: str,
             )
         except Exception:
             print(examples)
+            input()
 
     train_dataset = train_example.map(
         prepare_train_features, batched=True, num_proc=None,
