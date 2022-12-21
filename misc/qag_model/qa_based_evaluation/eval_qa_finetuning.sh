@@ -9,7 +9,7 @@ done
 QAE () {
   ANCHOR_MODEL=${1}
   QAG_TYPE=${2}
-  NAME='new_wiki'
+  NAME='reddit'
   lmqg-qae -d "lmqg/qa_squadshifts_synthetic" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
 #  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
 #

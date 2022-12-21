@@ -135,7 +135,7 @@ def run_qa_evaluation(dataset: str,
         tokenized_examples = tokenizer(
             examples[question_column_name if pad_on_right else context_column_name],
             examples[context_column_name if pad_on_right else question_column_name],
-            question_first=pad_on_right,
+            # question_first=pad_on_right,
             truncation="only_second" if pad_on_right else "only_first",
             max_length=max_seq_length,
             stride=doc_stride,
