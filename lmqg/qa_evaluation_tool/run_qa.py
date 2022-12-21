@@ -219,27 +219,28 @@ def run_qa_evaluation(dataset: str,
                     tokenized_examples["start_positions"].append(cls_index)
                     tokenized_examples["end_positions"].append(cls_index)
                 else:
-                    # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
-                    # Note: we could go after the last offset if the answer is the last word (edge case).
-                    while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
-                        token_start_index += 1
-                    tokenized_examples["start_positions"].append(token_start_index - 1)
+                    try:
+                        # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
+                        # Note: we could go after the last offset if the answer is the last word (edge case).
+                        while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
+                            token_start_index += 1
+                        tokenized_examples["start_positions"].append(token_start_index - 1)
 
-                    while offsets[token_end_index][1] >= end_char:
-                        token_end_index -= 1
-                        try:
-                            offsets[token_end_index][1]
-                        except Exception:
-                            print(offsets, token_end_index, end_char, len(answers["text"][0]), answers)
-                            exit()
-                    tokenized_examples["end_positions"].append(token_end_index + 1)
-                    answer_found = tokenizer.decode(
-                        tokenized_examples["input_ids"][i][
-                        tokenized_examples["start_positions"][i]: 1 + tokenized_examples["end_positions"][i]]
-                    )
-                    if answers['text'][0].lower().replace(" ", "") != answer_found.lower().replace(" ", ""):
-                        logging.debug(f"answer not matched:\n \t - reference: {answers['text'][0].lower()}\n \t "
-                                      f"- found: {answer_found.lower()}")
+                        while offsets[token_end_index][1] >= end_char:
+                            token_end_index -= 1
+                        tokenized_examples["end_positions"].append(token_end_index + 1)
+                        answer_found = tokenizer.decode(
+                            tokenized_examples["input_ids"][i][
+                            tokenized_examples["start_positions"][i]: 1 + tokenized_examples["end_positions"][i]]
+                        )
+                        if answers['text'][0].lower().replace(" ", "") != answer_found.lower().replace(" ", ""):
+                            logging.debug(f"answer not matched:\n \t - reference: {answers['text'][0].lower()}\n \t "
+                                          f"- found: {answer_found.lower()}")
+                    except Exception:
+                        logging.warning(f"answer not found:\n \t - answer: {answers}\n \t - context: "
+                                        f"{tokenizer.decode(tokenized_examples['input_ids'][i])}")
+                        tokenized_examples["start_positions"].append(cls_index)
+                        tokenized_examples["end_positions"].append(cls_index)
 
         return tokenized_examples
 
