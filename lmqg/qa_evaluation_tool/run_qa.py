@@ -228,7 +228,7 @@ def run_qa_evaluation(dataset: str,
                         try:
                             offsets[token_end_index][1]
                         except Exception:
-                            print(offsets, token_end_index)
+                            print(offsets, token_end_index, end_char, len(answers["text"][0]), answers)
                             exit()
                     tokenized_examples["end_positions"].append(token_end_index + 1)
                     answer_found = tokenizer.decode(
