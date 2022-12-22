@@ -23,7 +23,7 @@ lmqg-eval-qag -m "lmqg_output/t5-small-squad-qg-ae/best_model" -e "lmqg_output/t
 lmqg-push-to-hf -m "lmqg_output/t5-small-squad-qg-ae/best_model" -a "t5-small-squad-qg-ae" -o "lmqg"
 
 # Multitask QAG Model for non-English
-mlqg_answer () {
+mlqg_multi () {
   MODEL_NAME=${1}
   MODEL_ALIAS=${2}
   BATCH=${3}
@@ -39,8 +39,8 @@ mlqg_answer () {
   done
 }
 
-mlqg_answer "mt5-small" "google/mt5-small" "64" "1"
-mlqg_answer "mt5-base" "google/mt5-base" "32" "2"
+mlqg_multi "mt5-small" "google/mt5-small" "64" "1"
+mlqg_multi "mt5-base" "google/mt5-base" "32" "2"
 
 # TODO: Additional training for German
 LA="de"
@@ -78,6 +78,22 @@ lmqg-train-search -m "facebook/bart-base" -b 16 -g 4 8 -c "lmqg_output/bart-base
 lmqg-eval -m "lmqg_output/bart-base-squad-ae/best_model" -e "lmqg_output/bart-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qa -m "lmqg_output/bart-base-squad-ae/best_model" -e "lmqg_output/bart-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/bart-base-squad-ae/best_model" -a "bart-base-squad-ae" -o "lmqg"
+
+mlqg_ae () {
+  MODEL_NAME=${1}
+  MODEL_ALIAS=${2}
+  BATCH=${3}
+  GRAD=${4}
+  for LA in "ja" "es" "ko" "it" "de" "ru" "fr"
+  do
+    lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --language "${LA}" --n-max-config 1 -i 'paragraph_sentence' -o 'answer'
+    lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i 'paragraph_sentence' -o 'answer'
+    lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
+    lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -a "${MODEL_NAME}-${LA}quad-ae" -o "lmqg"
+  done
+}
+
+mlqg_ae "mt5-small" "google/mt5-small" "32" "2"
 
 # Evaluate pipeline QAG: QG + QA models
 git clone "https://huggingface.co/lmqg/t5-small-squad-qg"

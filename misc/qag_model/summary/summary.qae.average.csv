@@ -1,0 +1,19 @@
+Type,Language Model,QAEval (F1),QAEval (EM)
+QG,facebook/bart-base,49.42,33.8
+Pipeline QAG,facebook/bart-base,51.65,34.03
+End2end QAG,facebook/bart-base,17.49,10.17
+QG,facebook/bart-large,49.44,33.92
+Pipeline QAG,facebook/bart-large,50.04,32.4
+End2end QAG,facebook/bart-large,33.97,21.44
+QG,t5-small,48.48,33.07
+Pipeline QAG,t5-small,45.35,27.44
+Multitask QAG,t5-small,44.0,25.15
+End2end QAG,t5-small,48.33,31.72
+QG,t5-base,50.7,34.69
+Pipeline QAG,t5-base,51.7,33.61
+Multitask QAG,t5-base,49.64,30.91
+End2end QAG,t5-base,51.77,35.36
+QG,t5-large,48.93,33.42
+Pipeline QAG,t5-large,52.04,33.89
+Multitask QAG,t5-large,49.48,30.94
+End2end QAG,t5-large,53.67,37.3
