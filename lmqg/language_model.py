@@ -291,7 +291,7 @@ class TransformersQG:
         self.tokenizer, self.model, config = load_language_model(self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
         if 'add_prefix' not in config.to_dict().keys():
             # this means the model is not fine-tuned
-            assert add_prefix, '`add_prefix` is required for non-fine-tuned models'
+            # assert add_prefix, '`add_prefix` is required for non-fine-tuned models'
             self.add_prefix = add_prefix
         else:
             self.add_prefix = config.add_prefix
