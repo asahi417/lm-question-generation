@@ -46,11 +46,11 @@ mlqg_multi "mt5-base" "google/mt5-base" "32" "2"
 LA="de"
 MODEL_ALIAS="google/mt5-base"
 MODEL_NAME="mt5-base"
-lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b 32 -g 4 8 --lr 1e-04 5e-04 --epoch-partial 5 -e 20 --label-smoothing 0.15 --language "${LA}" --n-max-config 1 -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b 4 -g 32 --lr 1e-04 5e-04 --epoch-partial 5 -e 20 --label-smoothing 0.15 --language "${LA}" --n-max-config 1 -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_answer" -o 'question'
 lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
-lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qag --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad"
+lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -a "${MODEL_NAME}-${LA}quad-qg-ae" -o "lmqg"
 
 # Ablation: answer extraction only model
@@ -90,10 +90,14 @@ mlqg_ae () {
     lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i 'paragraph_sentence' -o 'answer'
     lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
     lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -a "${MODEL_NAME}-${LA}quad-ae" -o "lmqg"
+    rm -rf "lmqg_output/${MODEL_NAME}-${LA}quad-ae"
   done
 }
 
+[STONE]
 mlqg_ae "mt5-small" "google/mt5-small" "32" "2"
+
+
 
 # Evaluate pipeline QAG: QG + QA models
 git clone "https://huggingface.co/lmqg/t5-small-squad-qg"

@@ -9,17 +9,14 @@ done
 QAE () {
   ANCHOR_MODEL=${1}
   QAG_TYPE=${2}
-  NAME='reddit'
-  lmqg-qae -d "lmqg/qa_squadshifts_synthetic" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500 --max-seq-length 380
-#  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
-#
-#  do
-#    lmqg-qae -d "lmqg/qa_squadshifts_synthetic" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
-#  done
+  for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
+  do
+    lmqg-qae -d "lmqg/qa_squadshifts_synthetic" -n "${ANCHOR_MODEL}.${QAG_TYPE}.${NAME}" --output-dir "qa_eval_output/silver_qa.${ANCHOR_MODEL}.${QAG_TYPE}/qa_squadshifts.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500
+  done
 }
 
 QAE_LOCAL () {
-  # Same function as `QAE` but for local file
+  # Same function as `QAE` but working with local files
   ANCHOR_MODEL=${1}
   QAG_TYPE=${2}
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
@@ -43,15 +40,12 @@ QAE "t5-small-squad" "multitask"
 QAE "t5-base-squad" "multitask"
 QAE "t5-large-squad" "multitask"
 
-
-[UKRI]
 QAE "t5-small-squad" "pipeline"
 QAE "t5-base-squad" "pipeline"
 QAE "t5-large-squad" "pipeline"
 QAE "bart-base-squad" "pipeline"
 QAE "bart-large-squad" "pipeline"
 
-[UKRI]
 QAE "t5-small-squad" "end2end"
 QAE "t5-base-squad" "end2end"
 QAE "t5-large-squad" "end2end"
