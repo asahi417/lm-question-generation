@@ -50,9 +50,10 @@ class Bleu:
         bleu_scorer = BleuScorer(n=self._n)
         for h, r in zip(hyps, refs):
             assert type(h) is str, h
-            r = [r] if type(r) is str else r
+            r = r if type(r) is list else [r]
+            r = [_r.encode() if type(_r) is str else _r for _r in r]
+            h = h.encode() if type(h) is str else h
             if self._normalize_hypothesis:
-                h = h.encode() if type(h) is str else h
                 assert type(h) == bytes, f"{h} ({type(h)})"
                 h = text_normalization(h.decode()).encode('utf-8')
             bleu_scorer += (h, r)

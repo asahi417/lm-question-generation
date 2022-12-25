@@ -76,8 +76,10 @@ class Meteor:
         with self.lock:
             assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
             for h, r in zip(hyps, refs):
+                h = h.encode() if type(h) is str else h
+                r = r if type(r) is list else [r]
+                r = [_r.encode() if type(_r) is str else _r for _r in r]
                 if self.normalize_hypothesis:
-                    h = h.encode() if type(h) is str else h
                     h = text_normalization(h.decode()).encode('utf-8')
                 stat = self._stat(h, r)
                 eval_line += ' ||| {}'.format(stat)
