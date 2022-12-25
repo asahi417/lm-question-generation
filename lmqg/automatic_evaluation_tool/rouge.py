@@ -83,7 +83,7 @@ class Rouge:
         for h, r in zip(hyps, refs):
             h = h.encode() if type(h) is str else h
             if self.normalize_hypothesis:
-                h = text_normalization(h[0].decode()).encode('utf-8')
+                h = text_normalization(h.decode()).encode('utf-8')
             r = r if type(r) is list else [r]
             r = [_r.encode() if type(_r) is str else _r for _r in r]
             score.append(self.calc_score([h], r))
