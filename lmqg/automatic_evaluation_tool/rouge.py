@@ -81,6 +81,7 @@ class Rouge:
         score = []
         assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
         for h, r in zip(hyps, refs):
+            h = h.encode() if type(h) is str else h
             if self.normalize_hypothesis:
                 h = text_normalization(h[0].decode()).encode('utf-8')
             r = r if type(r) is list else [r]
