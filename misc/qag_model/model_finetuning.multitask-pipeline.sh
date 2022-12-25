@@ -42,7 +42,7 @@ mlqg_multi () {
 mlqg_multi "mt5-small" "google/mt5-small" "64" "1"
 mlqg_multi "mt5-base" "google/mt5-base" "32" "2"
 
-# TODO: Additional training for German
+# TODO: Additional training for German [RUNNING ON HAWK]
 LA="de"
 MODEL_ALIAS="google/mt5-base"
 MODEL_NAME="mt5-base"
@@ -94,7 +94,7 @@ mlqg_ae () {
   done
 }
 
-[STONE]
+[STONE: PAUSED]
 mlqg_ae "mt5-small" "google/mt5-small" "32" "2"
 
 

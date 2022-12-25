@@ -8,7 +8,7 @@ from statistics import mean
 
 from datasets import load_dataset
 from lmqg import TransformersQG
-from lmqg.automatic_evaluation_tool import QAAlignedF1Score
+from lmqg.automatic_evaluation_tool import QAAlignedF1Score, Bleu, Meteor, Rouge, BERTScore, MoverScore
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -52,7 +52,12 @@ def main():
         (QAAlignedF1Score(target_metric='recall', base_metric='moverscore', language=opt.language),
          "QAAlignedRecall (MoverScore)"),
         (QAAlignedF1Score(target_metric='precision', base_metric='moverscore', language=opt.language),
-         "QAAlignedPrecision (MoverScore)")
+         "QAAlignedPrecision (MoverScore)"),
+        (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
+        (Meteor(), "METEOR"),
+        (Rouge(), "ROUGE_L"),
+        (BERTScore(language=opt.language), "BERTScore"),
+        (MoverScore(language=opt.language), 'MoverScore')
     ]
 
     def load_model():
@@ -154,7 +159,11 @@ def main():
         for metric, metric_name in metrics:
             if opt.overwrite_metric or metric_name not in output[_split]:
                 scores = metric.get_score(prediction, gold_reference)
-                output[_split][metric_name] = mean(scores.tolist())
+                if type(metric_name) is list:
+                    for _metric_name, _score in zip(metric_name, scores):
+                        output[_split][_metric_name] = mean(_score.tolist())
+                else:
+                    output[_split][metric_name] = mean(scores.tolist())
 
     with open(metric_file, "w") as f:
         json.dump(output, f)

@@ -5,10 +5,12 @@ QAE () {
   RANDOM_SEED=${1}
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
-    lmqg-qae -d "lmqg/qa_squadshifts_synthetic_random" -n "seed_${RANDOM_SEED}.end2end.${NAME}" --output-dir "qa_eval_output/random_sampling/${RANDOM_SEED}" --down-sample-size-train 1000 --down-sample-size-valid 500
+    lmqg-qae -d "lmqg/qa_squadshifts_synthetic_random" -n "seed_${RANDOM_SEED}.end2end.${NAME}" --output-dir "qa_eval_output/random_sampling/${RANDOM_SEED}.${NAME}" --down-sample-size-train 1000 --down-sample-size-valid 500 --ray-result-dir "ray_${RANDOM_SEED}_${NAME}"
+    rm -rf "ray_${RANDOM_SEED}_${NAME}"
   done
 }
 
+[RUNNING ON STONE]
 QAE 0
 QAE 1
 QAE 2
