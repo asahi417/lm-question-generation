@@ -52,8 +52,7 @@ class Bleu:
             assert type(h) is str, h
             r = [r] if type(r) is str else r
             if self._normalize_hypothesis:
-                if type(h) is str:
-                    h = h.encode()
+                h = h.encode() if type(h) is str else h
                 assert type(h) == bytes, f"{h} ({type(h)})"
                 h = text_normalization(h.decode()).encode('utf-8')
             bleu_scorer += (h, r)

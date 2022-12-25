@@ -76,10 +76,8 @@ class Meteor:
         with self.lock:
             assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
             for h, r in zip(hyps, refs):
-            # for i in imgIds:
-            #     assert (len(res[i]) == 1)
-            #     hypo = res[i][0]
                 if self.normalize_hypothesis:
+                    h = h.encode() if type(h) is str else h
                     h = text_normalization(h.decode()).encode('utf-8')
                 stat = self._stat(h, r)
                 eval_line += ' ||| {}'.format(stat)
