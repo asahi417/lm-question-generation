@@ -76,11 +76,14 @@ class Meteor:
         with self.lock:
             assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
             for h, r in zip(hyps, refs):
+                print(h, r)
                 h = h.encode() if type(h) is str else h
                 r = r if type(r) is list else [r]
                 r = [_r.encode() if type(_r) is str else _r for _r in r]
                 if self.normalize_hypothesis:
                     h = text_normalization(h.decode()).encode('utf-8')
+                print(h, r)
+                input()
                 stat = self._stat(h, r)
                 eval_line += ' ||| {}'.format(stat)
 
@@ -118,7 +121,7 @@ class Meteor:
 
             self.meteor_p.stdin.write(enc('{}\n'.format(eval_line)))
             self.meteor_p.stdin.flush()
-            for i in range(0, len(imgIds)):
+            for _ in range(0, len(imgIds)):
                 v = self.meteor_p.stdout.readline()
                 try:
                     scores.append(float(dec(v.strip())))
