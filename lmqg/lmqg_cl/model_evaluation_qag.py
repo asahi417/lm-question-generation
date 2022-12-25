@@ -157,7 +157,8 @@ def main():
                 f.write('\n'.join(prediction))
 
         for metric, metric_name in metrics:
-            if opt.overwrite_metric or metric_name not in output[_split]:
+            metric_name_list = [metric_name] if type(metric_name) is str else metric_name
+            if opt.overwrite_metric or any(m not in output[_split] for m in metric_name_list):
                 scores = metric.get_score(prediction, gold_reference)
                 if type(metric_name) is list:
                     for _metric_name, _score in zip(metric_name, scores):

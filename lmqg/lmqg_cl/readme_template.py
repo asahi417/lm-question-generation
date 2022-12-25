@@ -226,7 +226,7 @@ def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_en
     return tmp
 
 
-def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, is_multitask, is_end2end, is_qa, is_ae):
+def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_ae, metric_qag_pipe, is_multitask, is_end2end, is_qa, is_ae):
     metric_label = 'Question Generation'
     metric_label_type = "question_generation"
     if is_qa:
@@ -248,11 +248,13 @@ def format_metric(dataset, dataset_type, metric, metric_qag, metric_qa, metric_a
     metrics:"""
     tmp += __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end)
     if metric_qag is not None:
-        tmp += __format_metric(metric_qag, 'Question & Answer Generation', "question_answer_generation", is_multitask, is_end2end)
+        tmp += __format_metric(metric_qag, 'Question & Answer Generation (with Gold Answer)', "question_answer_generation_with_gold_answer", is_multitask, is_end2end)
     if metric_qa:
         tmp += __format_metric(metric_qa, 'Question Answering', "question_answering", is_multitask, is_end2end)
     if metric_ae:
         tmp += __format_metric(metric_ae, 'Answer Extraction', "answer_extraction", is_multitask, is_end2end)
+    if metric_qag_pipe:
+        tmp += __format_metric(metric_ae, 'Question & Answer Generation', "question_answer_generation", is_multitask, is_end2end)
     return tmp
 
 
@@ -432,7 +434,15 @@ def get_readme(model_name: str, model_checkpoint: str):
             with open(tmp_path) as f:
                 metric_ae = {k: {_k: round(_v * 100 if _k not in ["AnswerF1Score", "AnswerExactMatch"] else _v, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
 
-    metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae]
+    metric_qag_pipeline = None
+    tmp_path = f"eval_pipeline/metric.first.answer.paragraph.questions_answers.{dataset.replace('/', '_')}.{dataset_name}.{model_name.replace('/', '_')}-ae.json"
+    if os.path.exists(tmp_path):
+        with open(tmp_path) as f:
+            metric_qag_pipeline = {
+                k: {_k: round(_v * 100, 2) for _k, _v in
+                    v.items()} for k, v in json.load(f).items()}
+
+    metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae, metric_qag_pipeline]
 
     # metric for ood
     metrics_ood = []
@@ -457,7 +467,7 @@ def get_readme(model_name: str, model_checkpoint: str):
                 raise ValueError(f"dataset {_dataset} is not found")
         with open(i) as f:
             metric = json.load(f)
-            metrics_ood.append([_dataset, _dataset_name, metric, None, None, None])
+            metrics_ood.append([_dataset, _dataset_name, metric, None, None, None, None])
 
     metrics_text = '\n'.join([
         format_metric(
@@ -467,11 +477,12 @@ def get_readme(model_name: str, model_checkpoint: str):
             metric_qag=m_qag,
             metric_qa=m_qa,
             metric_ae=m_ae,
+            metric_qag_pipe=m_qag_pipe,
             is_multitask=_is_multitask,
             is_end2end=_is_qag,
             is_qa=_is_qa,
             is_ae=_is_ae
-        ) for d, t, m, m_qag, m_qa, m_ae in [metric_main] + metrics_ood])
+        ) for d, t, m, m_qag, m_qa, m_ae, m_qag_pipe in [metric_main] + metrics_ood])
     # readme table
     df_main = pd.DataFrame(*list(zip(*list(metric_main[2]["test"].items())))[::-1], columns=["Score"])
     df_main['Type'] = metric_main[1]
@@ -491,9 +502,22 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
         markdown_table += f"""
-- ***Metric (Question & Answer Generation)***: {"" if _is_multitask else "QAG metrics are computed with *the gold answer* and generated question on it for this model, as the model cannot provide an answer."} [raw metric file]({link_qag})
+- ***Metric (Question & Answer Generation, Reference Answer)***: {"" if _is_multitask else "Each question is generated from *the gold answer*."} [raw metric file]({link_qag})
 
 {df_qag.to_markdown()}
+
+"""
+    if metric_main[6] is not None:
+        df_qag_pipe = pd.DataFrame(*list(zip(*list(metric_main[6]["test"].items())))[::-1], columns=["Score"])
+        df_qag_pipe['Type'] = metric_main[1]
+        df_qag_pipe['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
+        link_qag_pipe = f"https://huggingface.co/{model_name}/raw/main/eval_pipeline/metric.first.answer.paragraph.questions_answers.{dataset.replace('/', '_')}.{dataset_name}.{model_name.replace('/', '_')}-ae.json"
+        ae_model = f"https://huggingface.co/{model_name.replace('qg', 'ae')}"
+        df_qag_pipe = df_qag_pipe.sort_index()
+        markdown_table += f"""
+- ***Metric (Question & Answer Generation, Pipeline Approach)***: Each question is generated on the answer generated by [`{model_name.replace('qg', 'ae')}`]({ae_model}). [raw metric file]({link_qag_pipe})
+
+{df_qag_pipe.to_markdown()}
 
 """
     if metric_main[4] is not None:
