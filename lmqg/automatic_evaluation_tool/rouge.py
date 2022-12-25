@@ -77,6 +77,15 @@ class Rouge:
             score = 0.0
         return score
 
+    def get_score(self, hyps, refs):
+        score = []
+        assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
+        for h, r in zip(hyps, refs):
+            if self.normalize_hypothesis:
+                h = text_normalization(h[0].decode()).encode('utf-8')
+            score.append(self.calc_score([h], r))
+        return np.array(score)
+
     def compute_score(self, gts, res):
         """
         Computes Rouge-L score given a set of reference and candidate sentences for the dataset

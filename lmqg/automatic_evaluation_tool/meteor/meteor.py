@@ -15,6 +15,8 @@ import threading
 import psutil
 from ..text_normalization import text_normalization
 
+import numpy as np
+
 
 # Assumes meteor-1.5.jar is in the same directory as meteor.py.  Change as needed.
 METEOR_JAR = 'meteor-1.5.jar'
@@ -67,6 +69,37 @@ class Meteor:
         # reference from atexit so the object can be garbage-collected.
         if atexit is not None and atexit.unregister is not None:
             atexit.unregister(self.close)
+
+    def get_score(self, hyps, refs):
+        scores = []
+        eval_line = 'EVAL'
+        with self.lock:
+            assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
+            for h, r in zip(hyps, refs):
+            # for i in imgIds:
+            #     assert (len(res[i]) == 1)
+            #     hypo = res[i][0]
+                if self.normalize_hypothesis:
+                    h = text_normalization(h.decode()).encode('utf-8')
+                stat = self._stat(h, r)
+                eval_line += ' ||| {}'.format(stat)
+
+            self.meteor_p.stdin.write(enc('{}\n'.format(eval_line)))
+            self.meteor_p.stdin.flush()
+            for i in range(0, len(hyps)):
+                v = self.meteor_p.stdout.readline()
+                try:
+                    scores.append(float(dec(v.strip())))
+                except:
+                    sys.stderr.write("Error handling value: {}\n".format(v))
+                    sys.stderr.write("Decoded value: {}\n".format(dec(v.strip())))
+                    sys.stderr.write("eval_line: {}\n".format(eval_line))
+                    # You can try uncommenting the next code line to show stderr from the Meteor JAR.
+                    # If the Meteor JAR is not writing to stderr, then the line will just hang.
+                    # sys.stderr.write("Error from Meteor:\n{}".format(self.meteor_p.stderr.read()))
+                    raise
+
+        return np.array(scores)
 
     def compute_score(self, gts, res):
         assert (gts.keys() == res.keys())

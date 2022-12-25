@@ -7,6 +7,7 @@
 # Creation Date : 06-01-2015
 # Last Modified : Thu 19 Mar 2015 09:13:28 PM PDT
 # Authors : Hao Fang <hfang@uw.edu> and Tsung-Yi Lin <tl483@cornell.edu>
+import numpy as np
 
 from .bleu_scorer import BleuScorer
 from ..text_normalization import text_normalization
@@ -40,12 +41,24 @@ class Bleu:
                 hypo = text_normalization(hypo.decode()).encode('utf-8')
             bleu_scorer += (hypo, ref)
 
-        #score, scores = bleu_scorer.compute_score(option='shortest')
         score, scores = bleu_scorer.compute_score(option='closest', verbose=0)
-        #score, scores = bleu_scorer.compute_score(option='average', verbose=1)
 
-        # return (bleu, bleu_info)
         return score, scores
+
+    def get_score(self, hyps, refs):
+        assert len(hyps) == len(refs), f"{len(hyps)} != {len(refs)}"
+        bleu_scorer = BleuScorer(n=self._n)
+        for h, r in zip(hyps, refs):
+            assert type(h) is str, h
+            r = [r] if type(r) is str else r
+            if self._normalize_hypothesis:
+                if type(h) is str:
+                    h = h.encode()
+                assert type(h) == bytes, f"{h} ({type(h)})"
+                h = text_normalization(h.decode()).encode('utf-8')
+            bleu_scorer += (h, r)
+        _, scores = bleu_scorer.compute_score(option='closest', verbose=0)
+        return np.array(scores)
 
     @staticmethod
     def method():
