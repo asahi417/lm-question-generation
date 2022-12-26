@@ -1,0 +1,9 @@
+[console_scripts]
+lmqg-eval = lmqg.lmqg_cl.model_evaluation:main
+lmqg-eval-qa = lmqg.lmqg_cl.model_evaluation_qa:main
+lmqg-eval-qag = lmqg.lmqg_cl.model_evaluation_qag:main
+lmqg-generate-qa = lmqg.lmqg_cl.model_evaluation_qa_based_metric:main_generate_qa_pair
+lmqg-push-to-hf = lmqg.lmqg_cl.push_to_hf:main
+lmqg-qae = lmqg.lmqg_cl.model_evaluation_qa_based_metric:main_qa_model_training
+lmqg-train-search = lmqg.lmqg_cl.model_finetuning:main_training_search
+
