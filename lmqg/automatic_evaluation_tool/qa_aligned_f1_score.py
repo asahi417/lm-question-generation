@@ -3,6 +3,7 @@ from typing import List
 from itertools import product, chain
 from statistics import mean
 import numpy as np
+from lmqg.spacy_module import SpacyPipeline
 
 EPS = 1e-6
 
@@ -32,6 +33,9 @@ class QAAlignedF1Score:
         self.instance_separator = instance_separator
         self.question_key = question_key
         self.answer_key = answer_key
+        # pipe = SpacyPipeline(self.language)
+        # self.question_key = (pipe.token(question_key))
+        # self.answer_key = pipe.token(answer_key)
         self.qa_separator = qa_separator
         assert target_metric in ['f1', 'recall', 'precision'], target_metric
         self.target_metric = target_metric
@@ -53,6 +57,8 @@ class QAAlignedF1Score:
     def get_score(self, hyps: List, refs: List):
         hyps = [h.split(self.instance_separator) for h in hyps]
         refs = [r.split(self.instance_separator) for r in refs]
+        print(hyps)
+        input()
 
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
         logging.info(f"found {len([i for i in hyps if len(i) == 0])} empty prediction from {len(hyps)}")

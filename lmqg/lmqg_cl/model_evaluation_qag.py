@@ -10,7 +10,6 @@ from datasets import load_dataset
 from lmqg import TransformersQG
 from lmqg.automatic_evaluation_tool import QAAlignedF1Score, Bleu, Meteor, Rouge, BERTScore, MoverScore
 
-
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
 
