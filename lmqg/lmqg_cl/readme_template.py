@@ -436,8 +436,6 @@ def get_readme(model_name: str, model_checkpoint: str):
 
     metric_qag_pipeline = None
     tmp_path = pj(model_checkpoint, "eval_pipeline", f"metric.first.answer.paragraph.questions_answers.{dataset.replace('/', '_')}.{dataset_name}.{model_name.replace('/', '_')}-ae.json")
-    print(tmp_path)
-    input()
     if os.path.exists(tmp_path):
         with open(tmp_path) as f:
             metric_qag_pipeline = {k: {_k: round(_v * 100, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
