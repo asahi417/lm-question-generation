@@ -82,7 +82,6 @@ class Meteor:
                 if self.normalize_hypothesis:
                     h = text_normalization(h.decode()).encode('utf-8')
 
-
                 stat = self._stat(h, r)
                 print(h, r)
                 print(stat)
@@ -103,6 +102,7 @@ class Meteor:
                     # If the Meteor JAR is not writing to stderr, then the line will just hang.
                     # sys.stderr.write("Error from Meteor:\n{}".format(self.meteor_p.stderr.read()))
                     raise
+            score = float(dec(self.meteor_p.stdout.readline()).strip())
 
         return np.array(scores)
 
