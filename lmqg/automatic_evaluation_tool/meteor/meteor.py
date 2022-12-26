@@ -81,13 +81,8 @@ class Meteor:
                 r = [_r.encode() if type(_r) is str else _r for _r in r]
                 if self.normalize_hypothesis:
                     h = text_normalization(h.decode()).encode('utf-8')
-
                 stat = self._stat(h, r)
-                print(h, r)
-                print(stat)
-                # input()
                 eval_line += ' ||| {}'.format(stat)
-
             self.meteor_p.stdin.write(enc('{}\n'.format(eval_line)))
             self.meteor_p.stdin.flush()
             for i in range(0, len(hyps)):
