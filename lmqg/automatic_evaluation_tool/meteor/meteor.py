@@ -86,7 +86,7 @@ class Meteor:
                 stat = self._stat(h, r)
                 print(h, r)
                 print(stat)
-                input()
+                # input()
                 eval_line += ' ||| {}'.format(stat)
 
             self.meteor_p.stdin.write(enc('{}\n'.format(eval_line)))
