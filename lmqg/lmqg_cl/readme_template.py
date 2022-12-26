@@ -439,7 +439,8 @@ def get_readme(model_name: str, model_checkpoint: str):
     if os.path.exists(tmp_path):
         with open(tmp_path) as f:
             metric_qag_pipeline = {k: {_k: round(_v * 100, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
-
+    print(tmp_path, os.path.exists(tmp_path))
+    input()
     metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae, metric_qag_pipeline]
 
     # metric for ood
