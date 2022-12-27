@@ -27,7 +27,9 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 def url_ae(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph_sentence.answer.lmqg_qg_{d}.default.json"
 def url_qg(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.sentence.paragraph_answer.question.lmqg_qg_{d}.default.json"
 def url_qag(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph.questions_answers.lmqg_qag_{d}.default.json"
+def url_multitask(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph.questions_answers.lmqg_qg_{d}.default.json"
 def url_pipeline(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval_pipeline/metric.first.answer.paragraph.questions_answers.lmqg_qg_{d}.default.lmqg_{m}-{d}-ae.json"
+def url_reference(m, d, suffix): return f"https://huggingface.co/lmqg/{m}-{d}-{suffix}/raw/main/eval/metric.first.answer.paragraph.questions_answers.lmqg_qg_{d}.default.json"
 
 
 def download(filename, url):
@@ -106,7 +108,7 @@ if __name__ == '__main__':
                 "Type": "QG",
                 "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
             }
-            tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg.qag.json'), url_qag(_m, _d, 'qg'))
+            tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg.qag.json'), url_reference(_m, _d, 'qg'))
             _metric.update(
                 {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
                  sorted(tmp['test'].keys())})
@@ -148,7 +150,7 @@ if __name__ == '__main__':
             "Type": "Multitask QAG",
             "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
         }
-        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.qag.json'), url_qag(_m, _d, 'qg-ae'))
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg-ae.qag.json'), url_multitask(_m, _d, 'qg-ae'))
         _metric.update(
             {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
              sorted(tmp['test'].keys())})
@@ -167,7 +169,7 @@ if __name__ == '__main__':
         tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qag.qag.json'), url_qag(_m, _d, 'qag'))
         _metric.update(
             {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
-             sorted(tmp['test'].keys()) if 'QAAligned' in k})
+             sorted(tmp['test'].keys())})
         metrics_qag.append(_metric)
 
     df = pd.DataFrame(metrics_ae).round(2).sort_values(by=['Data', 'Language Model', 'Type'])
@@ -199,6 +201,11 @@ if __name__ == '__main__':
     df = pd.DataFrame(metrics_qag).round(2).sort_values(by=['Data', 'Language Model', 'Type'])
     print('- Question & Answer Pairs Generation\n')
     print(df.to_markdown(index=False), '\n\n')
+    df['BLEU-1'] = df.pop('Bleu_1')
+    df['BLEU-2'] = df.pop('Bleu_2')
+    df['BLEU-3'] = df.pop('Bleu_3')
+    df['BLEU-4'] = df.pop('Bleu_4')
+    df['ROUGE-L'] = df.pop('ROUGE_L')
     df['Model'] = [i.split("`")[1] for i in df['Model']]
     df['Data'] = [i.split("`")[1] for i in df['Data']]
     df['Language Model'] = [i.split("`")[1] for i in df['Language Model']]
