@@ -58,7 +58,6 @@ class QAAlignedF1Score:
         hyps = [h.split(self.instance_separator) for h in hyps]
         refs = [r.split(self.instance_separator) for r in refs]
         print(hyps)
-        input()
 
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
         logging.info(f"found {len([i for i in hyps if len(i) == 0])} empty prediction from {len(hyps)}")

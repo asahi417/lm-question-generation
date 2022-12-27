@@ -30,10 +30,12 @@ def compute_metrics(out_file,
     """ compute automatic metric """
     spacy_model = SpacyPipeline(language=language) if language in LANG_NEED_TOKENIZATION else None
     pairs = []
+    pairs_raw = []
     with open(tgt_file, "r") as infile:
         for n, line in enumerate(infile):
             if line.endswith('\n'):
                 line = line[:-1]
+            pairs_raw.append({'tokenized_question': line.strip(), 'tokenized_sentence': n})
             if spacy_model is None:
                 pairs.append({'tokenized_question': line.strip(), 'tokenized_sentence': n})
             else:
@@ -45,6 +47,7 @@ def compute_metrics(out_file,
             for n, line in enumerate(infile):
                 if line.endswith('\n'):
                     line = line[:-1]
+                pairs_raw[n]['tokenized_sentence'] = line.strip().lower()
                 if spacy_model is None:
                     pairs[n]['tokenized_sentence'] = line.strip().lower()
                 else:
@@ -55,54 +58,59 @@ def compute_metrics(out_file,
         for n, line in enumerate(infile):
             if line.endswith('\n'):
                 line = line[:-1]
-            if spacy_model is not None:
-                pairs[n]['prediction'] = ' '.join(spacy_model.token(line.strip()))
-            else:
+            pairs_raw[n]['prediction'] = line.strip()
+            if spacy_model is None:
                 pairs[n]['prediction'] = line.strip()
+            else:
+                pairs[n]['prediction'] = ' '.join(spacy_model.token(line.strip()))
+
     # eval
     json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
-    res = defaultdict(lambda: [])
-    gts = defaultdict(lambda: [])
 
-    for pair in pairs:
+    def format_pair(_pairs):
+        res = defaultdict(lambda: [])
+        gts = defaultdict(lambda: [])
 
-        # key is the sentence where the model generates the question
-        key = pair['tokenized_sentence']
+        for pair in _pairs:
 
-        # one generation per sentence
-        if 'prediction' in pair:
-            pred = pair['prediction'].encode('utf-8')
-        else:
-            logging.warning('prediction not found at the evaluation')
-            pred = ''.encode('utf-8')
-        res[key].append(pred)
+            # key is the sentence where the model generates the question
+            key = pair['tokenized_sentence']
 
-        # multiple gold question per sentence
-        gts[key].append(pair['tokenized_question'].encode('utf-8'))
+            # one generation per sentence
+            if 'prediction' in pair:
+                pred = pair['prediction'].encode('utf-8')
+            else:
+                logging.warning('prediction not found at the evaluation')
+                pred = ''.encode('utf-8')
+            res[key].append(pred)
 
-    res_filtered = defaultdict(lambda: [])
-    for k, v in res.items():
-        # answer-level evaluation
-        if prediction_aggregation is None:
-            assert len(v) == 1
-            res_filtered[k] = v
-        elif prediction_aggregation == 'first':
-            # the first one
-            res_filtered[k] = [v[0]]
-        elif prediction_aggregation == 'last':
-            # the last one
-            res_filtered[k] = [v[-1]]
-        elif prediction_aggregation == 'long':
-            # the longest generation
-            res_filtered[k] = [v[v.index(sorted(v, key=len)[-1])]]
-        elif prediction_aggregation == 'short':
-            # the shortest generation
-            res_filtered[k] = [v[v.index(sorted(v, key=len)[0])]]
-        elif prediction_aggregation == 'middle':
-            # middle length generation
-            res_filtered[k] = [v[v.index(sorted(v, key=len)[int(len(v)/2)])]]
-        else:
-            raise ValueError(f'unknown aggregation method: {prediction_aggregation}')
+            # multiple gold question per sentence
+            gts[key].append(pair['tokenized_question'].encode('utf-8'))
+
+        res_filtered = defaultdict(lambda: [])
+        for k, v in res.items():
+            # answer-level evaluation
+            if prediction_aggregation is None:
+                assert len(v) == 1
+                res_filtered[k] = v
+            elif prediction_aggregation == 'first':
+                # the first one
+                res_filtered[k] = [v[0]]
+            elif prediction_aggregation == 'last':
+                # the last one
+                res_filtered[k] = [v[-1]]
+            elif prediction_aggregation == 'long':
+                # the longest generation
+                res_filtered[k] = [v[v.index(sorted(v, key=len)[-1])]]
+            elif prediction_aggregation == 'short':
+                # the shortest generation
+                res_filtered[k] = [v[v.index(sorted(v, key=len)[0])]]
+            elif prediction_aggregation == 'middle':
+                # middle length generation
+                res_filtered[k] = [v[v.index(sorted(v, key=len)[int(len(v)/2)])]]
+            else:
+                raise ValueError(f'unknown aggregation method: {prediction_aggregation}')
+        return gts, res_filtered
 
     output = {}
     scorers = [(Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"])]
@@ -131,9 +139,13 @@ def compute_metrics(out_file,
         if skip is not None:
             scorers_extra = [s for s in scorers_extra if s[1] not in skip]
         scorers += scorers_extra
-
+    gts_, res_filtered_ = format_pair(pairs)
+    gts_raw, res_filtered_raw = format_pair(pairs_raw)
     for scorer, method in scorers:
-        score, scores = scorer.compute_score(gts, res_filtered)
+        if type(method) is str and method.startswith('QAAligned'):
+            score, scores = scorer.compute_score(gts_raw, res_filtered_raw)
+        else:
+            score, scores = scorer.compute_score(gts_, res_filtered_)
         torch.cuda.empty_cache()
         if type(method) is not list:
             score, scores, method = [score], [scores], [method]
