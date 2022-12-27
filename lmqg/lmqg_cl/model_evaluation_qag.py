@@ -9,6 +9,9 @@ from statistics import mean
 from datasets import load_dataset
 from lmqg import TransformersQG
 from lmqg.automatic_evaluation_tool import QAAlignedF1Score, Bleu, Meteor, Rouge, BERTScore, MoverScore
+from lmqg.spacy_module import SpacyPipeline
+from lmqg.automatic_evaluation import LANG_NEED_TOKENIZATION
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -85,7 +88,7 @@ def main():
             output = json.load(f)
     else:
         output = {}
-
+    spacy_model = SpacyPipeline(language=opt.language) if opt.language in LANG_NEED_TOKENIZATION else None
     for _split, _file in zip([opt.test_split, opt.validation_split], [opt.hyp_test, opt.hyp_dev]):
         if _file is None:
             if opt.model_ae is not None:
@@ -158,6 +161,8 @@ def main():
         for metric, metric_name in metrics:
             metric_name_list = [metric_name] if type(metric_name) is str else metric_name
             if opt.overwrite_metric or any(m not in output[_split] for m in metric_name_list):
+                if spacy_model is not None and (type(metric_name) is list or not metric_name.startswith("QAAligned")):
+                    prediction = [' '.join(spacy_model.token(i)) for i in prediction]
                 scores = metric.get_score(prediction, gold_reference)
                 if type(metric_name) is list:
                     for _metric_name, _score in zip(metric_name, scores):
