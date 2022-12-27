@@ -42,17 +42,6 @@ mlqg_multi () {
 mlqg_multi "mt5-small" "google/mt5-small" "64" "1"
 mlqg_multi "mt5-base" "google/mt5-base" "32" "2"
 
-# TODO: Additional training for German [RUNNING ON HAWK]
-LA="de"
-MODEL_ALIAS="google/mt5-base"
-MODEL_NAME="mt5-base"
-lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b 4 -g 32 --lr 1e-04 5e-04 --epoch-partial 5 -e 20 --label-smoothing 0.15 --language "${LA}" --n-max-config 1 -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
-lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_answer" -o 'question'
-lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
-lmqg-eval-qag --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad"
-lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
-lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-qg-ae/best_model" -a "${MODEL_NAME}-${LA}quad-qg-ae" -o "lmqg"
-
 # Ablation: answer extraction only model
 lmqg-train-search -m "t5-large" -b 4 -g 16 32 -c "lmqg_output/t5-large-squad-ae" -i 'paragraph_sentence' -o 'answer' -p 'ae'
 lmqg-eval -m "lmqg_output/t5-large-squad-ae/best_model" -e "lmqg_output/t5-large-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'

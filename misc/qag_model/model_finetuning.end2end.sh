@@ -7,6 +7,7 @@ LA='es'  # [HAWK ccs2008]
 LA='ko'  # [HAWK ccs2107]
 LA='de'
 LA='it'
+LA='ru'
 MODEL="google/mt5-small"
 MODEL_SHORT='mt5-small'
 MODEL="google/mt5-base"

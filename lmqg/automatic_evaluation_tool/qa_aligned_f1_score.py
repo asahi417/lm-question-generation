@@ -60,6 +60,8 @@ class QAAlignedF1Score:
         hyps = [self.filter_qa_pairs(hyp) for hyp in hyps]
         logging.info(f"found {len([i for i in hyps if len(i) == 0])} empty prediction from {len(hyps)}")
         pairs = list(chain(*[list(product(h, r)) for h, r in zip(hyps, refs) if len(h) != 0]))
+        if len(pairs) == 0:
+            return np.array([0.0])
         h, r = list(zip(*pairs))
         scores = self.base_metric.get_score(h, r)
         assert len(scores) == len(pairs), f"{len(scores)} != {len(pairs)}"
