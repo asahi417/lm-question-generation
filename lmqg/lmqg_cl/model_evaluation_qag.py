@@ -118,6 +118,8 @@ def main():
                 f"question: {i['question']}, answer: {i['answer']}" for _, i in g.iterrows()
             ]))
         prediction = None
+        print(_file, os.path.exists(_file))
+        input()
         if not opt.overwrite_prediction and os.path.exists(_file):
             with open(_file) as f:
                 _prediction = f.read().split('\n')
