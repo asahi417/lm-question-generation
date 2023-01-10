@@ -165,7 +165,6 @@ language_dict = {
 def keep_qag_metric(df):
     df = df.T
     col = df.columns
-    print(col)
     for i in ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4", "METEOR", "ROUGE_L", "BERTScore", "MoverScore"]:
         if i in col:
             df.pop(i)
@@ -517,10 +516,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         df_qag['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
-        print(df_qag)
         df_qag = keep_qag_metric(df_qag)
-        print(df_qag)
-        input()
         markdown_table += f"""
 - ***Metric (Question & Answer Generation{', Reference Answer' if not _is_multitask else ''})***: {"" if _is_multitask else "Each question is generated from *the gold answer*."} [raw metric file]({link_qag})
 
