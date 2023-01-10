@@ -175,39 +175,39 @@ def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_en
     if "QAAlignedF1Score (BERTScore)" not in metric['test']:
         if "Bleu_4" in metric["test"]:
             tmp += f"""
-        - name: BLEU4 ({metric_label})
-          type: bleu4_{metric_label_type}
-          value: {metric["test"]["Bleu_4"]}"""
+    - name: BLEU4 ({metric_label})
+      type: bleu4_{metric_label_type}
+      value: {metric["test"]["Bleu_4"]}"""
         if "ROUGE_L" in metric["test"]:
             tmp += f"""
-        - name: ROUGE-L ({metric_label})
-          type: rouge_l_{metric_label_type}
-          value: {metric["test"]["ROUGE_L"]}"""
+    - name: ROUGE-L ({metric_label})
+      type: rouge_l_{metric_label_type}
+      value: {metric["test"]["ROUGE_L"]}"""
         if "METEOR" in metric["test"]:
             tmp += f"""
-        - name: METEOR ({metric_label})
-          type: meteor_{metric_label_type}
-          value: {metric["test"]["METEOR"]}"""
+    - name: METEOR ({metric_label})
+      type: meteor_{metric_label_type}
+      value: {metric["test"]["METEOR"]}"""
         if "BERTScore" in metric["test"]:
             tmp += f"""
-        - name: BERTScore ({metric_label})
-          type: bertscore_{metric_label_type}
-          value: {metric["test"]["BERTScore"]}"""
+    - name: BERTScore ({metric_label})
+      type: bertscore_{metric_label_type}
+      value: {metric["test"]["BERTScore"]}"""
         if "MoverScore" in metric["test"]:
             tmp += f"""
-        - name: MoverScore ({metric_label})
-          type: moverscore_{metric_label_type}
-          value: {metric["test"]["MoverScore"]}"""
+    - name: MoverScore ({metric_label})
+      type: moverscore_{metric_label_type}
+      value: {metric["test"]["MoverScore"]}"""
         if "AnswerF1Score" in metric['test']:
             tmp += f"""
-        - name: AnswerF1Score ({metric_label})
-          type: answer_f1_score__{metric_label_type}
-          value: {metric["test"]["AnswerF1Score"]}"""
+    - name: AnswerF1Score ({metric_label})
+      type: answer_f1_score__{metric_label_type}
+      value: {metric["test"]["AnswerF1Score"]}"""
         if "AnswerExactMatch" in metric['test']:
             tmp += f"""
-        - name: AnswerExactMatch ({metric_label})
-          type: answer_exact_match_{metric_label_type}
-          value: {metric["test"]["AnswerExactMatch"]}"""
+    - name: AnswerExactMatch ({metric_label})
+      type: answer_exact_match_{metric_label_type}
+      value: {metric["test"]["AnswerExactMatch"]}"""
     if "QAAlignedF1Score (BERTScore)" in metric['test']:
         tmp += f"""
     - name: QAAlignedF1Score-BERTScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
