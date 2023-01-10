@@ -28,5 +28,5 @@ note.sh
 note2.sh
 metric
 tmp*
-
+*.xlsx
 simple-question-generation

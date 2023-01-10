@@ -162,43 +162,52 @@ language_dict = {
 }
 
 
+def keep_qag_metric(df):
+    col = df.columns
+    for i in ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4", "METEOR", "ROUGE_L", "BERTScore", "MoverScore"]:
+        if i in col:
+            df.pop(i)
+    return df
+
+
 def __format_metric(metric, metric_label, metric_label_type, is_multitask, is_end2end):
     tmp = ""
-    if "Bleu_4" in metric["test"]:
-        tmp += f"""
-    - name: BLEU4 ({metric_label})
-      type: bleu4_{metric_label_type}
-      value: {metric["test"]["Bleu_4"]}"""
-    if "ROUGE_L" in metric["test"]:
-        tmp += f"""
-    - name: ROUGE-L ({metric_label})
-      type: rouge_l_{metric_label_type}
-      value: {metric["test"]["ROUGE_L"]}"""
-    if "METEOR" in metric["test"]:
-        tmp += f"""
-    - name: METEOR ({metric_label})
-      type: meteor_{metric_label_type}
-      value: {metric["test"]["METEOR"]}"""
-    if "BERTScore" in metric["test"]:
-        tmp += f"""
-    - name: BERTScore ({metric_label})
-      type: bertscore_{metric_label_type}
-      value: {metric["test"]["BERTScore"]}"""
-    if "MoverScore" in metric["test"]:
-        tmp += f"""
-    - name: MoverScore ({metric_label})
-      type: moverscore_{metric_label_type}
-      value: {metric["test"]["MoverScore"]}"""
-    if "AnswerF1Score" in metric['test']:
-        tmp += f"""
-    - name: AnswerF1Score ({metric_label})
-      type: answer_f1_score__{metric_label_type}
-      value: {metric["test"]["AnswerF1Score"]}"""
-    if "AnswerExactMatch" in metric['test']:
-        tmp += f"""
-    - name: AnswerExactMatch ({metric_label})
-      type: answer_exact_match_{metric_label_type}
-      value: {metric["test"]["AnswerExactMatch"]}"""
+    if "QAAlignedF1Score (BERTScore)" not in metric['test']:
+        if "Bleu_4" in metric["test"]:
+            tmp += f"""
+        - name: BLEU4 ({metric_label})
+          type: bleu4_{metric_label_type}
+          value: {metric["test"]["Bleu_4"]}"""
+        if "ROUGE_L" in metric["test"]:
+            tmp += f"""
+        - name: ROUGE-L ({metric_label})
+          type: rouge_l_{metric_label_type}
+          value: {metric["test"]["ROUGE_L"]}"""
+        if "METEOR" in metric["test"]:
+            tmp += f"""
+        - name: METEOR ({metric_label})
+          type: meteor_{metric_label_type}
+          value: {metric["test"]["METEOR"]}"""
+        if "BERTScore" in metric["test"]:
+            tmp += f"""
+        - name: BERTScore ({metric_label})
+          type: bertscore_{metric_label_type}
+          value: {metric["test"]["BERTScore"]}"""
+        if "MoverScore" in metric["test"]:
+            tmp += f"""
+        - name: MoverScore ({metric_label})
+          type: moverscore_{metric_label_type}
+          value: {metric["test"]["MoverScore"]}"""
+        if "AnswerF1Score" in metric['test']:
+            tmp += f"""
+        - name: AnswerF1Score ({metric_label})
+          type: answer_f1_score__{metric_label_type}
+          value: {metric["test"]["AnswerF1Score"]}"""
+        if "AnswerExactMatch" in metric['test']:
+            tmp += f"""
+        - name: AnswerExactMatch ({metric_label})
+          type: answer_exact_match_{metric_label_type}
+          value: {metric["test"]["AnswerExactMatch"]}"""
     if "QAAlignedF1Score (BERTScore)" in metric['test']:
         tmp += f"""
     - name: QAAlignedF1Score-BERTScore ({metric_label}){"" if is_multitask or is_end2end else " [Gold Answer]"}
@@ -445,8 +454,6 @@ def get_readme(model_name: str, model_checkpoint: str):
     if os.path.exists(tmp_path):
         with open(tmp_path) as f:
             metric_qag_pipeline = {k: {_k: round(_v * 100, 2) for _k, _v in v.items()} for k, v in json.load(f).items()}
-    # print(tmp_path, os.path.exists(tmp_path))
-    # input()
     metric_main = [dataset, dataset_name, metric, metric_qag, metric_qa, metric_ae, metric_qag_pipeline]
 
     # metric for ood
@@ -494,6 +501,8 @@ def get_readme(model_name: str, model_checkpoint: str):
     df_main['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
     link_main = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file}.{dataset.replace("/", "_")}.{dataset_name}.json'
     df_main = df_main.sort_index()
+    if metric_title == "Question & Answer Generation":
+        df_main = keep_qag_metric(df_main)
     markdown_table = f"""
 - ***Metric ({metric_title})***: [raw metric file]({link_main}) 
 
@@ -506,6 +515,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         df_qag['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
+        df_qag = keep_qag_metric(df_qag)
         markdown_table += f"""
 - ***Metric (Question & Answer Generation{', Reference Answer' if not _is_multitask else ''})***: {"" if _is_multitask else "Each question is generated from *the gold answer*."} [raw metric file]({link_qag})
 
@@ -519,6 +529,7 @@ def get_readme(model_name: str, model_checkpoint: str):
         link_qag_pipe = f"https://huggingface.co/{model_name}/raw/main/eval_pipeline/metric.first.answer.paragraph.questions_answers.{dataset.replace('/', '_')}.{dataset_name}.{model_name.replace('-qg', '-ae').replace('/', '_')}.json"
         ae_model = f"https://huggingface.co/{model_name.replace('-qg', '-ae')}"
         df_qag_pipe = df_qag_pipe.sort_index()
+        df_qag_pipe = keep_qag_metric(df_qag_pipe)
         markdown_table += f"""
 - ***Metric (Question & Answer Generation, Pipeline Approach)***: Each question is generated on the answer generated by [`{model_name.replace('-qg', '-ae')}`]({ae_model}). [raw metric file]({link_qag_pipe})
 

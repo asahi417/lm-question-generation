@@ -1,4 +1,39 @@
 Model,Data,Type,Language Model,BERTScore,METEOR,MoverScore,QAAlignedF1Score (BERTScore),QAAlignedF1Score (MoverScore),QAAlignedPrecision (BERTScore),QAAlignedPrecision (MoverScore),QAAlignedRecall (BERTScore),QAAlignedRecall (MoverScore),BLEU-1,BLEU-2,BLEU-3,BLEU-4,ROUGE-L
+lmqg/mt5-base-dequad-qg-ae,lmqg/qg_dequad,Multitask QAG,google/mt5-base,5.71,1.01,43.51,6.11,4.24,6.3,4.34,5.95,4.15,0.85,0.32,0.04,0.03,1.71
+lmqg/mt5-small-dequad-qag,lmqg/qg_dequad,End2end QAG,google/mt5-small,61.18,1.49,46.62,0.0,0.0,0.0,0.0,0.0,0.0,0.03,0.01,0.0,0.0,2.57
+lmqg/mt5-small-dequad-qg-ae,lmqg/qg_dequad,Multitask QAG,google/mt5-small,72.77,20.36,52.71,80.02,53.99,78.91,53.77,81.23,54.27,15.62,7.61,2.48,1.03,17.07
+lmqg/mt5-small-dequad-qg,lmqg/qg_dequad,Pipeline QAG,google/mt5-small,73.16,20.32,52.63,81.19,54.3,80.0,54.04,82.46,54.59,14.65,7.15,2.23,0.89,16.85
+lmqg/mt5-small-dequad-qg,lmqg/qg_dequad,QG,google/mt5-small,74.29,18.96,52.45,90.55,64.33,90.59,64.37,90.51,64.29,13.87,6.38,0.54,0.08,16.17
+lmqg/mt5-base-esquad-qg-ae,lmqg/qg_esquad,Multitask QAG,google/mt5-base,69.46,22.16,51.69,79.67,54.82,77.14,53.27,82.44,56.56,10.75,5.37,2.92,1.78,15.15
+lmqg/mt5-small-esquad-qag,lmqg/qg_esquad,End2end QAG,google/mt5-small,64.09,16.9,50.15,78.12,53.92,78.0,53.93,78.27,53.93,7.43,3.51,2.04,1.36,12.76
+lmqg/mt5-small-esquad-qg-ae,lmqg/qg_esquad,Multitask QAG,google/mt5-small,68.93,21.82,51.59,79.06,54.49,76.46,52.96,81.94,56.21,10.52,5.19,2.82,1.73,14.86
+lmqg/mt5-small-esquad-qg,lmqg/qg_esquad,Pipeline QAG,google/mt5-small,69.78,22.22,51.8,79.89,54.82,77.46,53.31,82.56,56.52,11.1,5.5,3.0,1.83,15.46
+lmqg/mt5-small-esquad-qg,lmqg/qg_esquad,QG,google/mt5-small,89.41,37.58,63.56,89.43,63.73,89.44,63.75,89.41,63.72,39.84,26.59,18.28,12.77,42.77
+lmqg/mt5-base-frquad-qg-ae,lmqg/qg_frquad,Multitask QAG,google/mt5-base,67.93,19.22,50.92,79.16,53.9,76.69,52.57,81.87,55.36,10.39,5.22,2.66,1.32,14.85
+lmqg/mt5-small-frquad-qag,lmqg/qg_frquad,End2end QAG,google/mt5-small,64.81,16.12,50.01,77.23,52.36,76.76,52.19,77.74,52.54,9.63,4.73,2.64,1.54,15.33
+lmqg/mt5-small-frquad-qg-ae,lmqg/qg_frquad,Multitask QAG,google/mt5-small,68.58,19.6,51.07,79.7,54.22,77.29,52.84,82.36,55.76,10.98,5.54,2.94,1.47,15.41
+lmqg/mt5-small-frquad-qg,lmqg/qg_frquad,Pipeline QAG,google/mt5-small,68.54,19.29,51.06,79.72,53.94,77.58,52.7,82.06,55.32,11.49,5.61,2.84,1.4,15.84
+lmqg/mt5-small-frquad-qg,lmqg/qg_frquad,QG,google/mt5-small,88.51,34.29,62.42,88.52,62.46,88.53,62.46,88.51,62.45,39.78,27.56,19.54,13.83,42.57
+lmqg/mt5-base-itquad-qg-ae,lmqg/qg_itquad,Multitask QAG,google/mt5-base,77.22,24.87,54.79,81.98,56.35,81.19,56.0,82.83,56.75,23.77,13.36,6.73,3.8,23.43
+lmqg/mt5-small-itquad-qag,lmqg/qg_itquad,End2end QAG,google/mt5-small,70.79,17.1,51.31,79.41,54.15,81.16,55.49,77.79,52.94,17.99,9.64,4.94,2.96,20.56
+lmqg/mt5-small-itquad-qg-ae,lmqg/qg_itquad,Multitask QAG,google/mt5-small,77.25,24.38,54.65,81.81,56.02,81.17,55.76,82.51,56.32,23.88,13.37,6.51,3.54,23.48
+lmqg/mt5-small-itquad-qg,lmqg/qg_itquad,Pipeline QAG,google/mt5-small,77.23,23.95,54.66,81.63,55.85,81.04,55.6,82.28,56.14,23.77,13.25,6.48,3.48,23.31
+lmqg/mt5-small-itquad-qg,lmqg/qg_itquad,QG,google/mt5-small,86.62,34.31,60.68,87.66,61.6,87.76,61.73,87.57,61.48,40.5,28.64,20.78,15.44,40.08
+lmqg/mt5-base-jaquad-qg-ae,lmqg/qg_jaquad,Multitask QAG,google/mt5-base,64.05,23.7,50.99,80.35,56.23,77.28,54.02,83.79,58.81,0.25,0.01,0.0,0.0,0.53
+lmqg/mt5-small-jaquad-qag,lmqg/qg_jaquad,End2end QAG,google/mt5-small,58.55,9.88,49.1,58.35,39.19,58.34,39.21,58.38,39.17,8.16,6.13,4.7,3.66,15.62
+lmqg/mt5-small-jaquad-qg-ae,lmqg/qg_jaquad,Multitask QAG,google/mt5-small,64.25,23.91,51.01,80.51,56.28,80.51,56.28,80.51,56.28,0.25,0.01,0.0,0.0,0.53
+lmqg/mt5-small-jaquad-qg,lmqg/qg_jaquad,Pipeline QAG,google/mt5-small,63.94,23.63,50.95,79.78,55.85,76.84,53.8,83.06,58.22,0.26,0.01,0.0,0.0,0.53
+lmqg/mt5-small-jaquad-qg,lmqg/qg_jaquad,QG,google/mt5-small,81.91,36.7,58.13,86.07,61.83,86.08,61.85,86.06,61.81,1.16,0.12,0.0,0.0,2.27
+lmqg/mt5-base-koquad-qg-ae,lmqg/qg_koquad,Multitask QAG,google/mt5-base,67.47,23.49,62.16,80.28,81.97,77.03,78.1,83.91,86.43,7.87,4.3,2.12,1.05,12.74
+lmqg/mt5-small-koquad-qag,lmqg/qg_koquad,End2end QAG,google/mt5-small,58.39,12.95,58.81,74.23,75.06,74.29,75.14,74.2,75.04,4.09,2.09,1.17,0.71,8.06
+lmqg/mt5-small-koquad-qg-ae,lmqg/qg_koquad,Multitask QAG,google/mt5-small,68.11,23.79,62.67,80.36,82.55,77.34,78.93,83.72,86.69,8.34,4.4,2.1,1.01,13.22
+lmqg/mt5-small-koquad-qg,lmqg/qg_koquad,Pipeline QAG,google/mt5-small,67.87,23.6,62.45,80.52,82.95,77.56,79.39,83.8,87.02,8.16,4.36,2.07,1.03,13.0
+lmqg/mt5-small-koquad-qg,lmqg/qg_koquad,QG,google/mt5-small,87.21,36.66,84.46,87.52,85.15,87.57,85.23,87.49,85.09,41.86,30.67,18.85,10.86,46.66
+lmqg/mt5-base-ruquad-qg-ae,lmqg/qg_ruquad,Multitask QAG,google/mt5-base,68.76,22.48,52.18,80.21,57.17,76.48,54.4,84.49,60.55,11.21,6.44,4.08,2.61,16.09
+lmqg/mt5-small-ruquad-qag,lmqg/qg_ruquad,End2end QAG,google/mt5-small,63.57,16.02,50.64,52.95,38.59,52.86,38.57,53.06,38.62,8.17,4.57,3.05,2.2,13.97
+lmqg/mt5-small-ruquad-qg-ae,lmqg/qg_ruquad,Multitask QAG,google/mt5-small,68.55,22.13,52.08,79.74,56.69,76.15,54.11,83.83,59.79,11.17,6.34,3.92,2.46,15.87
+lmqg/mt5-small-ruquad-qg,lmqg/qg_ruquad,Pipeline QAG,google/mt5-small,66.18,21.27,51.57,76.96,55.53,73.41,53.24,81.05,58.25,9.81,5.77,3.7,2.43,14.74
+lmqg/mt5-small-ruquad-qg,lmqg/qg_ruquad,QG,google/mt5-small,90.03,43.1,67.82,90.17,68.22,90.17,68.23,90.16,68.21,45.81,34.13,25.81,18.61,51.04
 lmqg/bart-base-squad-qag,lmqg/qg_squad,End2end QAG,facebook/bart-base,89.02,17.12,59.02,84.49,57.46,85.64,60.01,83.38,55.26,24.85,14.37,9.14,6.33,20.71
 lmqg/bart-base-squad-qg,lmqg/qg_squad,Pipeline QAG,facebook/bart-base,90.58,24.95,61.7,92.84,64.24,92.75,64.46,92.95,64.11,25.24,13.96,6.68,3.63,25.1
 lmqg/bart-base-squad-qg,lmqg/qg_squad,QG,facebook/bart-base,94.59,39.55,69.39,95.49,70.38,95.55,70.67,95.44,70.1,43.24,29.03,19.61,13.87,41.96

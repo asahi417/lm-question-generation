@@ -13,11 +13,13 @@ LM_QG_AE = ['t5-small', 't5-base', 't5-large']
 LM_QAG = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
 
 DATA_ML = ['ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
+LM_QG_ML = ['google/mt5-small']
 # LM_QG_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
-LM_QG_ML = []
-LM_AE_ML = []
-# LM_QG_AE_ML = ['mt5-small', 'mt5-base']
-LM_QG_AE_ML = []
+LM_AE_ML = ['google/mt5-small']
+# LM_AE_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
+LM_QG_AE_ML = ['google/mt5-small']
+# LM_QG_AE_ML = ['google/mt5-small', 'google/mt5-base']
+LM_QAG_ML = ['google/mt5-small']
 
 METRIC_PERC = ["AnswerF1Score", "AnswerExactMatch"]
 TMP_DIR = 'metric_files'
@@ -100,19 +102,18 @@ if __name__ == '__main__':
             print(f"{_m}-{_d}-qg")
             pass
 
-        if _lm in LM_QG:
-            # QAG metrics: QG with reference answer
-            _metric = {
-                "Model": f"[`lmqg/{_m}-{_d}-qg`](https://huggingface.co/lmqg/{_m}-{_d}-qg)",
-                "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
-                "Type": "QG",
-                "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
-            }
-            tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg.qag.json'), url_reference(_m, _d, 'qg'))
-            _metric.update(
-                {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
-                 sorted(tmp['test'].keys())})
-            metrics_qag.append(_metric)
+        # QAG metrics: QG with reference answer
+        _metric = {
+            "Model": f"[`lmqg/{_m}-{_d}-qg`](https://huggingface.co/lmqg/{_m}-{_d}-qg)",
+            "Data": f"[`lmqg/qg_{_d}`](https://huggingface.co/datasets/lmqg/qg_{_d})",
+            "Type": "QG",
+            "Language Model": f"[`{_lm}`](https://huggingface.co/{_lm})"
+        }
+        tmp = download(pj(TMP_DIR, f'{_m}.{_d}.qg.qag.json'), url_reference(_m, _d, 'qg'))
+        _metric.update(
+            {k: 100 * tmp['test'][k] if k not in METRIC_PERC else tmp['test'][k] for k in
+             sorted(tmp['test'].keys())})
+        metrics_qag.append(_metric)
 
     for _d, _lm in list(product(DATA, LM_QG_AE)) + list(product(DATA_ML, LM_QG_AE_ML)):
         _m = os.path.basename(_lm)
@@ -156,7 +157,7 @@ if __name__ == '__main__':
              sorted(tmp['test'].keys())})
         metrics_qag.append(_metric)
 
-    for _d, _lm in list(product(DATA, LM_QAG)):
+    for _d, _lm in list(product(DATA, LM_QAG)) + list(product(DATA_ML, LM_QAG_ML)):
         _m = os.path.basename(_lm)
 
         # QAG metrics: e2e QAG model

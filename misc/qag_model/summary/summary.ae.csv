@@ -1,4 +1,18 @@
 Model,Data,Type,Language Model,AnswerExactMatch,AnswerF1Score,BERTScore,METEOR,MoverScore,BLEU-1,BLEU-2,BLEU-3,BLEU-4,ROUGE-L
+lmqg/mt5-base-dequad-qg-ae,lmqg/qg_dequad,Multitask QAG,google/mt5-base,0.32,8.63,63.01,5.34,47.54,5.06,2.4,1.35,0.85,3.93
+lmqg/mt5-small-dequad-qg-ae,lmqg/qg_dequad,Multitask QAG,google/mt5-small,9.94,37.66,75.15,22.47,57.76,19.77,13.28,8.84,5.83,18.26
+lmqg/mt5-base-esquad-qg-ae,lmqg/qg_esquad,Multitask QAG,google/mt5-base,57.98,75.33,90.04,43.74,80.94,37.35,32.53,28.86,25.75,49.61
+lmqg/mt5-small-esquad-qg-ae,lmqg/qg_esquad,Multitask QAG,google/mt5-small,57.63,75.31,89.77,43.11,80.64,35.18,30.48,26.92,23.89,48.58
+lmqg/mt5-base-frquad-qg-ae,lmqg/qg_frquad,Multitask QAG,google/mt5-base,43.01,63.54,86.03,35.22,73.94,35.54,30.87,27.14,23.84,40.94
+lmqg/mt5-small-frquad-qg-ae,lmqg/qg_frquad,Multitask QAG,google/mt5-small,46.96,67.44,87.84,37.9,76.45,40.67,35.92,32.1,28.71,43.93
+lmqg/mt5-base-itquad-qg-ae,lmqg/qg_itquad,Multitask QAG,google/mt5-base,60.7,74.04,91.12,43.51,82.62,40.14,34.56,30.56,26.87,45.82
+lmqg/mt5-small-itquad-qg-ae,lmqg/qg_itquad,Multitask QAG,google/mt5-small,57.85,72.09,90.24,42.68,81.17,39.33,33.64,29.59,26.01,45.15
+lmqg/mt5-base-jaquad-qg-ae,lmqg/qg_jaquad,Multitask QAG,google/mt5-base,30.21,30.21,78.16,26.18,65.84,34.67,31.79,29.28,27.35,36.81
+lmqg/mt5-small-jaquad-qg-ae,lmqg/qg_jaquad,Multitask QAG,google/mt5-small,29.55,29.55,78.12,26.22,65.68,34.96,31.92,29.49,27.55,36.63
+lmqg/mt5-base-koquad-qg-ae,lmqg/qg_koquad,Multitask QAG,google/mt5-base,83.02,88.43,96.14,61.26,95.2,74.93,65.39,51.39,34.98,83.83
+lmqg/mt5-small-koquad-qg-ae,lmqg/qg_koquad,Multitask QAG,google/mt5-small,80.78,86.98,95.65,59.91,94.61,75.14,66.16,53.61,38.2,82.32
+lmqg/mt5-base-ruquad-qg-ae,lmqg/qg_ruquad,Multitask QAG,google/mt5-base,44.44,64.31,86.22,38.79,74.64,45.61,40.76,36.22,31.64,49.73
+lmqg/mt5-small-ruquad-qg-ae,lmqg/qg_ruquad,Multitask QAG,google/mt5-small,41.44,62.67,85.69,37.87,73.38,44.37,39.42,34.82,30.21,48.66
 lmqg/bart-base-squad-ae,lmqg/qg_squad,AE,facebook/bart-base,58.17,69.47,91.96,41.71,82.2,65.92,63.24,60.8,58.72,68.7
 lmqg/bart-large-squad-ae,lmqg/qg_squad,AE,facebook/bart-large,58.95,69.67,91.93,41.89,82.41,65.82,63.21,60.73,58.61,68.96
 lmqg/t5-base-squad-ae,lmqg/qg_squad,AE,t5-base,59.48,70.32,91.87,43.62,82.69,64.27,60.78,57.35,54.28,69.72
