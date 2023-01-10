@@ -515,6 +515,8 @@ def get_readme(model_name: str, model_checkpoint: str):
         df_qag['Dataset'] = f"[{metric_main[0]}](https://huggingface.co/datasets/{metric_main[0]})"
         link_qag = f'https://huggingface.co/{model_name}/raw/main/eval/{eval_file_qag}.{dataset.replace("/", "_")}.{dataset_name}.json'
         df_qag = df_qag.sort_index()
+        print(df_qag)
+        input()
         df_qag = keep_qag_metric(df_qag)
         markdown_table += f"""
 - ***Metric (Question & Answer Generation{', Reference Answer' if not _is_multitask else ''})***: {"" if _is_multitask else "Each question is generated from *the gold answer*."} [raw metric file]({link_qag})
