@@ -43,6 +43,7 @@ from transformers.utils.versions import require_version
 import ray
 from ray import tune
 from huggingface_hub import create_repo
+import torch.distributed as dist
 
 from .trainer_qa import QuestionAnsweringTrainer
 from .utils_qa import postprocess_qa_predictions
@@ -327,7 +328,10 @@ def run_qa_evaluation(dataset: str,
         references = [{"id": ex["id"], "answers": ex[answer_column_name]} for ex in examples]
         return EvalPrediction(predictions=formatted_predictions, label_ids=references)
 
-    metric = load_metric("squad")
+    if dist.is_initialized():
+        metric = load_metric("squad", num_process=dist.get_world_size(), process_id=dist.get_rank())
+    else:
+        metric = load_metric("squad")
 
     def compute_metrics(p: EvalPrediction):
         return metric.compute(predictions=p.predictions, references=p.label_ids)
