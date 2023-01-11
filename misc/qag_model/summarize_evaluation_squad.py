@@ -13,13 +13,13 @@ LM_QG_AE = ['t5-small', 't5-base', 't5-large']
 LM_QAG = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
 
 DATA_ML = ['ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
-LM_QG_ML = ['google/mt5-small']
+LM_QG_ML = ['google/mt5-small', 'google/mt5-base']
 # LM_QG_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
-LM_AE_ML = ['google/mt5-small']
+LM_AE_ML = ['google/mt5-small', 'google/mt5-base']
 # LM_AE_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
-LM_QG_AE_ML = ['google/mt5-small']
+LM_QG_AE_ML = ['google/mt5-small', 'google/mt5-base']
 # LM_QG_AE_ML = ['google/mt5-small', 'google/mt5-base']
-LM_QAG_ML = ['google/mt5-small']
+LM_QAG_ML = ['google/mt5-small', 'google/mt5-base']
 
 METRIC_PERC = ["AnswerF1Score", "AnswerExactMatch"]
 TMP_DIR = 'metric_files'
@@ -211,5 +211,34 @@ if __name__ == '__main__':
     df['Data'] = [i.split("`")[1] for i in df['Data']]
     df['Language Model'] = [i.split("`")[1] for i in df['Language Model']]
     df.to_csv(pj(EXPORT_DIR, "summary.qag.csv"), index=False)
+
+    # multilngual result for paper
+    df = pd.read_csv("summary/summary.qag.csv")
+    for c in ['Model', 'BERTScore', 'METEOR', 'MoverScore',
+              'QAAlignedF1Score (MoverScore)', 'QAAlignedPrecision (MoverScore)',
+              'QAAlignedRecall (MoverScore)', 'BLEU-1', 'BLEU-2', 'BLEU-3', 'BLEU-4', 'ROUGE-L']:
+        df.pop(c)
+    df = df[[i not in ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large'] for i in df["Language Model"]]]
+    f1 = df.pop("QAAlignedF1Score (BERTScore)")
+    pre = df.pop("QAAlignedPrecision (BERTScore)")
+    rec = df.pop("QAAlignedRecall (BERTScore)")
+    df["QAAligned BERTScore"] = [f"{round(a, 1)} / {round(b, 2)} / {round(c, 3)}" for a, b, c in zip(f1, pre, rec)]
+    df['Type'] = [i.replace(" QAG", "") for i in df['Type']]
+    df['Language'] = [i.replace("lmqg/qg_", "")[:2].upper() for i in df.pop("Data")]
+
+    def pretty_name(i):
+        if i == 'google/mt5-small':
+            return "MT5\textsubscript{SMALL}"
+        if i == 'google/mt5-base':
+            return "MT5\textsubscript{BASE}"
+        if i == 'facebook/mbart-large-cc25':
+            return "MBART\textsubscript{LARGE}"
+        raise ValueError("Unknown model")
+
+    df['Language Model'] = [pretty_name(i) for i in df['Language Model']]
+    # df = df.sort_values(by=)
+    # for _, _df in df.groupby("Language Model"):
+    #     _df
+
 
 

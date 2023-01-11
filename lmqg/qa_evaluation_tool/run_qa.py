@@ -40,11 +40,13 @@ from transformers import (
 )
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
+import ray
 from ray import tune
 from huggingface_hub import create_repo
 
 from .trainer_qa import QuestionAnsweringTrainer
 from .utils_qa import postprocess_qa_predictions
+
 
 os.environ["WANDB_DISABLED"] = "true"
 
@@ -87,7 +89,9 @@ def run_qa_evaluation(dataset: str,
                       hf_organization_to_push: str = None,
                       hf_use_auth_token: bool = False,
                       down_sample_size_train: int = None,
+                      num_cpus: int = 4,
                       down_sample_size_validation: int = None):
+    ray.init(ignore_reinit_error=True, num_cpus=num_cpus)
     best_hyperparameters_path = pj(output_dir, 'best_hyperparameters.json')
     best_model_path = pj(output_dir, 'best_model')
     summary_file = pj(output_dir, 'test_result.json')

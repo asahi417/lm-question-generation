@@ -1,3 +1,4 @@
+# TODO: mbart ae on ru
 # Multitask QAG Model
 # train, eval QG, eval AE, eval AR (answer metric), eval QAG, push-to-hub
 
@@ -21,6 +22,21 @@ lmqg-eval -m "lmqg_output/t5-small-squad-qg-ae/best_model" -e "lmqg_output/t5-sm
 lmqg-eval-qa -m "lmqg_output/t5-small-squad-qg-ae/best_model" -e "lmqg_output/t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qag -m "lmqg_output/t5-small-squad-qg-ae/best_model" -e "lmqg_output/t5-small-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
 lmqg-push-to-hf -m "lmqg_output/t5-small-squad-qg-ae/best_model" -a "t5-small-squad-qg-ae" -o "lmqg"
+
+lmqg-train-search -m "facebook/bart-large" -b 64 -g 1 2 -c "lmqg_output/bart-large-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-eval -m "lmqg_output/bart-large-squad-qg-ae/best_model" -e "lmqg_output/bart-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "lmqg_output/bart-large-squad-qg-ae/best_model" -e "lmqg_output/bart-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/bart-large-squad-qg-ae/best_model" -e "lmqg_output/bart-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "lmqg_output/bart-large-squad-qg-ae/best_model" -e "lmqg_output/bart-large-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-push-to-hf -m "lmqg_output/bart-large-squad-qg-ae/best_model" -a "bart-large-squad-qg-ae" -o "lmqg"
+
+lmqg-train-search -m "facebook/bart-base"  -b 32 -g 2 4 -c "lmqg_output/bart-base-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-eval -m "lmqg_output/bart-base-squad-qg-ae/best_model" -e "lmqg_output/bart-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "lmqg_output/bart-base-squad-qg-ae/best_model" -e "lmqg_output/bart-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/bart-base-squad-qg-ae/best_model" -e "lmqg_output/bart-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "lmqg_output/bart-base-squad-qg-ae/best_model" -e "lmqg_output/bart-base-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-push-to-hf -m "lmqg_output/bart-base-squad-qg-ae/best_model" -a "bart-base-squad-qg-ae" -o "lmqg"
+
 
 # Multitask QAG Model for non-English
 mlqg_multi () {
@@ -145,5 +161,5 @@ mlqg_pipeline_qag () {
 }
 
 mlqg_pipeline_qag "mt5-small"
-mlqg_pipeline_qag "mbart-large-cc25"  # ru
 mlqg_pipeline_qag "mt5-base"
+mlqg_pipeline_qag "mbart-large-cc25"  # ru

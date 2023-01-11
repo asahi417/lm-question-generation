@@ -1,13 +1,14 @@
+# TODO: Resume ITQUAD E2E on UKRI
 ############
 # ML SQuAD #
 ############
-LA='fr' #
+LA='fr'
 LA='ja'
 LA='es'
-LA='ko' #
-LA='de' #
-LA='it' #
-LA='ru' #
+LA='ko'
+LA='de'
+LA='it'
+LA='ru'
 MODEL="google/mt5-small"
 MODEL_SHORT='mt5-small'
 lmqg-train-search --use-auth-token -d "lmqg/qag_${LA}quad" -m "${MODEL}" -b 8 -g 8 16 -c "lmqg_output/${MODEL_SHORT}-${LA}quad-qag" -i 'paragraph' -o 'questions_answers' --n-max-config 2 --epoch-partial 5 -e 15 --max-length-output-eval 256 --max-length-output 256 --lr 1e-04 5e-04 1e-03
@@ -24,6 +25,7 @@ MODEL_SHORT='mbart-large-cc25'
 lmqg-train-search --use-auth-token -d "lmqg/qag_${LA}quad" -m "${MODEL}" -b 2 -g 32 64 -c "lmqg_output/${MODEL_SHORT}-${LA}quad-qag" -i 'paragraph' -o 'questions_answers' --n-max-config 2 --epoch-partial 5 -e 15 --max-length-output-eval 256 --max-length-output 256 --lr 1e-04 5e-04 1e-03
 lmqg-eval -m "lmqg_output/${MODEL_SHORT}-${LA}quad-qag/best_model" -e "lmqg_output/${MODEL_SHORT}-${LA}quad-qag/best_model/eval" --language "${LA}" -d "lmqg/qag_${LA}quad" -i "paragraph" -o 'questions_answers' --max-length-output 256 --max-length 256
 lmqg-push-to-hf -m "lmqg_output/${MODEL_SHORT}-${LA}quad-qag/best_model" -a "${MODEL_SHORT}-${LA}quad-qag" -o "lmqg"
+
 #########
 # SQuAD #
 #########

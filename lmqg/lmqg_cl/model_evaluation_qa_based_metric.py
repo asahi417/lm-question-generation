@@ -32,6 +32,8 @@ def main_qa_model_training():
     parser.add_argument('--skip-training', action='store_true')
     parser.add_argument('--down-sample-size-train', default=None, type=int)
     parser.add_argument('--down-sample-size-validation', default=None, type=int)
+    parser.add_argument('--num-cpus', default=4, type=int)
+
     opt = parser.parse_args()
     if opt.dataset_train is not None and opt.dataset_validation is not None and opt.dataset_test is not None:
         dataset_files = {
@@ -60,7 +62,8 @@ def main_qa_model_training():
         overwrite=opt.overwrite,
         skip_training=opt.skip_training,
         down_sample_size_train=opt.down_sample_size_train,
-        down_sample_size_validation=opt.down_sample_size_validation
+        down_sample_size_validation=opt.down_sample_size_validation,
+        num_cpus=opt.num_cpus
     )
 
 
