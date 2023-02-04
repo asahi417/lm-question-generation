@@ -21,7 +21,7 @@ API_TOKEN = os.getenv("API_TOKEN")
 ##########
 # CONFIG #
 ##########
-# Default models for each mode
+# Default models for each qag type
 DEFAULT_MODELS_E2E = {
     "en": ["lmqg/t5-large-squad-qag", None],
     "ja": ["lmqg/mt5-base-jaquad-qag", None],
@@ -88,7 +88,7 @@ for v in PRETTY_NAME.values():
 class ModelInput(BaseModel):
     input_text: str
     language: str = 'en'
-    mode: str = None  # End2End/Pipeline/Multitask
+    qag_type: str = None  # End2End/Pipeline/Multitask
     model: str = None
     highlight: str or List = None  # answer
     num_beams: int = 4
@@ -127,30 +127,30 @@ async def process(model_input: ModelInput):
         raise HTTPException(status_code=404, detail='Input text is empty string.')
     try:
         model_input.highlight = validate_default(model_input.highlight, default=None)
-        model_input.mode = validate_default(model_input.mode, default='End2End' if model_input.highlight is None else 'Multitask')
+        model_input.qag_type = validate_default(model_input.qag_type, default='End2End' if model_input.highlight is None else 'Multitask')
         model_input.model = validate_default(model_input.model, default=None)
 
         # language validation
         if model_input.language in LANGUAGE_MAP:
             model_input.language = LANGUAGE_MAP[model_input.language]
 
-        # mode validation
-        elif model_input.mode == 'End2End' and model_input.highlight is not None:
-            raise ValueError("End2End mode does not support answer-given question generation")
+        # qag_type validation
+        elif model_input.qag_type == 'End2End' and model_input.highlight is not None:
+            raise ValueError("End2End qag_type does not support answer-given question generation")
 
         # model validation
         if model_input.model is None:
-            model_qg, model_ae = DEFAULT_MODELS[model_input.mode][model_input.language]
+            model_qg, model_ae = DEFAULT_MODELS[model_input.qag_type][model_input.language]
         else:
             model_base = PRETTY_NAME[model_input.model]
-            if model_input.mode == 'End2End':
+            if model_input.qag_type == 'End2End':
                 model_qg, model_ae = f"{model_base}-qag", None
-            elif model_input.mode == 'Pipeline':
+            elif model_input.qag_type == 'Pipeline':
                 model_qg, model_ae = f"{model_base}-qg", f"{model_base}-ae"
-            elif model_input.mode == 'Multitask':
+            elif model_input.qag_type == 'Multitask':
                 model_qg, model_ae = f"{model_base}-qg-ae", f"{model_base}-qg-ae"
             else:
-                raise ValueError(f"unknown mode: {model_input.mode}")
+                raise ValueError(f"unknown qag_type: {model_input.qag_type}")
         qa_list = generate_qa(
             api_token=API_TOKEN,
             input_text=model_input.input_text,
@@ -163,7 +163,7 @@ async def process(model_input: ModelInput):
             do_sample=model_input.do_sample,
             max_length=model_input.max_length,
             num_beams=model_input.num_beams,
-            is_qag=model_input.mode == 'End2End',
+            is_qag=model_input.qag_type == 'End2End',
             add_prefix_qg=PREFIX_INFO_QAG[model_qg],
             add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None else None
         )
