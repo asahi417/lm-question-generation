@@ -17,7 +17,7 @@ def append_score(
         list_qa_new.append({
             "question": q,
             "answer": a,
-            "score": 100 * (1 - SequenceMatcher(None, context, q).find_longest_match().size / len(q))
+            "score": 100 * (1 - SequenceMatcher(None, context, q).find_longest_match(0, len(context), 0, len(q)).size / len(q))
         })
     list_qa_new = sorted(list_qa_new, key=lambda x: x['score'], reverse=True)
     return list_qa_new
