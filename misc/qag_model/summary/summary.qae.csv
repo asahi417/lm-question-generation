@@ -1,4 +1,14 @@
 eval_exact_match,eval_f1,domain,model,qag_type
+36.7,54.25,average,bart-large-squad,multitask
+34.24,53.64,amazon,bart-large-squad,multitask
+36.43,54.13,new_wiki,bart-large-squad,multitask
+41.75,57.66,nyt,bart-large-squad,multitask
+34.38,51.58,reddit,bart-large-squad,multitask
+30.45,49.37,amazon,bart-base-squad,multitask
+33.18,50.83,average,bart-base-squad,multitask
+32.07,50.55,new_wiki,bart-base-squad,multitask
+39.15,55.04,nyt,bart-base-squad,multitask
+31.05,48.35,reddit,bart-base-squad,multitask
 30.35,45.93,amazon,gold,
 27.42,43.25,amazon,bart-base-squad,qg_reference
 30.15,49.03,amazon,bart-base-squad,pipeline

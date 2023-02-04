@@ -3,7 +3,7 @@
 ##############################################################
 qa_generation_squadshifts_ref () {
   ANCHOR_MODEL=${1}
-  BATCH=16
+  BATCH=32
   for NAME in 'amazon' 'new_wiki' 'nyt' 'reddit'
   do
     lmqg-generate-qa --use-reference-answer -m "lmqg/${ANCHOR_MODEL}-qg" -l "en" -d "lmqg/qa_squadshifts" -n "${NAME}" -b "${BATCH}" -e "qa_squadshifts_synthetic/${ANCHOR_MODEL}.qg_reference.${NAME}"
@@ -68,3 +68,5 @@ qa_generation_squadshifts_multitask () {
 qa_generation_squadshifts_multitask "t5-small-squad"
 qa_generation_squadshifts_multitask "t5-base-squad"
 qa_generation_squadshifts_multitask "t5-large-squad"
+qa_generation_squadshifts_multitask "bart-base-squad"
+qa_generation_squadshifts_multitask "bart-large-squad"

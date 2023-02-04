@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# https://github.com/huggingface/datasets/issues/1942
 """
 Fine-tuning the library models for question answering using a slightly adapted version of the 🤗 Trainer.
 """

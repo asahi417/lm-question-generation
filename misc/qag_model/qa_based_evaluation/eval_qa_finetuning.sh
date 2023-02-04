@@ -39,6 +39,8 @@ QAE "bart-large-squad" "qg_reference"
 QAE "t5-small-squad" "multitask"
 QAE "t5-base-squad" "multitask"
 QAE "t5-large-squad" "multitask"
+QAE "bart-base-squad" "multitask"
+QAE "bart-large-squad" "multitask"
 
 QAE "t5-small-squad" "pipeline"
 QAE "t5-base-squad" "pipeline"

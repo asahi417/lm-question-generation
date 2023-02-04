@@ -6,6 +6,8 @@ import pandas as pd
 os.makedirs('summary', exist_ok=True)
 output = []
 for _file in glob("qa_eval_output/*/*/test_result.json"):
+    if _file.startswith("qa_eval_output/random_sampling"):
+        continue
     _file_name, _domain, _ = _file.split("/")[1:]
     with open(_file) as f:
         tmp = json.load(f)
@@ -28,27 +30,3 @@ df.pop('sort_model')
 df.pop('sort_qag_type')
 
 df.to_csv("summary/summary.qae.csv", index=False)
-df = df[df.domain == 'average']
-df = df[df.model != 'gold']
-
-
-def pretty_name(_name):
-    if _name == 'end2end':
-        return "End2end QAG"
-    elif _name == 'qg_reference':
-        return "QG"
-    elif _name == 'pipeline':
-        return "Pipeline QAG"
-    elif _name == 'multitask':
-        return "Multitask QAG"
-    raise ValueError(_name)
-
-
-df['Type'] = df['qag_type'].apply(lambda x: pretty_name(x))
-df['Language Model'] = df['model'].apply(lambda x: f"facebook/{x.replace('-squad', '')}" if x.startswith('bart') else x.replace('-squad', ''))
-df['QAEval (F1)'] = df.pop('eval_f1')
-df['QAEval (EM)'] = df.pop('eval_exact_match')
-df.pop("qag_type")
-df.pop("domain")
-df.pop("model")
-df.to_csv("summary/summary.qae.average.csv", index=False)

@@ -1,4 +1,9 @@
-""" API with huggingface inference API """
+""" API with huggingface inference API
+
+Language-wise best model
+- answer specified
+- answer agnostic
+"""
 import os
 import logging
 import random
@@ -10,132 +15,150 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from lmqg import TransformersQGInferenceAPI
+from lmqg.inference_api import generate_qa
+from lmqg.spacy_module import SpacyPipeline
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
 API_TOKEN = os.getenv("API_TOKEN")
-KEYWORD_EXTRACTOR = os.getenv('KEYWORD_EXTRACTOR', 'positionrank')
 
-QG_PRETTY_NAME = {
-    'T5 SMALL': 'lmqg/t5-small-squad-qg-ae',
-    'T5 BASE': 'lmqg/t5-base-squad-qg-ae',
-    'T5 LARGE': 'lmqg/t5-large-squad-qg-ae',
-    'BART BASE': 'lmqg/bart-base-squad-qg',
-    'BART LARGE': 'lmqg/bart-large-squad-qg',
-    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-qg-ae',
-    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-qg-ae',
-    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-qg-ae',
-    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-qg-ae',
-    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-qg-ae',
-    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-qg-ae',
-    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-qg-ae',
-    'mT5 BASE (JA)': 'lmqg/mt5-base-jaquad-qg',
-    'mT5 BASE (DE)': 'lmqg/mt5-base-dequad-qg',
-    'mT5 BASE (ES)': 'lmqg/mt5-base-esquad-qg',
-    'mT5 BASE (KO)': 'lmqg/mt5-base-koquad-qg',
-    'mT5 BASE (RU)': 'lmqg/mt5-base-ruquad-qg',
-    'mT5 BASE (IT)': 'lmqg/mt5-base-itquad-qg',
-    'mT5 BASE (FR)': 'lmqg/mt5-base-frquad-qg',
-    'mBART LARGE (JA)': 'lmqg/mbart-large-cc25-jaquad-qg',
-    'mBART LARGE (DE)': 'lmqg/mbart-large-cc25-dequad-qg',
-    'mBART LARGE (ES)': 'lmqg/mbart-large-cc25-esquad-qg',
-    'mBART LARGE (KO)': 'lmqg/mbart-large-cc25-koquad-qg',
-    'mBART LARGE (RU)': 'lmqg/mbart-large-cc25-ruquad-qg',
-    'mBART LARGE (IT)': 'lmqg/mbart-large-cc25-itquad-qg',
-    'mBART LARGE (FR)': 'lmqg/mbart-large-cc25-frquad-qg'
-}
-QG_PREFIX_INFO = {k: AutoConfig.from_pretrained(v).add_prefix for k, v in QG_PRETTY_NAME.items()}
-AE_PRETTY_NAME = {
-    'T5 SMALL': 'lmqg/t5-small-squad-qg-ae',
-    'T5 BASE': 'lmqg/t5-base-squad-qg-ae',
-    'T5 LARGE': 'lmqg/t5-large-squad-qg-ae',
-    'mT5 SMALL (JA)': 'lmqg/mt5-small-jaquad-qg-ae',
-    'mT5 SMALL (DE)': 'lmqg/mt5-small-dequad-qg-ae',
-    'mT5 SMALL (ES)': 'lmqg/mt5-small-esquad-qg-ae',
-    'mT5 SMALL (KO)': 'lmqg/mt5-small-koquad-qg-ae',
-    'mT5 SMALL (RU)': 'lmqg/mt5-small-ruquad-qg-ae',
-    'mT5 SMALL (IT)': 'lmqg/mt5-small-itquad-qg-ae',
-    'mT5 SMALL (FR)': 'lmqg/mt5-small-frquad-qg-ae',
-    'Keyword': None
-}
-AE_PREFIX_INFO = {k: AutoConfig.from_pretrained(v).add_prefix if v is not None else None
-                  for k, v in AE_PRETTY_NAME.items()}
+##########
+# CONFIG #
+##########
+# Default models for each mode
+DEFAULT_MODELS_E2E = {
+    "en": ["lmqg/t5-large-squad-qag", None],
+    "ja": ["lmqg/mt5-base-jaquad-qag", None],
+    "de": ["lmqg/mbart-large-cc25-dequad-qag", None],
+    "es": ["lmqg/mt5-base-esquad-qag", None],
+    "it": ["lmqg/mt5-base-itquad-qag", None],
+    "ko": ["lmqg/lmqg/mbart-large-cc25-koquad-qag", None],
+    "fr": ["lmqg/mt5-base-frquad-qag", None],
+    "ru": ["lmqg/mbart-large-cc25-ruquad-qag", None]}
+DEFAULT_MODELS_MULTITASK = {
+    "en": ["lmqg/t5-large-squad-qg-ae", "lmqg/t5-large-squad-qg-ae"],
+    "ja": ["lmqg/mt5-small-jaquad-qg-ae", "lmqg/mt5-small-jaquad-qg-ae"],
+    "de": ["lmqg/mt5-small-dequad-qg-ae", "lmqg/mt5-small-dequad-qg-ae"],
+    "es": ["lmqg/mt5-base-esquad-qg-ae", "lmqg/mt5-base-esquad-qg-ae"],
+    "it": ["lmqg/mt5-base-itquad-qg-ae", "lmqg/mt5-base-itquad-qg-ae"],
+    "ko": ["lmqg/mt5-small-koquad-qg-ae", "lmqg/mt5-small-koquad-qg-ae"],
+    "fr": ["lmqg/mt5-small-frquad-qg-ae", "lmqg/mt5-small-frquad-qg-ae"],
+    "ru": ["lmqg/mt5-base-ruquad-qg-ae", "lmqg/mt5-base-ruquad-qg-ae"]}
+DEFAULT_MODELS_PIPELINE = {
+    "en": ["lmqg/bart-large-squad-qg", "lmqg/bart-large-squad-ae"],
+    "ja": ["lmqg/mt5-base-jaquad-qg", "lmqg/mt5-base-jaquad-ae"],
+    "de": ["lmqg/mt5-small-dequad-qg", "lmqg/mt5-small-dequad-ae"],
+    "es": ["lmqg/mt5-base-esquad-qg", "lmqg/mt5-base-esquad-ae"],
+    "it": ["lmqg/mt5-base-itquad-qg", "lmqg/mt5-base-itquad-ae"],
+    "ko": ["lmqg/mbart-large-cc25-koquad-qg", "lmqg/mbart-large-cc25-koquad-ae"],
+    "fr": ["lmqg/mt5-small-frquad-qg", "lmqg/mt5-small-frquad-ae"],
+    "ru": ["lmqg/mt5-base-ruquad-qg", "lmqg/mt5-base-ruquad-qg"]}
+DEFAULT_MODELS = {"End2End": DEFAULT_MODELS_E2E, "Pipeline": DEFAULT_MODELS_PIPELINE, "Multitask": DEFAULT_MODELS_MULTITASK}
+# Other configs
 LANGUAGE_MAP = {
-    "Japanese": "ja",
     "English": "en",
+    "Japanese": "ja",
     'German': "de",
     'Spanish': 'es',
     'Italian': 'it',
     'Korean': 'ko',
     'Russian': "ru",
-    'French': "fr"
-}
+    'French': "fr"}
+SPACY_PIPELINE = {i: SpacyPipeline(i) for i in LANGUAGE_MAP.values()}  # spacy for sentence splitting
+# QAG model pretty names used in frontend
+PRETTY_NAME = {
+    "T5 SMALL": "lmqg/t5-small-squad",
+    "T5 BASE": "lmqg/t5-base-squad",
+    "T5 LARGE": "lmqg/t5-large-squad",
+    "BART BASE": "lmqg/bart-base-squad",
+    "BART LARGE": "lmqg/bart-large-squad"}
+PRETTY_NAME.update({f'mT5 SMALL ({i.upper()})': f'lmqg/mt5-small-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
+PRETTY_NAME.update({f'mT5 BASE ({i.upper()})': f'lmqg/mt5-base-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
+PRETTY_NAME.update({f'mBART LARGE ({i.upper()})': f'lmqg/mbart-large-cc25-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
+# Prefix information for each model
+PREFIX_INFO_QAG = {}
+for v in PRETTY_NAME.values():
+    for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
+        try:
+            PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
+        except Exception:
+            pass
 
-
-# Run app
+########
+# MAIN #
+########
+# App input
 class ModelInput(BaseModel):
     input_text: str
     language: str = 'en'
-    answer_model: str = 'lmqg/t5-small-squad-qg-ae'  # 'keyword_extraction'
-    qg_model: str = 'lmqg/t5-small-squad-qg'
-    highlight: str or List = None
+    mode: str = None  # End2End/Pipeline/Multitask
+    model: str = None
+    highlight: str or List = None  # answer
     num_beams: int = 4
     num_questions: int = 5
     use_gpu: bool = False
     do_sample: bool = True
     top_p: float = 0.9
     max_length: int = 64
-
-
+# Run app
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
-# Endpoint
+############
+# ENDPOINT #
+############
+# General info
 @app.get("/")
 def read_root():
-    return {"What's this?": "Automatic question & answer generation application."}
+    return {"About": "Automatic question & answer generation application. Send inquiry to https://asahiushio.com/."}
 
 
-@app.get("/info")
-async def info():
-    return {"keyword_extractor": KEYWORD_EXTRACTOR, "QG models": QG_PRETTY_NAME, "Answer models": AE_PRETTY_NAME}
-
-
+# Main endpoint
 @app.post("/question_generation")
 async def process(model_input: ModelInput):
     if len(model_input.input_text) == 0:
         raise HTTPException(status_code=404, detail='Input text is empty string.')
     try:
-        prefix_qg = None
-        prefix_answer = None
-        if model_input.qg_model in QG_PRETTY_NAME:
-            prefix_qg = QG_PREFIX_INFO[model_input.qg_model]
-            model_input.qg_model = QG_PRETTY_NAME[model_input.qg_model]
-        if model_input.answer_model in AE_PRETTY_NAME:
-            prefix_answer = AE_PREFIX_INFO[model_input.answer_model]
-            model_input.answer_model = AE_PRETTY_NAME[model_input.answer_model]
+        # language validation
         if model_input.language in LANGUAGE_MAP:
             model_input.language = LANGUAGE_MAP[model_input.language]
-        qg_model = TransformersQGInferenceAPI(
-            model=model_input.qg_model,
-            answer_model=model_input.answer_model,
+
+        # mode validation
+        if model_input.mode is None:
+            model_input.mode = 'End2End' if model_input.highlight is None else 'Multitask'
+        elif model_input.mode == 'End2End' and model_input.highlight is not None:
+            raise ValueError("End2End mode does not support answer-given question generation")
+
+        # model validation
+        if model_input.model is None:
+            model_qg, model_ae = DEFAULT_MODELS[model_input.mode][model_input.language]
+        else:
+            model_base = PRETTY_NAME[model_input.model]
+            if model_input.mode == 'End2End':
+                model_qg, model_ae = f"{model_base}-qag", None
+            elif model_input.mode == 'Pipeline':
+                model_qg, model_ae = f"{model_base}-qg", f"{model_base}-ae"
+            elif model_input.mode == 'Multitask':
+                model_qg, model_ae = f"{model_base}-qg-ae", f"{model_base}-qg-ae"
+            else:
+                raise ValueError(f"unknown mode: {model_input.mode}")
+        qa_list = generate_qa(
             api_token=API_TOKEN,
-            language=model_input.language,
-            add_prefix_qg=prefix_qg,
-            add_prefix_answer=prefix_answer,
-            keyword_extraction_model=KEYWORD_EXTRACTOR)
-        qa_list = qg_model.generate_qa(
-            model_input.input_text,
+            input_text=model_input.input_text,
+            model_qg=model_qg,
+            model_ae=model_ae,
+            spacy=SPACY_PIPELINE[model_input.language],
             input_answer=model_input.highlight,
-            num_beams=model_input.num_beams,
-            num_questions=model_input.num_questions,
             top_p=model_input.top_p,
             use_gpu=model_input.use_gpu,
             do_sample=model_input.do_sample,
-            max_length=model_input.max_length
+            max_length=model_input.max_length,
+            num_beams=model_input.num_beams,
+            is_qag=model_input.mode == 'End2End',
+            add_prefix_qg=PREFIX_INFO_QAG[model_qg],
+            add_prefix_answer=PREFIX_INFO_QAG[model_ae]
         )
         return {'qa': qa_list}
     except Exception:
@@ -143,6 +166,7 @@ async def process(model_input: ModelInput):
         raise HTTPException(status_code=404, detail=traceback.print_exc())
 
 
+# Dummy endpoint
 @app.post("/question_generation_dummy")
 async def process(model_input: ModelInput):
     i = random.randint(0, 2)
