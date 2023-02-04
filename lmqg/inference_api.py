@@ -131,7 +131,6 @@ def generate_qa(
         assert len(question) == len(input_answer), f"{question} != {input_answer}"
         qa = [{'question': q, 'answer': a} for q, a in zip(question, input_answer)]
         logging.info(f"complete process: {len(output)} qa pairs generated")
-
     return qa
 
 

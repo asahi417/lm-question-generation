@@ -31,3 +31,4 @@ tmp*
 *.xlsx
 simple-question-generation
 acl_submission
+sample.jsonl

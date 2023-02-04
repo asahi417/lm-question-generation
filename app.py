@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from lmqg.inference_api import generate_qa
 from lmqg.spacy_module import SpacyPipeline
-
+from lmqg.scorer import append_score
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -73,12 +73,12 @@ PRETTY_NAME.update({f'mT5 BASE ({i.upper()})': f'lmqg/mt5-base-{i}quad' for i in
 PRETTY_NAME.update({f'mBART LARGE ({i.upper()})': f'lmqg/mbart-large-cc25-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
 # Prefix information for each model
 PREFIX_INFO_QAG = {}
-for v in PRETTY_NAME.values():
-    for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
-        try:
-            PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
-        except Exception:
-            pass
+# for v in PRETTY_NAME.values():
+#     for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
+#         try:
+#             PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
+#         except Exception:
+#             pass
 
 
 ########
@@ -104,9 +104,9 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 
 def validate_default(value, default=None):
-    if value is None or type(value) is not str:
+    if value is not None and type(value) is not str:
         return value
-    if value.lower() in ['default', '']:
+    if value is None or value.lower() in ['default', '']:
         return default
     return value
 
@@ -164,9 +164,10 @@ async def process(model_input: ModelInput):
             max_length=model_input.max_length,
             num_beams=model_input.num_beams,
             is_qag=model_input.qag_type == 'End2End',
-            add_prefix_qg=PREFIX_INFO_QAG[model_qg],
-            add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None else None
+            add_prefix_qg=PREFIX_INFO_QAG[model_qg] if model_qg in PREFIX_INFO_QAG else None,
+            add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None
         )
+        qa_list = append_score(model_input.input_text, qa_list)
         return {'qa': qa_list}
     except Exception:
         logging.exception('Error')
@@ -177,7 +178,7 @@ async def process(model_input: ModelInput):
 @app.post("/question_generation_dummy")
 async def process(model_input: ModelInput):
     i = random.randint(0, 2)
-    target = [{'question': "Who founded Nintendo Karuta?", 'answer': "Fusajiro Yamauchi"},
-              {'question': "When did Nintendo distribute its first video game console, the Color TV-Game?", 'answer': "1977"},
-              {'question': "When did Nintendo release Super Mario Bros?", 'answer': "1985"}]
+    target = [{'question': "Who founded Nintendo Karuta?", 'answer': "Fusajiro Yamauchi", "score": 0.5},
+              {'question': "When did Nintendo distribute its first video game console, the Color TV-Game?", 'answer': "1977", "score": 0.3},
+              {'question': "When did Nintendo release Super Mario Bros?", 'answer': "1985", "score": 0.1}]
     return {"qa": target[:i]}
