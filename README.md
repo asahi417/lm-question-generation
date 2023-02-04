@@ -160,7 +160,7 @@ We provide a rest API which hosts the model inference through huggingface infere
 ```shell
 pip install lmqg[api]
 ```
-Swagger UI is available at [`http://127.0.0.1:8080/docs`](http://127.0.0.1:8080/docs), when you run the app locally (replace the address by your server address).
+Swagger UI is available at [`http://127.0.0.1:8088/docs`](http://127.0.0.1:8088/docs), when you run the app locally (replace the address by your server address).
 
 ### Build
 - Build/Run Local (command line):
@@ -188,7 +188,7 @@ The main endpoint is `question_generation`, which has following parameters,
 | **answer_model** | answer extraction model |
 
 and return a list of dictionaries with `question` and `answer`. 
-```python
+```shell
 {
   "qa": [
     {"question": "Who founded Nintendo Karuta?", "answer": "Fusajiro Yamauchi"},

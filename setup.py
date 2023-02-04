@@ -36,7 +36,6 @@ setup(
             'spacy_ke',
             'pydantic',
             'protobuf'
-
         ]
     },
     install_requires=[
