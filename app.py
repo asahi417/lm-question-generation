@@ -73,12 +73,12 @@ PRETTY_NAME.update({f'mT5 BASE ({i.upper()})': f'lmqg/mt5-base-{i}quad' for i in
 PRETTY_NAME.update({f'mBART LARGE ({i.upper()})': f'lmqg/mbart-large-cc25-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
 # Prefix information for each model
 PREFIX_INFO_QAG = {}
-# for v in PRETTY_NAME.values():
-#     for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
-#         try:
-#             PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
-#         except Exception:
-#             pass
+for v in PRETTY_NAME.values():
+    for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
+        try:
+            PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
+        except Exception:
+            pass
 
 
 ########
@@ -136,7 +136,7 @@ async def process(model_input: ModelInput):
         model_input.highlight = validate_default(model_input.highlight, default=None)
         model_input.qag_type = validate_default(
             model_input.qag_type,
-            default='End2End' if model_input.highlight is None and model_input.language == 'en' else 'Pipeline'
+            default='End2End' if model_input.highlight is None and model_input.language == 'en' else 'Multitask'
         )
         model_input.model = validate_default(model_input.model, default=None)
 
