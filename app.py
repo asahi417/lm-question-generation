@@ -126,17 +126,19 @@ async def process(model_input: ModelInput):
     if len(model_input.input_text) == 0:
         raise HTTPException(status_code=404, detail='Input text is empty string.')
     try:
-        model_input.highlight = validate_default(model_input.highlight, default=None)
-        model_input.qag_type = validate_default(model_input.qag_type, default='End2End' if model_input.highlight is None else 'Multitask')
-        model_input.model = validate_default(model_input.model, default=None)
-
         # language validation
         if model_input.language in LANGUAGE_MAP:
             model_input.language = LANGUAGE_MAP[model_input.language]
-
         # qag_type validation
         elif model_input.qag_type == 'End2End' and model_input.highlight is not None:
             raise ValueError("End2End qag_type does not support answer-given question generation")
+
+        model_input.highlight = validate_default(model_input.highlight, default=None)
+        model_input.qag_type = validate_default(
+            model_input.qag_type,
+            default='End2End' if model_input.highlight is None and model_input.language == 'en' else 'Pipeline'
+        )
+        model_input.model = validate_default(model_input.model, default=None)
 
         # model validation
         if model_input.model is None:
