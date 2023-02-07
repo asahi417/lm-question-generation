@@ -19,6 +19,15 @@ evaluate bart_large_squad en qg_squad bart-large-squad-qg
 lmqg-train-search -m facebook/bart-base -b 32 -g 2 4 8 16 -c lmqg_output/bart_base_squad
 evaluate bart_base_squad en qg_squad bart-base-squad-qg
 
+
+lmqg-train-search -m google/flan-t5-large -p qg -b 16 -g 4 8 16 32 -c lmqg_output/flan_t5_large_squad
+evaluate flan_t5_large_squad en qg_squad flan-t5-large-squad-qg
+lmqg-train-search -m google/flan-t5-base -p qg -b 16 -g 4 8 16 32 -c lmqg_output/flan_t5_base_squad
+evaluate flan_t5_base_squad en qg_squad flan-t5-base-squad-qg
+lmqg-train-search -m google/flan-t5-small -p qg -b 64 -g 1 2 4 8 -c lmqg_output/flan_t5_small_squad
+evaluate flan_t5_small_squad en qg_squad flan-t5-small-squad-qg
+
+
 ####################
 # MultilingualQUAD #
 ####################

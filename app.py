@@ -4,19 +4,23 @@ import logging
 import random
 import traceback
 from typing import List
+from itertools import chain
 
 from transformers import AutoConfig
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from lmppl import EncoderDecoderLM
 
 from lmqg.inference_api import generate_qa
 from lmqg.spacy_module import SpacyPipeline
-from lmqg.scorer import append_score
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
 API_TOKEN = os.getenv("API_TOKEN")
+# local model for qa pair scoring
+SCORER_MODEL = os.getenv("SCORER_MODEL", "lmqg/t5-small-squad-qag")
+SCORER = EncoderDecoderLM(SCORER_MODEL, max_length_decoder=32, max_length_encoder=256)
 
 ##########
 # CONFIG #
@@ -28,7 +32,7 @@ DEFAULT_MODELS_E2E = {
     "de": ["lmqg/mbart-large-cc25-dequad-qag", None],
     "es": ["lmqg/mt5-base-esquad-qag", None],
     "it": ["lmqg/mt5-base-itquad-qag", None],
-    "ko": ["lmqg/lmqg/mbart-large-cc25-koquad-qag", None],
+    "ko": ["lmqg/mbart-large-cc25-koquad-qag", None],
     "fr": ["lmqg/mt5-base-frquad-qag", None],
     "ru": ["lmqg/mbart-large-cc25-ruquad-qag", None]}
 DEFAULT_MODELS_MULTITASK = {
@@ -72,13 +76,7 @@ PRETTY_NAME.update({f'mT5 SMALL ({i.upper()})': f'lmqg/mt5-small-{i}quad' for i 
 PRETTY_NAME.update({f'mT5 BASE ({i.upper()})': f'lmqg/mt5-base-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
 PRETTY_NAME.update({f'mBART LARGE ({i.upper()})': f'lmqg/mbart-large-cc25-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
 # Prefix information for each model
-PREFIX_INFO_QAG = {}
-for v in PRETTY_NAME.values():
-    for suffix in ['ae', 'qg', 'qag', 'qg-ae']:
-        try:
-            PREFIX_INFO_QAG[f"{v}-{suffix}"] = AutoConfig.from_pretrained(f"{v}-{suffix}").add_prefix
-        except Exception:
-            pass
+PREFIX_INFO_QAG = {v: AutoConfig.from_pretrained(v).add_prefix for v in chain(*chain(*[v.values() for v in DEFAULT_MODELS.values()])) if v is not None}
 
 
 ########
@@ -169,7 +167,12 @@ async def process(model_input: ModelInput):
             add_prefix_qg=PREFIX_INFO_QAG[model_qg] if model_qg in PREFIX_INFO_QAG else None,
             add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None
         )
-        qa_list = append_score(model_input.input_text, qa_list)
+        score = SCORER.get_perplexity(
+            input_texts=[model_input.input_text] * len(qa_list),
+            output_texts=[f"question: {x['question']}, answer: {x['answer']}" for x in qa_list]
+        )
+        for s, qa in zip(score, qa_list):
+            qa['score'] = s
         return {'qa': qa_list}
     except Exception:
         logging.exception('Error')

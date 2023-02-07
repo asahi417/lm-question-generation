@@ -13,6 +13,7 @@ RUN pip install pytextrank
 RUN pip install pydantic
 RUN pip install protobuf
 RUN pip install psutil
+RUN pip install lmppl
 
 RUN python -m spacy download en_core_web_sm
 RUN python -m spacy download ja_core_news_sm

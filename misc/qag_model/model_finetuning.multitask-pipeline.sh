@@ -37,6 +37,28 @@ lmqg-eval-qag -m "lmqg_output/bart-base-squad-qg-ae/best_model" -e "lmqg_output/
 lmqg-push-to-hf -m "lmqg_output/bart-base-squad-qg-ae/best_model" -a "bart-base-squad-qg-ae" -o "lmqg"
 
 
+lmqg-train-search -m "google/flan-t5-large" -b 16 -g 4 8 -c "lmqg_output/flan-t5-large-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-push-to-hf -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -a "flan-t5-large-squad-qg-ae" -o "lmqg"
+
+lmqg-train-search -m "google/flan-t5-base"  -b 32 -g 2 4 8 -c "lmqg_output/flan-t5-base-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-push-to-hf -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -a "flan-t5-base-squad-qg-ae" -o "lmqg"
+
+lmqg-train-search -m "google/flan-t5-small" -b 64 -g 1 2 4 -c "lmqg_output/flan-t5-small-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-push-to-hf -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -a "flan-t5-small-squad-qg-ae" -o "lmqg"
+
+
 # Multitask QAG Model for non-English
 mlqg_multi () {
   MODEL_NAME=${1}
@@ -83,6 +105,22 @@ lmqg-train-search -m "facebook/bart-base" -b 16 -g 4 8 -c "lmqg_output/bart-base
 lmqg-eval -m "lmqg_output/bart-base-squad-ae/best_model" -e "lmqg_output/bart-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qa -m "lmqg_output/bart-base-squad-ae/best_model" -e "lmqg_output/bart-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/bart-base-squad-ae/best_model" -a "bart-base-squad-ae" -o "lmqg"
+
+lmqg-train-search -m "google/flan-t5-large" -b 4 -g 16 32 -c "lmqg_output/flan-t5-large-squad-ae" -i 'paragraph_sentence' -o 'answer' -p 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-large-squad-ae/best_model" -e "lmqg_output/flan-t5-large-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-large-squad-ae/best_model" -e "lmqg_output/flan-t5-large-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "lmqg_output/flan-t5-large-squad-ae/best_model" -a "flan-t5-large-squad-ae" -o "lmqg"
+
+lmqg-train-search -m "google/flan-t5-base" -b 16 -g 4 8 -c "lmqg_output/flan-t5-base-squad-ae" -i 'paragraph_sentence' -o 'answer' -p 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-base-squad-ae/best_model" -e "lmqg_output/flan-t5-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-base-squad-ae/best_model" -e "lmqg_output/flan-t5-base-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "lmqg_output/flan-t5-base-squad-ae/best_model" -a "flan-t5-base-squad-ae" -o "lmqg"
+
+lmqg-train-search -m "google/flan-t5-small" -b 64 -g 1 2 -c "lmqg_output/flan-t5-small-squad-ae" -i 'paragraph_sentence' -o 'answer' -p 'ae'
+lmqg-eval -m "lmqg_output/flan-t5-small-squad-ae/best_model" -e "lmqg_output/flan-t5-small-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qa -m "lmqg_output/flan-t5-small-squad-ae/best_model" -e "lmqg_output/flan-t5-small-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "lmqg_output/flan-t5-small-squad-ae/best_model" -a "flan-t5-small-squad-ae" -o "lmqg"
+
 
 mlqg_ae () {
   MODEL_NAME=${1}

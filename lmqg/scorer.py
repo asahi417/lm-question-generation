@@ -22,5 +22,3 @@ def append_score(
     list_qa_new = sorted(list_qa_new, key=lambda x: x['score'], reverse=True)
     return list_qa_new
 
-
-
