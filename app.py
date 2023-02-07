@@ -172,7 +172,8 @@ async def process(model_input: ModelInput):
             output_texts=[f"question: {x['question']}, answer: {x['answer']}" for x in qa_list]
         )
         for s, qa in zip(score, qa_list):
-            qa['score'] = s
+            # perplexity is a positive value, so we transform it into unit interval with reverse order (higher is better)
+            qa['score'] = 1/(1 + s)
         return {'qa': qa_list}
     except Exception:
         logging.exception('Error')
