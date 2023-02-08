@@ -174,6 +174,7 @@ async def process(model_input: ModelInput):
         for s, qa in zip(score, qa_list):
             # perplexity is a positive value, so we transform it into unit interval with reverse order (higher is better)
             qa['score'] = 1/(1 + s)
+        qa_list = sorted(qa_list, key=lambda x: x['score'], reverse=True)
         return {'qa': qa_list}
     except Exception:
         logging.exception('Error')
