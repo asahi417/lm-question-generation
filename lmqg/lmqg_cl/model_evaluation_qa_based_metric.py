@@ -1,10 +1,5 @@
 import argparse
 import logging
-import json
-import os
-import pandas as pd
-from datasets import load_dataset
-from lmqg import TransformersQG
 from lmqg.qa_evaluation_tool import generate_qa_pairs, run_qa_evaluation
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -80,9 +75,8 @@ def main_generate_qa_pair():
     parser.add_argument('-e', '--export-dir', default='tmp_output', type=str)
     parser.add_argument('--max-length', default=512, type=int, help='')
     parser.add_argument('--max-length-output', default=64, type=int, help='')
-    parser.add_argument('--compute-ppl', action='store_true')
     opt = parser.parse_args()
-    qa_pairs = generate_qa_pairs(
+    generate_qa_pairs(
         model_qg=opt.model_qg,
         model_ae=opt.model_ae,
         language=opt.language,
@@ -94,35 +88,3 @@ def main_generate_qa_pair():
         overwrite=opt.overwrite,
         max_length=opt.max_length,
         max_length_output=opt.max_length)
-    if opt.compute_ppl:
-        logging.info(f"Perplexity: `{opt.model_qg}`, data: `{opt.anchor_data}`, data_name: `{opt.anchor_data_name}`")
-        anchor_data = load_dataset(opt.anchor_data, opt.anchor_data_name)
-        model = TransformersQG(opt.model_qg, max_length=opt.max_length, max_length_output=opt.max_length)
-        if model.is_qag:
-            target_outputs = ['questions_answers']
-        else:
-            assert model.is_qg
-            target_outputs = ['answer', 'question'] if model.is_ae else ['question']
-
-        for _split, dataset_split in qa_pairs.items():
-            df = pd.DataFrame(dataset_split)
-            for target in target_outputs:
-                output_file = f"{opt.export_dir}/perplexity_{target}.{_split}.json"
-                if os.path.exists(output_file) and not opt.overwrite:
-                    continue
-                ppl = model.get_perplexity(
-                    list_question=[i['question'] for i in dataset_split],
-                    list_context=[i['context'] for i in dataset_split],
-                    list_answer=[i['answers']['text'][0] for i in dataset_split],
-                    target_output=target,
-                    batch_size=opt.batch_size
-                )
-                assert len(dataset_split) == len(ppl), f"{len(dataset_split)} != {len(ppl)}"
-                with open(output_file, "w") as f:
-                    json.dump({f"perplexity_{target}": ppl}, f)
-                df['perplexity'] = ppl
-                target_col = [i for i in df.columns if 'perplexity' not in i]
-                filtered_1 = df.sort_values(by=f'perplexity_{target}').head(len(anchor_data))[target_col]
-                filtered_1_d = list(filtered_1.T.to_dict().values())
-                with open(f"{opt.export_dir}/{_split}.filtered.perplexity_{target}.jsonl", "w") as f:
-                    f.write('\n'.join([json.dumps(i) for i in filtered_1_d]))
