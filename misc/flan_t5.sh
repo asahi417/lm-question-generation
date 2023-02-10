@@ -1,4 +1,4 @@
-# Pipe
+# AE
 lmqg-train-search -m "google/flan-t5-large" -b 4 -g 16 32 -c "lmqg_output/flan-t5-large-squad-ae" -i 'paragraph_sentence' -o 'answer' -p 'ae'
 lmqg-eval -m "lmqg_output/flan-t5-large-squad-ae/best_model" -e "lmqg_output/flan-t5-large-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qa -m "lmqg_output/flan-t5-large-squad-ae/best_model" -e "lmqg_output/flan-t5-large-squad-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
