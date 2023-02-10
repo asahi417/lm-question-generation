@@ -103,6 +103,7 @@ def main():
     copy_tree(opt.model_checkpoint, opt.model_alias)
     with open(f"{opt.model_alias}/.gitattributes", 'w') as f:
         f.write(gitattribute)
-    os.system(
-        f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
-    shutil.rmtree(opt.model_alias)  # clean up the cloned repo
+
+    # os.system(
+    #     f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
+    # shutil.rmtree(opt.model_alias)  # clean up the cloned repo
