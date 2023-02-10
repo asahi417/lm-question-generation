@@ -47,7 +47,7 @@ setup(
         "requests",
         "pandas",
         "numpy",
-        "transformers",
+        "transformers>=4.26.1",
         "huggingface-hub",
         # "transformers<=4.21.2",  # push-to-model is not working for latest version
         # "huggingface-hub<=0.9.1",

@@ -17,7 +17,7 @@ lmqg-eval-qa -m "lmqg_output/switch-large-128-squad-qg-ae/best_model" -e "lmqg_o
 lmqg-eval-qag -m "lmqg_output/switch-large-128-squad-qg-ae/best_model" -e "lmqg_output/switch-large-128-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
 lmqg-push-to-hf -m "lmqg_output/switch-large-128-squad-qg-ae/best_model" -a "switch-large-128-squad-qg-ae" -o "lmqg"
 
-[RUN] lmqg-train-search -m "google/switch-base-128"  -b 8 -g 8 16 32 -c "lmqg_output/switch-base-128-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
+[RUN] lmqg-train-search -m "google/switch-base-128"  -b 4 -g 16 32 64 -c "lmqg_output/switch-base-128-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval -m "lmqg_output/switch-base-128-squad-qg-ae/best_model" -e "lmqg_output/switch-base-128-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
 lmqg-eval -m "lmqg_output/switch-base-128-squad-qg-ae/best_model" -e "lmqg_output/switch-base-128-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qa -m "lmqg_output/switch-base-128-squad-qg-ae/best_model" -e "lmqg_output/switch-base-128-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
