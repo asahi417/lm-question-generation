@@ -44,10 +44,11 @@ def main():
             raise ValueError(f'unsupported model type: {config.model_type}')
 
         model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
-        args = {"repo_id": f"{opt.organization}/{opt.model_alias}", "use_auth_token": opt.use_auth_token, "repo_url": url}
+        args = {"repo_id": f"{opt.organization}/{opt.model_alias}", "use_auth_token": opt.use_auth_token}
         model.push_to_hub(**args)
         tokenizer.push_to_hub(**args)
         config.push_to_hub(**args)
+        
 
     # upload remaining files
     copy_tree(f"{opt.model_checkpoint}", f"{opt.model_alias}")
