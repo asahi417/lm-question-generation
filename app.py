@@ -181,7 +181,7 @@ async def process(model_input: ModelInput):
                 q = qa['question']
                 c = model_input.input_text
                 match = SequenceMatcher(None, c, q).find_longest_match(0, len(c), 0, len(q))
-                qa['score'] = 100 * (1 - match.size / len(q))
+                qa['score'] = 1 - match.size / len(q)
         qa_list = sorted(qa_list, key=lambda x: x['score'], reverse=True)
         return {'qa': qa_list}
     except Exception:
