@@ -47,6 +47,7 @@ saved_model/**/* filter=lfs diff=lfs merge=lfs -text
 *tfevents* filter=lfs diff=lfs merge=lfs -text
 """
 
+
 def main():
     parser = argparse.ArgumentParser(description='Push to Model hub')
     parser.add_argument('-m', '--model-checkpoint', required=True, type=str)
@@ -103,5 +104,5 @@ def main():
     with open(f"{opt.model_alias}/.gitattributes", 'w') as f:
         f.write(gitattribute)
     os.system(
-        f"cd {opt.model_alias} && git lfs install && git lfs track  && git add . && git commit -m 'model update' && git push && cd ../")
+        f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
     shutil.rmtree(opt.model_alias)  # clean up the cloned repo
