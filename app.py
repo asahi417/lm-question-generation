@@ -3,6 +3,7 @@ import os
 import logging
 import random
 import traceback
+from difflib import SequenceMatcher
 from typing import List
 from itertools import chain
 
@@ -27,32 +28,32 @@ SCORER = EncoderDecoderLM(SCORER_MODEL, max_length_decoder=32, max_length_encode
 ##########
 # Default models for each qag type
 DEFAULT_MODELS_E2E = {
-    "en": ["lmqg/t5-large-squad-qag", None],
+    "en": ["lmqg/t5-small-squad-qag", None],
     "ja": ["lmqg/mt5-base-jaquad-qag", None],
     "de": ["lmqg/mbart-large-cc25-dequad-qag", None],
-    "es": ["lmqg/mt5-base-esquad-qag", None],
-    "it": ["lmqg/mt5-base-itquad-qag", None],
+    "es": ["lmqg/mt5-small-esquad-qag", None],
+    "it": ["lmqg/mt5-small-itquad-qag", None],
     "ko": ["lmqg/mbart-large-cc25-koquad-qag", None],
-    "fr": ["lmqg/mt5-base-frquad-qag", None],
-    "ru": ["lmqg/mbart-large-cc25-ruquad-qag", None]}
+    "fr": ["lmqg/mt5-small-frquad-qag", None],
+    "ru": ["lmqg/mt5-base-cc25-ruquad-qag", None]}
 DEFAULT_MODELS_MULTITASK = {
-    "en": ["lmqg/t5-large-squad-qg-ae", "lmqg/t5-large-squad-qg-ae"],
+    "en": ["lmqg/t5-small-squad-qg-ae", "lmqg/t5-small-squad-qg-ae"],
     "ja": ["lmqg/mt5-small-jaquad-qg-ae", "lmqg/mt5-small-jaquad-qg-ae"],
     "de": ["lmqg/mt5-small-dequad-qg-ae", "lmqg/mt5-small-dequad-qg-ae"],
-    "es": ["lmqg/mt5-base-esquad-qg-ae", "lmqg/mt5-base-esquad-qg-ae"],
-    "it": ["lmqg/mt5-base-itquad-qg-ae", "lmqg/mt5-base-itquad-qg-ae"],
+    "es": ["lmqg/mt5-small-esquad-qg-ae", "lmqg/mt5-small-esquad-qg-ae"],
+    "it": ["lmqg/mt5-small-itquad-qg-ae", "lmqg/mt5-small-itquad-qg-ae"],
     "ko": ["lmqg/mt5-small-koquad-qg-ae", "lmqg/mt5-small-koquad-qg-ae"],
     "fr": ["lmqg/mt5-small-frquad-qg-ae", "lmqg/mt5-small-frquad-qg-ae"],
-    "ru": ["lmqg/mt5-base-ruquad-qg-ae", "lmqg/mt5-base-ruquad-qg-ae"]}
+    "ru": ["lmqg/mt5-small-ruquad-qg-ae", "lmqg/mt5-small-ruquad-qg-ae"]}
 DEFAULT_MODELS_PIPELINE = {
-    "en": ["lmqg/bart-large-squad-qg", "lmqg/bart-large-squad-ae"],
-    "ja": ["lmqg/mt5-base-jaquad-qg", "lmqg/mt5-base-jaquad-ae"],
+    "en": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
+    "ja": ["lmqg/mt5-small-jaquad-qg", "lmqg/mt5-small-jaquad-ae"],
     "de": ["lmqg/mt5-small-dequad-qg", "lmqg/mt5-small-dequad-ae"],
-    "es": ["lmqg/mt5-base-esquad-qg", "lmqg/mt5-base-esquad-ae"],
-    "it": ["lmqg/mt5-base-itquad-qg", "lmqg/mt5-base-itquad-ae"],
-    "ko": ["lmqg/mbart-large-cc25-koquad-qg", "lmqg/mbart-large-cc25-koquad-ae"],
+    "es": ["lmqg/mt5-small-esquad-qg", "lmqg/mt5-small-esquad-ae"],
+    "it": ["lmqg/mt5-small-itquad-qg", "lmqg/mt5-small-itquad-ae"],
+    "ko": ["lmqg/mt5-small-koquad-qg", "lmqg/mt5-small-koquad-ae"],
     "fr": ["lmqg/mt5-small-frquad-qg", "lmqg/mt5-small-frquad-ae"],
-    "ru": ["lmqg/mt5-base-ruquad-qg", "lmqg/mt5-base-ruquad-qg"]}
+    "ru": ["lmqg/mt5-small-ruquad-qg", "lmqg/mt5-small-ruquad-qg"]}
 DEFAULT_MODELS = {"End2End": DEFAULT_MODELS_E2E, "Pipeline": DEFAULT_MODELS_PIPELINE, "Multitask": DEFAULT_MODELS_MULTITASK}
 # Other configs
 LANGUAGE_MAP = {
@@ -167,13 +168,20 @@ async def process(model_input: ModelInput):
             add_prefix_qg=PREFIX_INFO_QAG[model_qg] if model_qg in PREFIX_INFO_QAG else None,
             add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None
         )
-        score = SCORER.get_perplexity(
-            input_texts=[model_input.input_text] * len(qa_list),
-            output_texts=[f"question: {x['question']}, answer: {x['answer']}" for x in qa_list]
-        )
-        for s, qa in zip(score, qa_list):
-            # perplexity is a positive value, so we transform it into unit interval with reverse order (higher is better)
-            qa['score'] = 1/(1 + s)
+        if model_input.language == 'en':
+            score = SCORER.get_perplexity(
+                input_texts=[model_input.input_text] * len(qa_list),
+                output_texts=[f"question: {x['question']}, answer: {x['answer']}" for x in qa_list]
+            )
+            # perplexity is positive value, so we transform it into unit interval with reverse order (higher is better)
+            for s, qa in zip(score, qa_list):
+                qa['score'] = 1 / (1 + s)
+        else:
+            for qa in qa_list:
+                q = qa['question']
+                c = model_input.input_text
+                match = SequenceMatcher(None, c, q).find_longest_match(0, len(c), 0, len(q))
+                qa['score'] = 100 * (1 - match.size / len(q))
         qa_list = sorted(qa_list, key=lambda x: x['score'], reverse=True)
         return {'qa': qa_list}
     except Exception:
