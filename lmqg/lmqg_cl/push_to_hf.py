@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--use-auth-token', help='Huggingface transformers argument of `use_auth_token`',
                         action='store_true')
     parser.add_argument('--skip-model-upload', help='', action='store_true')
+    parser.add_argument('--access-token', default=None, type=str)
     opt = parser.parse_args()
 
     assert os.path.exists(pj(opt.model_checkpoint, "pytorch_model.bin")), pj(opt.model_checkpoint, "pytorch_model.bin")
@@ -43,12 +44,15 @@ def main():
         else:
             raise ValueError(f'unsupported model type: {config.model_type}')
 
-        model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
+        if opt.access_token is not None:
+            model = model_class(opt.model_checkpoint, config=config, local_files_only=True, hub_token=opt.access_token)
+        else:
+            model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
         args = {"repo_id": f"{opt.organization}/{opt.model_alias}", "use_auth_token": opt.use_auth_token}
         model.push_to_hub(**args)
         tokenizer.push_to_hub(**args)
         config.push_to_hub(**args)
-        
+
 
     # upload remaining files
     copy_tree(f"{opt.model_checkpoint}", f"{opt.model_alias}")
