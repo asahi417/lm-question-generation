@@ -64,8 +64,9 @@ def main():
 
     # url = create_repo(opt.model_alias, organization=opt.organization, exist_ok=True)
     create_repo(repo_id=f"{opt.organization}/{opt.model_alias}", exist_ok=True, repo_type="model")
-
-    if not opt.skip_model_upload:
+    if opt.skip_model_upload:
+        os.system(f"git clone https://huggingface.co/{opt.organization}/{opt.model_alias}")
+    else:
         tokenizer = transformers.AutoTokenizer.from_pretrained(opt.model_checkpoint, local_files_only=True)
         config = transformers.AutoConfig.from_pretrained(opt.model_checkpoint, local_files_only=True)
         if config.model_type == 't5':  # T5 model requires T5ForConditionalGeneration class
@@ -104,6 +105,5 @@ def main():
     with open(f"{opt.model_alias}/.gitattributes", 'w') as f:
         f.write(gitattribute)
 
-    # os.system(
-    #     f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
+    os.system(f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
     # shutil.rmtree(opt.model_alias)  # clean up the cloned repo
