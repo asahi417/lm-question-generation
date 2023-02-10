@@ -65,6 +65,8 @@ def main():
     # url = create_repo(opt.model_alias, organization=opt.organization, exist_ok=True)
     create_repo(repo_id=f"{opt.organization}/{opt.model_alias}", exist_ok=True, repo_type="model")
     if opt.skip_model_upload:
+        if os.path.exists(opt.model_alias):
+            shutil.rmtree(opt.model_alias)
         os.system(f"git clone https://huggingface.co/{opt.organization}/{opt.model_alias}")
     else:
         tokenizer = transformers.AutoTokenizer.from_pretrained(opt.model_checkpoint, local_files_only=True)
