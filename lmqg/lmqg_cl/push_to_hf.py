@@ -26,7 +26,8 @@ def main():
     assert os.path.exists(pj(opt.model_checkpoint, "pytorch_model.bin")), pj(opt.model_checkpoint, "pytorch_model.bin")
     logging.info(f"Upload {opt.model_checkpoint} to {opt.organization}/{opt.model_alias}")
 
-    url = create_repo(opt.model_alias, organization=opt.organization, exist_ok=True)
+    # url = create_repo(opt.model_alias, organization=opt.organization, exist_ok=True)
+    url = create_repo(repo_id=f"{opt.organization}/{opt.model_alias}", exist_ok=True, repo_type="model")
 
     if not opt.skip_model_upload:
         tokenizer = transformers.AutoTokenizer.from_pretrained(opt.model_checkpoint, local_files_only=True)
