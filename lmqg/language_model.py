@@ -85,6 +85,8 @@ def load_language_model(model_name, cache_dir: str = None, use_auth_token: bool 
         model_class = transformers.BartForConditionalGeneration.from_pretrained
     elif config.model_type == 'mbart':
         model_class = transformers.MBartForConditionalGeneration.from_pretrained
+    elif config.model_type == 'switch_transformers':
+        model_class = transformers.SwitchTransformersForConditionalGeneration.from_pretrained
     else:
         raise ValueError(f'unsupported model type: {config.model_type}')
     model = model_class(
