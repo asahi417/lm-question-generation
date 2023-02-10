@@ -35,7 +35,7 @@ DEFAULT_MODELS_E2E = {
     "it": ["lmqg/mt5-small-itquad-qag", None],
     "ko": ["lmqg/mbart-large-cc25-koquad-qag", None],
     "fr": ["lmqg/mt5-small-frquad-qag", None],
-    "ru": ["lmqg/mt5-base-ruquad-qag", None]}
+    "ru": ["lmqg/mt5-basemai-ruquad-qag", None]}
 DEFAULT_MODELS_MULTITASK = {
     "en": ["lmqg/t5-small-squad-qg-ae", "lmqg/t5-small-squad-qg-ae"],
     "ja": ["lmqg/mt5-small-jaquad-qg-ae", "lmqg/mt5-small-jaquad-qg-ae"],
