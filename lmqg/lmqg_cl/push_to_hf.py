@@ -45,11 +45,11 @@ def main():
             raise ValueError(f'unsupported model type: {config.model_type}')
 
         if opt.access_token is not None:
-            model = model_class(opt.model_checkpoint, config=config, local_files_only=True, hub_token=opt.access_token)
+            model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
         else:
             model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
         args = {"repo_id": f"{opt.organization}/{opt.model_alias}", "use_auth_token": opt.use_auth_token}
-        model.push_to_hub(**args)
+        model.push_to_hub(**args, hub_token=opt.access_token)
         tokenizer.push_to_hub(**args)
         config.push_to_hub(**args)
 
