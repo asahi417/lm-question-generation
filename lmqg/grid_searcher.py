@@ -37,7 +37,8 @@ class GridSearcher:
                  prediction_aggregation: str = 'first', prediction_level: str = 'sentence',
                  batch: int = 128, batch_eval: int = 32, n_beams_eval: int = 4, lr: List or float = 1e-4,
                  label_smoothing: List or float = None, random_seed: List or int = 42, language: str = 'en',
-                 normalize: bool = True, use_auth_token: bool = False):
+                 normalize: bool = True, use_auth_token: bool = False, torch_dtype=None, device_map: str = None,
+                 low_cpu_mem_usage: bool = False):
 
         # evaluation configs
         max_length_eval = max_length if max_length_eval is None else max_length_eval
@@ -62,6 +63,10 @@ class GridSearcher:
         self.checkpoint_dir = checkpoint_dir
         self.n_max_config = n_max_config
         self.use_auth_token = use_auth_token
+        self.torch_dtype = torch_dtype
+        self.device_map = device_map
+        self.low_cpu_mem_usage = low_cpu_mem_usage
+
         self.split, self.metric = metric.split('/')
 
         self.dynamic_config = {
@@ -204,7 +209,9 @@ class GridSearcher:
 
             if not os.path.exists(pj(checkpoint_dir, f'epoch_{self.epoch_partial}')):
                 trainer = Trainer(
-                    checkpoint_dir=checkpoint_dir, disable_log=True, use_auth_token=self.use_auth_token, **config)
+                    checkpoint_dir=checkpoint_dir, disable_log=True, use_auth_token=self.use_auth_token,
+                    device_map=self.device_map, low_cpu_mem_usage=self.low_cpu_mem_usage, torch_dtype=self.torch_dtype,
+                    **config)
                 trainer.train(
                     epoch_partial=self.epoch_partial, epoch_save=1, interval=interval)
 
@@ -242,7 +249,9 @@ class GridSearcher:
             logging.info(f'## 2nd RUN: Configuration {n}/{len(metrics)}: {self.split}/{self.metric} = {_metric}')
             model_ckpt = os.path.dirname(checkpoint_dir_model)
             if not os.path.exists(pj(model_ckpt, f'epoch_{self.epoch}')):
-                trainer = Trainer(checkpoint_dir=model_ckpt, disable_log=True, use_auth_token=self.use_auth_token)
+                trainer = Trainer(
+                    checkpoint_dir=model_ckpt, disable_log=True, use_auth_token=self.use_auth_token,
+                    device_map=self.device_map, low_cpu_mem_usage=self.low_cpu_mem_usage, torch_dtype=self.torch_dtype)
                 trainer.train(epoch_save=1, interval=interval)
 
             checkpoints.append(model_ckpt)
@@ -285,7 +294,8 @@ class GridSearcher:
                 if not os.path.exists(checkpoint_dir_model):
                     trainer = Trainer(
                         checkpoint_dir=best_model_dir, config_file='trainer_config.additional_training.json',
-                        disable_log=True, use_auth_token=self.use_auth_token)
+                        disable_log=True, use_auth_token=self.use_auth_token, device_map=self.device_map,
+                        low_cpu_mem_usage=self.low_cpu_mem_usage, torch_dtype=self.torch_dtype)
                     trainer.train(epoch_save=1, interval=interval)
                 logging.info(f'## 3rd RUN (EVAL): epoch {epoch} ##')
                 metric = evaluator(checkpoint_dir_model)

@@ -173,6 +173,9 @@ def evaluate(export_dir: str = '.',
              bleu_only: bool = False,
              overwrite: bool = False,
              use_auth_token: bool = False,
+             torch_dtype=None,
+             device_map: str = None,
+             low_cpu_mem_usage: bool = False,
              language: str = 'en',
              test_split: str = 'test',
              validation_split: str = 'validation'):
@@ -203,7 +206,11 @@ def evaluate(export_dir: str = '.',
                             max_length_output=max_length_output,
                             drop_overflow_error_text=False,
                             skip_overflow_error=True,
-                            language=language)
+                            language=language,
+                            use_auth_token=use_auth_token,
+                            torch_dtype=torch_dtype,
+                            device_map=device_map,
+                            low_cpu_mem_usage=low_cpu_mem_usage)
         lm.eval()
 
         def get_model_prediction_file(split, _input_type, _output_type):

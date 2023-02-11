@@ -29,9 +29,10 @@ def get_options():
     parser.add_argument('--overwrite', help='', action='store_true')
     parser.add_argument('--bleu-only', help='', action='store_true')
     parser.add_argument('--use-auth-token', help='', action='store_true')
+    parser.add_argument('--device-map', help='', default=None, type=str)
+    parser.add_argument('--low-cpu-mem-usage', help='', action='store_true')
     parser.add_argument('--prediction-aggregation', default=None, type=str)
     parser.add_argument('--prediction-level', default=None, type=str)
-
     return parser.parse_args()
 
 
@@ -65,6 +66,8 @@ def main():
         language=opt.language,
         bleu_only=opt.bleu_only,
         use_auth_token=opt.use_auth_token,
+        device_map=opt.device_map,
+        low_cpu_mem_usage=opt.low_cpu_mem_usage
     )
     print(json.dumps(metric, indent=4, sort_keys=True))
 

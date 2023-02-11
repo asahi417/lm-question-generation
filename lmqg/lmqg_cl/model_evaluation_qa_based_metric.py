@@ -75,6 +75,9 @@ def main_generate_qa_pair():
     parser.add_argument('-e', '--export-dir', default='tmp_output', type=str)
     parser.add_argument('--max-length', default=512, type=int, help='')
     parser.add_argument('--max-length-output', default=64, type=int, help='')
+    parser.add_argument('--use-auth-token', help='', action='store_true')
+    parser.add_argument('--device-map', help='', default=None, type=str)
+    parser.add_argument('--low-cpu-mem-usage', help='', action='store_true')
     opt = parser.parse_args()
     generate_qa_pairs(
         model_qg=opt.model_qg,
@@ -87,4 +90,7 @@ def main_generate_qa_pair():
         export_dir=opt.export_dir,
         overwrite=opt.overwrite,
         max_length=opt.max_length,
-        max_length_output=opt.max_length)
+        max_length_output=opt.max_length,
+        use_auth_token=opt.use_auth_token,
+        device_map=opt.device_map,
+        low_cpu_mem_usage=opt.low_cpu_mem_usage)

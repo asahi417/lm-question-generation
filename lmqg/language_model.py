@@ -67,7 +67,12 @@ def internet_connection(host='http://google.com'):
         return False
 
 
-def load_language_model(model_name, cache_dir: str = None, use_auth_token: bool = False):
+def load_language_model(model_name,
+                        cache_dir: str = None,
+                        use_auth_token: bool = False,
+                        torch_dtype=None,
+                        device_map: str = None,
+                        low_cpu_mem_usage: bool = False):
     """ load language model from huggingface model hub """
     # tokenizer
     local_files_only = not internet_connection()
@@ -89,8 +94,14 @@ def load_language_model(model_name, cache_dir: str = None, use_auth_token: bool 
         model_class = transformers.SwitchTransformersForConditionalGeneration.from_pretrained
     else:
         raise ValueError(f'unsupported model type: {config.model_type}')
-    model = model_class(
-        model_name, config=config, cache_dir=cache_dir, local_files_only=local_files_only, use_auth_token=use_auth_token)
+
+    param = {'config': config, "local_files_only": local_files_only, "use_auth_token": use_auth_token,
+             "low_cpu_mem_usage": low_cpu_mem_usage, "cache_dir": cache_dir}
+    if torch_dtype is not None:
+        param['torch_dtype'] = torch_dtype
+    if device_map is not None:
+        param['device_map'] = device_map
+    model = model_class(model_name, **param)
     # add new special tokens to the tokenizer and the model if they don't have it
     tokenizer.add_special_tokens({'additional_special_tokens': list(ADDITIONAL_SP_TOKENS.values())})
     model.resize_token_embeddings(len(tokenizer))
@@ -244,6 +255,9 @@ class TransformersQG:
                  drop_highlight_error_text: bool = False,
                  drop_answer_error_text: bool = False,
                  use_auth_token: bool = False,
+                 torch_dtype=None,
+                 device_map: str = None,
+                 low_cpu_mem_usage: bool = False,
                  is_qg: bool = None,
                  is_qag: bool = None,
                  is_qa: bool = None,
@@ -289,7 +303,9 @@ class TransformersQG:
         self.max_length_ae = max_length_ae
         self.max_length_output_ae = max_length_output_ae
         # load model
-        self.tokenizer, self.model, config = load_language_model(self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token)
+        self.tokenizer, self.model, config = load_language_model(
+            self.model_name, cache_dir=cache_dir, use_auth_token=use_auth_token, device_map=device_map,
+            torch_dtype=torch_dtype, low_cpu_mem_usage=low_cpu_mem_usage)
         if 'add_prefix' not in config.to_dict().keys():
             # this means the model is not fine-tuned
             # assert add_prefix, '`add_prefix` is required for non-fine-tuned models'

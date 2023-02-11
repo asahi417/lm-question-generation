@@ -30,6 +30,8 @@ def get_options():
     parser.add_argument('--batch-size', default=16, type=int)
     parser.add_argument('-l', '--language', help='', default='en', type=str)
     parser.add_argument('--use-auth-token', help='', action='store_true')
+    parser.add_argument('--device-map', help='', default=None, type=str)
+    parser.add_argument('--low-cpu-mem-usage', help='', action='store_true')
     parser.add_argument('-e', '--export-dir', required=True, type=str)
     parser.add_argument('--hyp-test', default=None, type=str)
     parser.add_argument('--hyp-dev', default=None, type=str)
@@ -71,7 +73,9 @@ def main():
                                     language=opt.language,
                                     max_length=opt.max_length,
                                     max_length_output=opt.max_length_output,
-                                    use_auth_token=opt.use_auth_token)
+                                    use_auth_token=opt.use_auth_token,
+                                    device_map=opt.device_map,
+                                    low_cpu_mem_usage=opt.low_cpu_mem_usage)
             _model.eval()
             return _model
         raise ValueError(f"require `-m` or `--model`")

@@ -82,9 +82,15 @@ class Trainer:
                  label_smoothing: float = None,
                  disable_log: bool = False,
                  config_file: str = 'trainer_config.json',
-                 use_auth_token: bool = False):
+                 use_auth_token: bool = False,
+                 torch_dtype=None,
+                 device_map: str = None,
+                 low_cpu_mem_usage: bool = False):
         logging.info('initialize model trainer')
         self.use_auth_token = use_auth_token
+        self.torch_dtype = torch_dtype
+        self.device_map = device_map
+        self.low_cpu_mem_usage = low_cpu_mem_usage
         # config
         self.config = Config(
             config_file=config_file, checkpoint_dir=checkpoint_dir, dataset_path=dataset_path, dataset_name=dataset_name,
@@ -118,8 +124,8 @@ class Trainer:
                     self.model = TransformersQG(
                         model=path, max_length=self.config.max_length, max_length_output=self.config.max_length_output,
                         label_smoothing=self.config.label_smoothing, add_prefix=add_prefix,
-                        drop_overflow_error_text=True
-                    )
+                        drop_overflow_error_text=True, use_auth_token=self.use_auth_token, device_map=self.device_map,
+                        low_cpu_mem_usage=self.low_cpu_mem_usage, torch_dtype=self.torch_dtype)
                     self.optimizer = self.setup_optimizer(epoch)
                     self.current_epoch = epoch
                     assert self.current_epoch <= self.config.epoch, 'model training is done'
@@ -133,7 +139,8 @@ class Trainer:
             self.model = TransformersQG(
                 model=self.config.model, max_length=self.config.max_length,
                 max_length_output=self.config.max_length_output, add_prefix=add_prefix,
-                drop_overflow_error_text=True)
+                drop_overflow_error_text=True, use_auth_token=self.use_auth_token,
+                device_map=self.device_map, low_cpu_mem_usage=self.low_cpu_mem_usage, torch_dtype=self.torch_dtype)
             self.optimizer = self.setup_optimizer()
             self.current_epoch = 0
 

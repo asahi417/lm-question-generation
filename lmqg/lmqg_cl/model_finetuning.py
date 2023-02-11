@@ -23,6 +23,8 @@ def arguments(parser):
     parser.add_argument('-b', '--batch', help='batch size', default=128, type=int)
     parser.add_argument('--fp16', help='fp16', action='store_true')
     parser.add_argument('--use-auth-token', help='', action='store_true')
+    parser.add_argument('--device-map', help='', default=None, type=str)
+    parser.add_argument('--low-cpu-mem-usage', help='', action='store_true')
     parser.add_argument('--max-length', default=512, type=int, help='max sequence length for input sequence')
     parser.add_argument('--max-length-output', default=32, type=int, help='max sequence length for output sequence')
     parser.add_argument('--interval', default=50, type=int)
@@ -89,7 +91,9 @@ def main_training():
         fp16=opt.fp16,
         gradient_accumulation_steps=opt.gradient_accumulation_steps,
         label_smoothing=opt.label_smoothing,
-        use_auth_token=opt.use_auth_token)
+        use_auth_token=opt.use_auth_token,
+        device_map=opt.device_map,
+        low_cpu_mem_usage=opt.low_cpu_mem_usage)
     trainer.train(interval=opt.interval, epoch_save=opt.epoch_save)
 
 
@@ -128,7 +132,8 @@ def main_training_search():
         max_length_output_eval=opt.max_length_output_eval,
         max_length_eval=opt.max_length_eval,
         language=opt.language,
-        use_auth_token=opt.use_auth_token
-    )
+        use_auth_token=opt.use_auth_token,
+        device_map=opt.device_map,
+        low_cpu_mem_usage=opt.low_cpu_mem_usage)
     trainer.run(interval=opt.interval, overwrite=opt.overwrite)
 
