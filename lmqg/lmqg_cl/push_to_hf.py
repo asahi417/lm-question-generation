@@ -7,7 +7,6 @@ from distutils.dir_util import copy_tree
 from os.path import join as pj
 from huggingface_hub import create_repo
 
-import transformers
 from lmqg.lmqg_cl.readme_template import get_readme
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -54,40 +53,14 @@ def main():
     parser.add_argument('-a', '--model-alias', required=True, type=str)
     parser.add_argument('-o', '--organization', required=True, type=str)
     parser.add_argument('--use-auth-token', help='Huggingface transformers argument of `use_auth_token`', action='store_true')
-    # parser.add_argument('--skip-model-upload', help='', action='store_true')
     opt = parser.parse_args()
 
     assert os.path.exists(pj(opt.model_checkpoint, "pytorch_model.bin")), pj(opt.model_checkpoint, "pytorch_model.bin")
     logging.info(f"Upload {opt.model_checkpoint} to {opt.organization}/{opt.model_alias}")
-
-    # url = create_repo(opt.model_alias, organization=opt.organization, exist_ok=True)
     create_repo(repo_id=f"{opt.organization}/{opt.model_alias}", exist_ok=True, repo_type="model")
-    # if opt.skip_model_upload:
     if os.path.exists(opt.model_alias):
         shutil.rmtree(opt.model_alias)
     os.system(f"git clone https://huggingface.co/{opt.organization}/{opt.model_alias}")
-
-    # tokenizer = transformers.AutoTokenizer.from_pretrained(opt.model_checkpoint, local_files_only=True)
-    # config = transformers.AutoConfig.from_pretrained(opt.model_checkpoint, local_files_only=True)
-    # if config.model_type == 't5':  # T5 model requires T5ForConditionalGeneration class
-    #     model_class = transformers.T5ForConditionalGeneration.from_pretrained
-    # elif config.model_type == 'mt5':
-    #     model_class = transformers.MT5ForConditionalGeneration.from_pretrained
-    # elif config.model_type == 'bart':
-    #     model_class = transformers.BartForConditionalGeneration.from_pretrained
-    # elif config.model_type == 'mbart':
-    #     model_class = transformers.MBartForConditionalGeneration.from_pretrained
-    # else:
-    #     raise ValueError(f'unsupported model type: {config.model_type}')
-    #
-    # model = model_class(opt.model_checkpoint, config=config, local_files_only=True)
-    # args = {"repo_id": f"{opt.organization}/{opt.model_alias}", "use_auth_token": opt.use_auth_token}
-    # model.push_to_hub(**args)
-    # tokenizer.push_to_hub(**args)
-    # config.push_to_hub(**args)
-
-    # upload remaining files
-    copy_tree(f"{opt.model_checkpoint}", f"{opt.model_alias}")
 
     # config
     readme = get_readme(
