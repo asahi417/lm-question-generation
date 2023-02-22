@@ -60,47 +60,60 @@ def generate_qa(
         add_prefix_answer: bool = None,
         splitting_symbol: str = '|',
         question_prefix: str = "question: ",
-        answer_prefix: str = ", answer: "):
+        answer_prefix: str = ", answer: ",
+        split_level: str = "paragraph"):
 
     logging.info('initialize TransformersQGInferenceAPI')
     is_qag = model_qg.endswith('qag') if is_qag is None else is_qag
     add_prefix_qg = transformers.AutoConfig.from_pretrained(model_qg).add_prefix if add_prefix_qg is None else add_prefix_qg
+
+    qa = []
+    qa_hash = []
     if is_qag:
         assert input_answer is None
-        input_text = f"{TASK_PREFIX['qag'] if add_prefix_qg else None}: {input_text}"
-        input_text = f"{TASK_PREFIX['qag']}: {input_text}" if add_prefix_qg else input_text
-        output = call_api(
-            input_text=input_text,
-            api_token=api_token,
-            model=model_qg,
-            max_length=max_length,
-            do_sample=do_sample,
-            num_beams=num_beams,
-            use_gpu=use_gpu,
-            top_p=top_p)
+        if split_level is None or split_level == "paragraph":
+            input_text = [input_text]
+        elif split_level == "sentence":
+            input_text = spacy.sentence(input_text)
+        else:
+            raise ValueError(f"split_level must be one of ['paragraph', 'sentence'], got {split_level}")
+        for x in input_text:
+            x = f"{TASK_PREFIX['qag'] if add_prefix_qg else None}: {x}"
+            x = f"{TASK_PREFIX['qag']}: {x}" if add_prefix_qg else x
+            output = call_api(
+                input_text=x, api_token=api_token, model=model_qg, max_length=max_length, do_sample=do_sample,
+                num_beams=num_beams, use_gpu=use_gpu, top_p=top_p)
 
-        qa = []
-        for raw_string in output[0]['generated_text'].split(splitting_symbol):
-            if len(raw_string.split(answer_prefix)) != 2 or question_prefix not in raw_string:
-                logging.info(f"invalid prediction: {raw_string}")
-            else:
-                q, a = raw_string.split(answer_prefix)
-                a = re.sub(r'\A\s+', '', a)
-                a = re.sub(r'\s+\Z', '', a)
-                q = q.replace(question_prefix, "")
-                q = re.sub(r'\A\s+', '', q)
-                q = re.sub(r'\s+\Z', '', q)
-                qa.append({'question': q, 'answer': a})
+            for raw_string in output[0]['generated_text'].split(splitting_symbol):
+                if len(raw_string.split(answer_prefix)) != 2 or question_prefix not in raw_string:
+                    logging.info(f"invalid prediction: {raw_string}")
+                else:
+                    if raw_string.replace(" ", "").lower() in qa_hash:
+                        continue
+                    qa_hash.append(raw_string.replace(" ", "").lower())
+                    q, a = raw_string.split(answer_prefix)
+                    a = re.sub(r'\A\s+', '', a)
+                    a = re.sub(r'\s+\Z', '', a)
+                    q = q.replace(question_prefix, "")
+                    q = re.sub(r'\A\s+', '', q)
+                    q = re.sub(r'\s+\Z', '', q)
+                    qa.append({'question': q, 'answer': a})
     else:
-
         if input_answer is None or len(input_answer) == 0:
+
             assert spacy is not None
             logging.info(f"answer extraction: {spacy.algorithm if model_ae is None else model_ae}")
             if model_ae is None:  # keyword extraction
                 input_answer = spacy.keyword(input_text)
             else:
                 add_prefix_ae = transformers.AutoConfig.from_pretrained(model_ae).add_prefix if add_prefix_answer is None else add_prefix_answer
-                batch = [highlight_sentence(input_text, i, TASK_PREFIX['ae'] if add_prefix_ae else None) for i in spacy.sentence(input_text)]
+                if split_level is None or split_level == "paragraph":
+                    batch = [highlight_sentence(input_text, i, TASK_PREFIX['ae'] if add_prefix_ae else None) for i in spacy.sentence(input_text)]
+                elif split_level == "sentence":
+                    batch = [highlight_sentence(i, i, TASK_PREFIX['ae'] if add_prefix_ae else None) for i in spacy.sentence(input_text)]
+                else:
+                    raise ValueError(f"split_level must be one of ['paragraph', 'sentence'], got {split_level}")
+
                 output = call_api(
                     input_text=batch,
                     api_token=api_token,
@@ -111,13 +124,20 @@ def generate_qa(
                     use_gpu=use_gpu,
                     top_p=top_p)
                 input_answer = list(filter(None, [clean(i['generated_text']) for i in output]))  # remove None
-                input_answer = list(filter(lambda x: x in input_text, input_answer))  # remove answers not in input_text
+                input_answer = list(filter(lambda _x: _x in input_text, input_answer))  # remove answers not in input_text
                 if len(input_answer) == 0:
                     raise AnswerNotFoundError(input_text)
 
         logging.info("generate question")
         input_answer = [input_answer] if type(input_answer) is str else input_answer
-        batch = [highlight_sentence(input_text, i, TASK_PREFIX['qg'] if add_prefix_qg else None) for i in input_answer]
+        batch = [highlight_sentence(input_text, i, None) for i in input_answer]
+        if split_level is not None and split_level == "sentence":
+            batch = [[_i for _i in spacy.sentence(i) if _i.count(ADDITIONAL_SP_TOKENS['hl']) == 2] for i in batch]
+            batch = [i[0] for i in batch if len(i) > 0]
+            if len(batch) == 0:
+                raise AnswerNotFoundError(input_text)
+        if add_prefix_qg:
+            batch = [f"{TASK_PREFIX['qg']}: {i}" for i in batch]
         output = call_api(
             input_text=batch,
             api_token=api_token,
@@ -127,9 +147,15 @@ def generate_qa(
             num_beams=num_beams,
             top_p=top_p,
             use_gpu=use_gpu)
-        question = [i['generated_text'] for i in output]
-        assert len(question) == len(input_answer), f"{question} != {input_answer}"
-        qa = [{'question': q, 'answer': a} for q, a in zip(question, input_answer)]
+        for i, a in zip(output, input_answer):
+
+            q = i['generated_text']
+            raw_string = f"{q}, {a}".replace(" ", "").lower()
+            if raw_string in qa_hash:
+                continue
+            qa_hash.append(raw_string)
+            qa.append({'question': q, 'answer': a})
+
         logging.info(f"complete process: {len(output)} qa pairs generated")
     return qa
 

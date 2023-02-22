@@ -95,6 +95,7 @@ class ModelInput(BaseModel):
     do_sample: bool = True
     top_p: float = 0.9
     max_length: int = 64
+    split: str = 'paragraph'
 
 
 # Run app
@@ -166,7 +167,8 @@ async def process(model_input: ModelInput):
             num_beams=model_input.num_beams,
             is_qag=model_input.qag_type == 'End2End',
             add_prefix_qg=PREFIX_INFO_QAG[model_qg] if model_qg in PREFIX_INFO_QAG else None,
-            add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None
+            add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None,
+            split_level=model_input.split
         )
         if model_input.language == 'en':
             score = SCORER.get_perplexity(

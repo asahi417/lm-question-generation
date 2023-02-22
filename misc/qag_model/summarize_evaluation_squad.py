@@ -12,8 +12,7 @@ LM_AE = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart
 LM_QG_AE = ['t5-small', 't5-base', 't5-large']
 LM_QAG = ['t5-small', 't5-base', 't5-large', 'facebook/bart-base', 'facebook/bart-large']
 
-DATA_ML = ['jaquad', 'itquad', 'koquad', 'esquad', 'dequad']
-# DATA_ML = ['ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
+DATA_ML = ['ruquad', 'jaquad', 'itquad', 'koquad', 'esquad', 'dequad', 'frquad']
 LM_QG_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
 LM_AE_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']
 LM_QG_AE_ML = ['google/mt5-small', 'google/mt5-base', 'facebook/mbart-large-cc25']  #

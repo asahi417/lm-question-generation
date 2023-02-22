@@ -28,7 +28,7 @@ def get_random_string(length: int = 6, exclude: List = None):
 class GridSearcher:
     """ Grid search (epoch, batch, lr, random_seed, label_smoothing) """
 
-    def __init__(self, checkpoint_dir: str, dataset_path: str = "asahi417/qg_squad", dataset_name: str = "default",
+    def __init__(self, checkpoint_dir: str, dataset_path: str = "lmqg/qg_squad", dataset_name: str = "default",
                  input_types: List or str = 'paragraph_answer', output_types: List or str = 'question',
                  prefix_types: List or str = 'qg', model: str = 't5-small', fp16: bool = False,
                  gradient_accumulation_steps: List or int = 4, metric: str = 'validation/Bleu_4',
