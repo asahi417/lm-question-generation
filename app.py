@@ -71,6 +71,9 @@ PRETTY_NAME = {
     "T5 SMALL": "lmqg/t5-small-squad",
     "T5 BASE": "lmqg/t5-base-squad",
     "T5 LARGE": "lmqg/t5-large-squad",
+    "Flan-T5 SMALL": "lmqg/flan-t5-small-squad",
+    "Flan-T5 BASE": "lmqg/flan-t5-base-squad",
+    "Flan-T5 LARGE": "lmqg/flan-t5-large-squad",
     "BART BASE": "lmqg/bart-base-squad",
     "BART LARGE": "lmqg/bart-large-squad"}
 PRETTY_NAME.update({f'mT5 SMALL ({i.upper()})': f'lmqg/mt5-small-{i}quad' for i in LANGUAGE_MAP.values() if i != 'en'})
