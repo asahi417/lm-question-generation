@@ -171,7 +171,7 @@ async def process(model_input: ModelInput):
             is_qag=model_input.qag_type == 'End2End',
             add_prefix_qg=PREFIX_INFO_QAG[model_qg] if model_qg in PREFIX_INFO_QAG else None,
             add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None,
-            split_level=model_input.split
+            split_level=model_input.split.lower()
         )
         if model_input.language == 'en':
             score = SCORER.get_perplexity(
