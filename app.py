@@ -139,7 +139,8 @@ async def process(model_input: ModelInput):
         model_input.highlight = validate_default(model_input.highlight, default=None)
         model_input.qag_type = validate_default(
             model_input.qag_type,
-            default='End2End' if model_input.highlight is None and model_input.language == 'en' else 'Multitask'
+            default='Multitask'
+            # default='End2End' if model_input.highlight is None and model_input.language == 'en' else 'Multitask'
         )
         model_input.model = validate_default(model_input.model, default=None)
 
