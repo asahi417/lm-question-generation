@@ -61,7 +61,9 @@ setup(
         'evaluate',
         "wandb",
         "ray",
-        "ray[tune]"
+        "ray[tune]",
+        "nltk",
+        "accelerate"
     ],
     python_requires='>=3.6',
     entry_points={
