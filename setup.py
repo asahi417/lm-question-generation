@@ -68,6 +68,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
+            'lmqg-train = lmqg.lmqg_cl.model_finetuning:main_training',
             'lmqg-train-search = lmqg.lmqg_cl.model_finetuning:main_training_search',
             'lmqg-eval = lmqg.lmqg_cl.model_evaluation:main',
             'lmqg-eval-qag = lmqg.lmqg_cl.model_evaluation_qag:main',
