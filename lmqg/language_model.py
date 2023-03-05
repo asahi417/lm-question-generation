@@ -353,6 +353,13 @@ class TransformersQG:
         logging.info(f'\t * Prefix: {self.add_prefix}')
         logging.info(f'\t * Language: {language} (ignore at the training phase)')
 
+    def push_to_hub(self, repo_id):
+        if self.parallel:
+            self.model.module.push_to_hub(repo_id)
+        else:
+            self.model.push_to_hub(repo_id)
+        self.tokenizer.push_to_hub(repo_id)
+
     def generate_qa_end2end(self,
                             list_context: str or List,
                             batch_size: int = None,

@@ -54,14 +54,22 @@ lmqg-push-to-hf -m "lmqg_output/bart-large-tweetqa-qa/best_model" -a "bart-large
 
 # Multi-QuAD
 ## WARNING: Models are not fine-tuned properly.
+LA="ko"  # worked
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage --language "${LA}"
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="de"  # running
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="ru"  # running
-LA="ko"  # running
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="it"  # running
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="es"  # running
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="ja"  # running
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
 LA="fr"  # running
-lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
+lmqg-train-search -m "google/mt5-small" -d "lmqg/qg_${LA}quad" --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --label-smoothing 0 0.15 --language "${LA}" --n-max-config 1 -b 16 -g 4 8 -c "lmqg_output/mt5-small-${LA}quad-qa" -i 'paragraph_question' -o 'answer' --low-cpu-mem-usage
+
 lmqg-eval -m "lmqg_output/mt5-small-${LA}quad-qa/best_model" -e "lmqg_output/mt5-small-${LA}quad-qa/best_model/eval" -d "lmqg/qg_${LA}quad" -i 'paragraph_question' -o 'answer'
 lmqg-eval-qa -m "lmqg_output/mt5-small-${LA}quad-qa/best_model" -e "lmqg_output/mt5-small-${LA}quad-qa/best_model/eval" -d "lmqg/qg_${LA}quad" --language "${LA}"
 lmqg-push-to-hf -m "lmqg_output/mt5-small-${LA}quad-qa/best_model" -a "mt5-small-${LA}quad-qa" -o "lmqg"
