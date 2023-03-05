@@ -27,7 +27,7 @@ def main():
     repo_id = f"{opt.organization}/{opt.model_alias}"
     logging.info(f"Upload {opt.model_checkpoint} to {repo_id}")
 
-    model = TransformersQG(opt.checkpoint_dir, use_auth_token=opt.use_auth_token)
+    model = TransformersQG(opt.model_checkpoint, use_auth_token=opt.use_auth_token)
     model.push_to_hub(repo_id)
 
     if os.path.exists(opt.model_alias):
