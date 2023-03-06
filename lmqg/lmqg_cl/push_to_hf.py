@@ -40,11 +40,8 @@ def main():
         f.write(readme)
 
     # upload remaining files
-    print(glob(pj(opt.model_checkpoint, "eval*")))
     for i in glob(pj(opt.model_checkpoint, "eval*")):
-        print(i, pj(opt.model_alias, os.path.basename(i)))
         copy_tree(i, pj(opt.model_alias, os.path.basename(i)))
-        input()
     repo.push_to_hub()
 
     # os.system(f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
