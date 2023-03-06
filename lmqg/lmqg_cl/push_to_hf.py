@@ -41,10 +41,8 @@ def main():
 
     # upload remaining files
     for i in glob(pj(opt.model_checkpoint, "eval*")):
-        copy_tree(i, opt.model_alias)
+        copy_tree(i, pj(opt.model_alias, os.path.basename(i)))
     repo.push_to_hub()
-    # with open(f"{opt.model_alias}/.gitattributes", 'w') as f:
-    #     f.write(gitattribute)
-    #
+
     # os.system(f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")
     # shutil.rmtree(opt.model_alias)  # clean up the cloned repo

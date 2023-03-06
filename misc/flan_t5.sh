@@ -18,22 +18,30 @@ lmqg-push-to-hf -m "lmqg_output/flan-t5-small-squad-ae/best_model" -a "flan-t5-s
 lmqg-train-search -m "google/flan-t5-large" -b 8 -g 8 16 -c "lmqg_output/flan-t5-large-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
 lmqg-eval -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
-lmqg-eval-qa -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qag -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-eval-qa -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-large-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/flan-t5-large-squad-qg-ae/best_model" -a "flan-t5-large-squad-qg-ae" -o "lmqg"
+
+
+lmqg-eval -m "best_model" -e "best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
+lmqg-eval -m "best_model" -e "best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-eval-qag -m "best_model" -e "best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-eval-qa -m "best_model" -e "best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
+lmqg-push-to-hf -m "best_model" -a "flan-t5-large-squad-qg-ae" -o "lmqg"
+
 
 lmqg-train-search -m "google/flan-t5-base"  -b 8 -g 8 16 32 -c "lmqg_output/flan-t5-base-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
 lmqg-eval -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
-lmqg-eval-qa -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qag -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-eval-qa -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-base-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/flan-t5-base-squad-qg-ae/best_model" -a "flan-t5-base-squad-qg-ae" -o "lmqg"
 
 lmqg-train-search -m "google/flan-t5-small" -b 32 -g 2 4 8 -c "lmqg_output/flan-t5-small-squad-qg-ae" -i 'paragraph_answer' 'paragraph_sentence' -o 'question' 'answer' -p 'qg' 'ae'
 lmqg-eval -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_answer" -o 'question'
 lmqg-eval -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
-lmqg-eval-qa -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-eval-qag -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" -d "lmqg/qg_squad" --language "en"
+lmqg-eval-qa -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -e "lmqg_output/flan-t5-small-squad-qg-ae/best_model/eval" --language "en" -d "lmqg/qg_squad" -i "paragraph_sentence" -o 'answer'
 lmqg-push-to-hf -m "lmqg_output/flan-t5-small-squad-qg-ae/best_model" -a "flan-t5-small-squad-qg-ae" -o "lmqg"
 
 # QG
