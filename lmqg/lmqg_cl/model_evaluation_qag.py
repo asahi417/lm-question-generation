@@ -67,6 +67,8 @@ def main():
     def load_model():
         if opt.model is not None:
             _model = TransformersQG(opt.model,
+                                    is_ae=True,
+                                    is_qg=True,
                                     model_ae=opt.model_ae,
                                     skip_overflow_error=True,
                                     drop_answer_error_text=True,
