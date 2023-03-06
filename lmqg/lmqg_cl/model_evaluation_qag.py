@@ -38,6 +38,9 @@ def get_options():
     parser.add_argument('--overwrite-prediction', help='', action='store_true')
     parser.add_argument('--overwrite-metric', help='', action='store_true')
     parser.add_argument('--use-reference-answer', action='store_true')
+    parser.add_argument('--is-qa', help='', action='store_true')
+    parser.add_argument('--is-ae', help='', action='store_true')
+    parser.add_argument('--is-qag', help='', action='store_true')
     return parser.parse_args()
 
 
@@ -67,8 +70,9 @@ def main():
     def load_model():
         if opt.model is not None:
             _model = TransformersQG(opt.model,
-                                    is_ae=True,
-                                    is_qg=True,
+                                    is_ae=None if opt.is_ae else True,
+                                    is_qg=None if opt.is_qg else True,
+                                    is_qag=None if opt.is_qag else True,
                                     model_ae=opt.model_ae,
                                     skip_overflow_error=True,
                                     drop_answer_error_text=True,
