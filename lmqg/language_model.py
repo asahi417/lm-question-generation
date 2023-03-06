@@ -286,7 +286,7 @@ class TransformersQG:
 
         # classify model type
         self.is_qg = 'qg' in model.split('-') if is_qg is None else is_qg
-        print(self.is_qg)
+        print(self.is_qg, model.split('-'), is_qg)
         input()
         self.is_ae = 'ae' in model.split('-') if is_ae is None else is_ae
         self.is_qa = 'qa' in model.split('-') if is_qa is None else is_qa
