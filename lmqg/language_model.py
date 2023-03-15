@@ -230,6 +230,10 @@ class EncodePlus:
                     if not self.drop_overflow_error_text:  # raise error for overflow text
                         raise ExceedMaxLengthError(self.max_length)
                     return None  # remove overflow text
+        print(input_sequence)
+        print(self.param_in)
+        input()
+
         encode = self.tokenizer(text_target=input_sequence, **self.param_in)
         if output_sequence is not None:
             encode['labels'] = self.tokenizer.encode(output_sequence, **self.param_out)
