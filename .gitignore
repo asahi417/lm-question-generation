@@ -32,3 +32,5 @@ tmp*
 simple-question-generation
 acl_submission
 sample.jsonl
+qa_mlqae
+qa_squadshifts
