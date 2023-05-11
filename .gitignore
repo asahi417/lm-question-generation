@@ -6,7 +6,7 @@ cache
 app_hf.py
 misc/huggingface_models
 misc/lmqg_model_evaluation/*.csv
-misc/emnlp_2022/manual_evaluation/data/main*
+misc/2022_emnlp_qg/manual_evaluation/data/main*
 misc/manual_evaluation/data/final_result.*
 misc/manual_evaluation/output
 misc/manual_evaluation/data/prediction*

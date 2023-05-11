@@ -3,11 +3,28 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/lmqg.svg)](https://pypi.python.org/pypi/lmqg/)
 [![PyPI status](https://img.shields.io/pypi/status/lmqg.svg)](https://pypi.python.org/pypi/lmqg/)
 
-# Generative Language Models for Paragraph-Level Question Generation
+# Question and Answer Generation with Language Models
+
+
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qag.png" width="500">
+    <em> Question generation </em>
+</p>
+
+
+The `lmqg` is a python library for question and answer generation (QAG) with language models (LMs). With `lmqg`, you can do following things:
+- ***QA Generation on Paragraph:*** Given a paragraph, generate a list of question and answer pairs in *8* languages (en/fr/ja/ko/ru/it/es/de).
+- ***QAG Model Training/Evaluation:*** On a dataset containing triples of *paragraph*, *question*, and *answer*, fine-tune LMs to achieve your own QAG model.
+- ***QAG Model Evaluation:*** Evaluate a QAG model on QAAlignedScore.
+- ***QAG Model Hosting:*** Host your QAG model on a web application or a restAPI server.
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qg_diagram.png" width="500">
+    <em> Question generation </em>
 </p>
+
 
 This is the official repository of the paper
 ["Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 main conference"](https://aclanthology.org/2022.emnlp-main.42/).
