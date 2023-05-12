@@ -224,10 +224,11 @@ We list our main models of AE, QG, End2end QAG, and Multitask QAG in 8 languages
 
 
 
-## Citation
-Please cite following paper if you use any resource.
 
-- [***Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 Main***](https://aclanthology.org/2022.emnlp-main.42/): The QG models.
+## Citation
+Please cite following paper if you use any resource and see the code to reproduce the model if needed.
+
+- [***Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 Main***](https://aclanthology.org/2022.emnlp-main.42/): The QG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2022_emnlp_qg)).
 ```
 @inproceedings{ushio-etal-2022-generative,
     title = "{G}enerative {L}anguage {M}odels for {P}aragraph-{L}evel {Q}uestion {G}eneration",
@@ -242,10 +243,10 @@ Please cite following paper if you use any resource.
 }
 ```
 
-- [***TBA, ACL 2022 Finding***](tba): The QAG models.
+- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2023, Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 ```
-@inproceedings{ushio-etal-2023-tba,
-    title = "TBA",
+@inproceedings{ushio-etal-2023-an-empirical,
+    title = "An Empirical Comparison of LM-based Question and Answer Generation Methods",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
@@ -257,7 +258,7 @@ Please cite following paper if you use any resource.
 }
 ```
 
-- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](tba): The library and demo.
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2023, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 
 ```
 @inproceedings{ushio-etal-2023-a-practical-toolkit

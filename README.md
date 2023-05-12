@@ -277,8 +277,8 @@ Please cite following paper if you use any resource and see the code to reproduc
 
 - [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2023, Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 ```
-@inproceedings{ushio-etal-2023-tba,
-    title = "TBA",
+@inproceedings{ushio-etal-2023-an-empirical,
+    title = "An Empirical Comparison of LM-based Question and Answer Generation Methods",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
