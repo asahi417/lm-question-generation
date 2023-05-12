@@ -8,7 +8,7 @@ with open('misc/squad_reference_files/paragraph-test.txt') as f:
     tmp = sorted(list(set(tmp)))
 for _i in tmp:
     print(_i)
-    _a = model.generate_a(_i, parallel=False)
+    _a = model.generate_a(_i)
     print(_a)
     out = model.generate_qa(_i)
     for o in out:

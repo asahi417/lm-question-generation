@@ -49,7 +49,7 @@ See more detail at our paper.
 | [Spanish (`lmqg/qg_esquad`)](https://huggingface.co/datasets/lmqg/qg_esquad)  | 77,025/10,570/10,570         | 781/122/64/21                                                 |
 | [German (`lmqg/qg_dequad`)](https://huggingface.co/datasets/lmqg/qg_dequad)   | 9,314/2,204/2,204            | 1,577/165/59/66                                               |
   
-***IMPORTANT:*** The `lmqg/qg_frquad` is private as the original FQuAD requires filling a form first, please see [here](https://huggingface.co/datasets/lmqg/qg_frquad_dummy/discussions/1).
+***IMPORTANT:*** The `lmqg/qg_frquad` is private as the original FQuAD requires filling a form first, please see [`here`](https://huggingface.co/datasets/lmqg/qg_frquad_dummy/discussions/1).
 
 - QG-Bench (multidomain): The multidomain subset of QG-Bench in English.
 
@@ -90,8 +90,8 @@ answer = [
 question = model.generate_q(list_context=context, list_answer=answer)
 print(question)
 [
-    'Who was an English painter who specialised in watercolour landscapes?',
-    'What nationality was William Turner?'
+    "Who was an English painter who specialised in watercolour landscapes?",
+    "What nationality was William Turner?"
 ]
 ```
 
@@ -106,28 +106,28 @@ pipe(input_text)
 [{'generated_text': 'Who starred as Etta James in Cadillac Records?'}]
 ```
 
-### English QG Models
-English QG model fine-tuned on [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad). The data split follows [Du, et al 2017](https://arxiv.org/pdf/1805.05942.pdf) and [Du, et al 2018](https://arxiv.org/pdf/1705.00106.pdf).
+### English QG Models Leaderboard
+English QG model fine-tuned on [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad). The data split follows [`Du, et al 2017`](https://arxiv.org/pdf/1805.05942.pdf) and [`Du, et al 2018`](https://arxiv.org/pdf/1705.00106.pdf).
 
-| model                                                                   | language model                                    | training data                                                    | test data                                                        | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
-|-------------------------------------------------------------------------|---------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|-------|--------|---------|-----------|------------|
-| [UniLM](https://arxiv.org/abs/1905.03197)                               | UniLM (340M Parameter)                            | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 22.78 |  25.49 |   51.57 |     -     |      -     |
-| [UniLM-v2](https://arxiv.org/abs/2002.12804)                            | UniLM-v2 (110M Parameter)                         | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.70 |  26.33 |   52.13 |     -     |      -     |
-| [ProphetNet](https://aclanthology.org/2020.findings-emnlp.217/)         | ProphetNet (340M Parameter)                       | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 23.91 |  26.60 |   52.26 |     -     |      -     |
-| [ERNIE-GEN](https://arxiv.org/abs/2001.11314)                           | ERNIE-GEN (340M Parameter)                        | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 25.40 |  26.92 |   52.84 |     -     |      -     |
-| [`lmqg/t5-small-squad-qg`](https://huggingface.co/lmqg/t5-small-squad-qg)     | [`t5-small`](https://huggingface.co/t5-small)     | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.40 |  25.84 |   51.43 |     90.20 |      63.89 |
-| [`lmqg/t5-base-squad-qg`](https://huggingface.co/lmqg/t5-base-squad-qg)       | [`t5-base`](https://huggingface.co/t5-base)       | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.13 |  26.97 |   53.33 |     90.60 |      64.74 |
-| [`lmqg/t5-large-squad-qg`](https://huggingface.co/lmqg/t5-large-squad-qg)     | [`t5-large`](https://huggingface.co/t5-large)     | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 27.21 |  27.70 |   54.13 |     91.00 |      65.29 |
-| [`lmqg/bart-base-squad-qg`](https://huggingface.co/lmqg/bart-base-squad-qg)   | [`facebook/bart-base`](https://huggingface.co/facebook/bart-base)   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.68 |  26.05 |   52.66 |     90.87 |      64.47 |
-| [`lmqg/bart-large-squad-qg`](https://huggingface.co/lmqg/bart-large-squad-qg) | [`facebook/bart-large`](https://huggingface.co/facebook/bart-large) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.17 |  27.07 |   53.85 |     91.00 |      64.99 |
+| Model                                                                         | LM                                                | Training Data                                                    | Test Data                                                        | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
+|-------------------------------------------------------------------------------|---------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|-------|--------|---------|-----------|------------|
+| [`UniLM`](https://arxiv.org/abs/1905.03197)                                     | UniLM (340M Parameter)                            | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 22.78 |  25.49 |   51.57 |     -     |      -     |
+| [`UniLM-v2`](https://arxiv.org/abs/2002.12804)                                  | UniLM-v2 (110M Parameter)                         | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.70 |  26.33 |   52.13 |     -     |      -     |
+| [`ProphetNet`](https://aclanthology.org/2020.findings-emnlp.217/)               | ProphetNet (340M Parameter)                       | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 23.91 |  26.60 |   52.26 |     -     |      -     |
+| [`ERNIE-GEN`](https://arxiv.org/abs/2001.11314)                                 | ERNIE-GEN (340M Parameter)                        | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 25.40 |  26.92 |   52.84 |     -     |      -     |
+| [`lmqg/t5-small-squad-qg`](https://huggingface.co/lmqg/t5-small-squad-qg)       | [`t5-small`](https://huggingface.co/t5-small)     | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.40 |  25.84 |   51.43 |     90.20 |      63.89 |
+| [`lmqg/t5-base-squad-qg`](https://huggingface.co/lmqg/t5-base-squad-qg)         | [`t5-base`](https://huggingface.co/t5-base)       | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.13 |  26.97 |   53.33 |     90.60 |      64.74 |
+| [`lmqg/t5-large-squad-qg`](https://huggingface.co/lmqg/t5-large-squad-qg)       | [`t5-large`](https://huggingface.co/t5-large)     | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 27.21 |  27.70 |   54.13 |     91.00 |      65.29 |
+| [`lmqg/bart-base-squad-qg`](https://huggingface.co/lmqg/bart-base-squad-qg)     | [`facebook/bart-base`](https://huggingface.co/facebook/bart-base)   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.68 |  26.05 |   52.66 |     90.87 |      64.47 |
+| [`lmqg/bart-large-squad-qg`](https://huggingface.co/lmqg/bart-large-squad-qg)   | [`facebook/bart-large`](https://huggingface.co/facebook/bart-large) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.17 |  27.07 |   53.85 |     91.00 |      64.99 |
 
 The results of UniLM/UniLM-v2/ProphetNet/ERNIE-GEN are taken from their papers.
 
-### Non-English QG Models
+### Non-English QG Models Leaderboard
 Non-English QG model fine-tuned on QG-Bench (multilingual).
 
-| model                                                                                 | language model                                                                  | training data                                                      | test data                                                          | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
-|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|-------|--------|---------|-----------|------------|
+| Model                                                                                     | LM                                                                            | Training Data                                                    | Test Data                                                        | BLEU4 | METEOR | ROUGE-L | BERTScore | MoverScore |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|-------|--------|---------|-----------|------------|
 | [`lmqg/mt5-small-squad-qg`](https://huggingface.co/lmqg/mt5-small-squad-qg)                 | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad)   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad)   | 21.65 |  23.83 |   48.95 |     90.01 |      62.75 |
 | [`lmqg/mt5-small-ruquad-qg`](https://huggingface.co/lmqg/mt5-small-ruquad-qg)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) | 16.31 |  26.39 |   31.39 |     84.27 |      62.49 |
 | [`lmqg/mt5-small-jaquad-qg`](https://huggingface.co/lmqg/mt5-small-jaquad-qg)               | [`mt5-small`](https://huggingface.co/mt5-small)                                 | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) | 30.49 |  29.03 |   50.88 |     80.87 |      58.67 |
@@ -151,65 +151,7 @@ Non-English QG model fine-tuned on QG-Bench (multilingual).
 | [`lmqg/mbart-large-cc25-koquad-qg`](https://huggingface.co/lmqg/mbart-large-cc25-koquad-qg) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) | 10.92 |  30.23 |   27.76 |     83.89 |      82.95 |
 | [`lmqg/mbart-large-cc25-esquad-qg`](https://huggingface.co/lmqg/mbart-large-cc25-esquad-qg) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) |  9.18 |  22.95 |   24.26 |     83.58 |      58.91 |
 | [`lmqg/mbart-large-cc25-dequad-qg`](https://huggingface.co/lmqg/mbart-large-cc25-dequad-qg) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) |  0.75 |  13.71 |   11.19 |     80.77 |      55.88 |
-| [`lmqg/mbart-large-cc25-frquad-qg`](https://huggingface.co/lmqg/mbart-large-cc25-frquad-qg) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  0.72 |   7.78 |   16.40 |     71.48 |      50.35 |
-
-
-## QG Models with Answer Extraction 
-To achieve an end-to-end question and answer generation, we fine-tune language models on the both of question generation and 
-answer extraction jointly. Following model can perform both of question generation and answer extraction.
-
-- With `lmqg` library
-
-```python
-from lmqg import TransformersQG
-# initialize model
-model = TransformersQG(language='en', model='lmqg/t5-large-squad-qg-ae')
-# paragraph to generate pairs of question and answer
-context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
-# model prediction
-question_answer = model.generate_qa(context)
-# the output is a list of tuple (question, answer)
-print(question_answer)
-[
-    ('Who was an English painter who specialised in watercolour landscapes?', 'William Turner'),
-    ("What was William Turner's nickname?", 'William Turner of Oxford'),
-    ("What did many of Turner's paintings depict around Oxford?", 'countryside'),
-    ("What is one of William Turner's best known paintings?", 'a view of the city of Oxford')
-]
-```
-
-- With `transformers` library
-```python
-from transformers import pipeline
-
-model_path = 'lmqg/t5-small-squad-qg-ae'
-pipe = pipeline("text2text-generation", model_path)
-target_text = "Beyonce further expanded her acting career, starring as blues singer Etta James in the 2008 musical biopic, Cadillac Records."
-
-# Answer Generation
-answers = pipe(f"extract answers: <h> {target_text} <hl>")
-print(answers)
-[{'generated_text': 'Etta James'}]
-
-# Question Generation
-answer = answers[0]['generated_text']
-question = pipe(f"generate question: {target_text[:target_text.find(answer)]}<hl> {answer} <hl>{target_text[target_text.find(answer) + len(answer)]}")
-print(question)
-[{'generated_text': 'Who starred as Etta James in Cadillac Records?'}]
-```
-
-| model                                                                                   | language model                                | training data                                                    | test data                                                        | BLEU4  | METEOR | ROUGE-L | BERTScore | MoverScore |
-|-----------------------------------------------------------------------------------------|-----------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------------|--------|--------|---------|-----------|------------|
-| [`lmqg/t5-small-squad-qg-ae`](https://huggingface.co/lmqg/t5-small-squad-qg-ae) | [`t5-small`](https://huggingface.co/t5-small) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 24.18  | 25.58  | 51.12   | 90.18     | 63.72      |
-| [`lmqg/t5-base-squad-qg-ae`](https://huggingface.co/lmqg/t5-base-squad-qg-ae)   | [`t5-base`](https://huggingface.co/t5-base)   | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 26.01  | 27.00  | 53.40   | 90.58     | 64.72      |
-| [`lmqg/t5-large-squad-qg-ae`](https://huggingface.co/lmqg/t5-large-squad-qg-ae) | [`t5-large`](https://huggingface.co/t5-large) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | [`lmqg/qg_squad`](https://huggingface.co/datasets/lmqg/qg_squad) | 27.20  | 27.81  | 54.23   | 90.69     | 65.29      |
-| [`lmqg/mt5-small-ruquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-ruquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) | [`lmqg/qg_ruquad`](https://huggingface.co/datasets/lmqg/qg_ruquad) | 18.06  | 28.92  | 33.78   | 86.29     | 65.02      |
-| [`lmqg/mt5-small-jaquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-jaquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) | [`lmqg/qg_jaquad`](https://huggingface.co/datasets/lmqg/qg_jaquad) | 31.91  | 29.64  | 52.58   | 81.64     | 59.42      |
-| [`lmqg/mt5-small-itquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-itquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_itquad`](https://huggingface.co/datasets/lmqg/qg_itquad) | [`lmqg/qg_itquad`](https://huggingface.co/datasets/lmqg/qg_itquad) | 7.25   | 17.5   | 21.84   | 80.61     | 56.63      |
-| [`lmqg/mt5-small-koquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-koquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) | [`lmqg/qg_koquad`](https://huggingface.co/datasets/lmqg/qg_koquad) | 10.91  | 27.52  | 25.83   | 83.40     | 82.54      |
-| [`lmqg/mt5-small-esquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-esquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | [`lmqg/qg_esquad`](https://huggingface.co/datasets/lmqg/qg_esquad) | 8.79   | 21.66  | 23.13   | 83.39     | 58.34      |
-| [`lmqg/mt5-small-dequad-qg-ae`](https://huggingface.co/lmqg/mt5-small-dequad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | [`lmqg/qg_dequad`](https://huggingface.co/datasets/lmqg/qg_dequad) | 0.82   | 12.18  | 10.15   | 80.39     | 55.10      |
-| [`lmqg/mt5-small-frquad-qg-ae`](https://huggingface.co/lmqg/mt5-small-frquad-qg-ae) | [`mt5-small`](https://huggingface.co/mt5-small) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | 7.75   | 17.62  | 28.06   | 79.90     | 56.44      |
+| [`lmqg/mbart-large-cc25-frquad-qg`](https://huggingface.co/lmqg/mbart-large-cc25-frquad-qg) | [`facebook/mbart-large-cc25`](https://huggingface.co/facebook/mbart-large-cc25) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) | [`lmqg/qg_frquad`](https://huggingface.co/datasets/lmqg/qg_frquad) |  9.47 |  19.80 |   30.62 |     81.75 |      57.96 |
 
 
 ## Citation
