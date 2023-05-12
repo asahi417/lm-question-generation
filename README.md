@@ -36,9 +36,8 @@ All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) v
 To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com/files/paper_2023_acl_qag.pdf) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qg_example.png" width="400">
-  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qag_example.png" width="400">
-  <em> Figure 2: An example of QAG (left) and QG (right). </em>
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/example.png" width="700">
+  <em> Figure 2: An example of QAG (a) and QG (b). </em>
 </p>
 
 ### Is QAG different from Question Generation (QG)? 🤔 
