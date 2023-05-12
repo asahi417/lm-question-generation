@@ -16,7 +16,7 @@ question and answer pairs on the context. With `lmqg`, you can do following thin
 - [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *8* languages (en/fr/ja/ko/ru/it/es/de).
 - [***Model Training/Evaluation:***](https://github.com/asahi417/lm-question-generation#model-development) Train & evaluate your own QG/QAG models.
 - [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
-- [***AutoQG:***]()
+- [***AutoQG:***](https://github.com/asahi417/lm-question-generation/tree/master#autoqg) Online web service to generate questions and answers with our models.
  
 ***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
