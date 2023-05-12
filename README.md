@@ -13,12 +13,12 @@
 The `lmqg` is a python library for question and answer generation (QAG) with language models (LMs). Here, we consider 
 paragraph-level QAG, where user will provide a context (paragraph or document), and the model will generate a list of 
 question and answer pairs on the context. With `lmqg`, you can do following things:
-- ***QAG & QG in One Line of Code:*** Given a paragraph, generate a list of question and answer pairs (or specify answer and generate question on it) in *8* languages (en/fr/ja/ko/ru/it/es/de).
+- [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *8* languages (en/fr/ja/ko/ru/it/es/de).
 - ***QAG & QG Model Training:*** On a dataset containing triples of *paragraph*, *question*, and *answer*, fine-tune LMs to achieve your own QAG or QG model.
 - ***QAG & QG Model Evaluation:*** Evaluate QAG or QG model.
 - ***QAG & QG Model Hosting:*** Host your QAG or QG model on a web application or a restAPI server.
  
-All the models are available at [https://autoqg.net/](https://autoqg.net/), an online demo service to play around with QAG models.
+All the models are available at [https://autoqg.net](https://autoqg.net), an online demo service to play around with QAG models.
 
 ***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)).
 
@@ -32,15 +32,16 @@ The **Multitask** follows same architecture as the **Pipeline**, but the QG and 
 Finally, **End2end** model will generate a list of question and answer pairs in an end-to-end manner.
 In practice, **Pipeline** and **Multitask** generate more question and answer pairs, while **End2end** generates less but a few times faster, 
 and the quality of the generated question and answer pairs depend on language.
-All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (link to the model card).
+All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md#qag)).
 To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com/files/paper_2023_acl_qag.pdf) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
 
-<p align="left">
+### Is QAG different from Question Generation (QG)? 🤔
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/example.png" width="700">
   <br><em> Figure 2: An example of QAG (a) and QG (b). </em>
 </p>
 
-### Is QAG different from Question Generation (QG)? 🤔 
 All the functionalities support question generation as well. Our QG model assumes user to specify an answer in addition to a context,
 and the QG model will generate a question that is answerable by the answer given the context (see Figure 2).
 To know more about QG, please check [our EMNLP 2022 paper](https://aclanthology.org/2022.emnlp-main.42/) that describes the QG models more in detail.
