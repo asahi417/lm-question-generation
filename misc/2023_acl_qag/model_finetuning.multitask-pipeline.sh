@@ -165,7 +165,6 @@ lmqg-push-to-hf -m "bart-large-squad-qg" -a "bart-large-squad-qg" -o "lmqg"
 
 mlqg_pipeline_qag () {
   MODEL_NAME=${1}
-  MODEL_ALIAS=${2}
   for LA in "ja" "es" "ko" "it" "de" "ru" "fr"
   do
     git clone "https://huggingface.co/lmqg/${MODEL_NAME}-${LA}quad-qg"

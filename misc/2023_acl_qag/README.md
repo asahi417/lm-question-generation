@@ -1,3 +1,48 @@
+# ACL 2023 QAG & Demo Papers
+This repository contains the code to reproduce the models for the following papers:
+- [***TBA, ACL 2022 Finding***](tba)
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](tba)
+
+## Contents
+- [`nqg_baseline`](https://github.com/asahi417/lm-question-generation/blob/master/misc/2022_emnlp_qg/nqg_baseline): Get LSTM based QG baseline.
+- [`qa_based_evaluation`](https://github.com/asahi417/lm-question-generation/blob/master/misc/2022_emnlp_qg/qa_based_evaluation): Run QA-based evaluation.
+- [`qg_model_training`](https://github.com/asahi417/lm-question-generation/blob/master/misc/2022_emnlp_qg/qg_model_training): Train QG models.
+
+## Citation
+Please cite following paper if you use any resource:
+- [***TBA, ACL 2022 Finding***](tba)
+```
+@inproceedings{ushio-etal-2023-tba,
+    title = "TBA",
+    author = "Ushio, Asahi  and
+        Alva-Manchego, Fernando  and
+        Camacho-Collados, Jose",
+    booktitle = "Proceedings of the 61th Annual Meeting of the Association for Computational Linguistics",
+    month = Jul,
+    year = "2023",
+    address = "Toronto, Canada",
+    publisher = "Association for Computational Linguistics",
+}
+```
+
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](tba)
+
+```
+@inproceedings{ushio-etal-2023-a-practical-toolkit
+    title = "A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration",
+    author = "Ushio, Asahi  and
+        Alva-Manchego, Fernando  and
+        Camacho-Collados, Jose",
+    booktitle = "Proceedings of the 61th Annual Meeting of the Association for Computational Linguistics: System Demonstrations",
+    month = Jul,
+    year = "2023",
+    address = "Toronto, Canada",
+    publisher = "Association for Computational Linguistics",
+}
+```
+
+
+
 # QAG
 ## Get Started
 ```shell
