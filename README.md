@@ -7,7 +7,7 @@
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/qag.png" width="400">
-    <em> Figure 1: Three distinct QAG approaches. </em>
+  <br><em> Figure 1: Three distinct QAG approaches. </em>
 </p>
 
 The `lmqg` is a python library for question and answer generation (QAG) with language models (LMs). Here, we consider 
