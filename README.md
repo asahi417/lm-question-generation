@@ -69,7 +69,10 @@ from lmqg import TransformersQG
 # initialize model
 model = TransformersQG('lmqg/t5-base-squad-qag') # or TransformersQG(model='lmqg/t5-base-squad-qg-ae') 
 # paragraph to generate pairs of question and answer
-context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known " \
+          "as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, " \
+          "J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his " \
+          "best known pictures is a view of the city of Oxford from Hinksey Hill."
 # model prediction
 question_answer = model.generate_qa(context)
 # the output is a list of tuple (question, answer)
@@ -93,7 +96,10 @@ from lmqg import TransformersQG
 # initialize model
 model = TransformersQG(model='lmqg/t5-base-squad-qg', model_ae='lmqg/t5-base-squad-ae')  
 # paragraph to generate pairs of question and answer
-context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his best known pictures is a view of the city of Oxford from Hinksey Hill."
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known " \
+          "as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, " \
+          "J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his " \
+          "best known pictures is a view of the city of Oxford from Hinksey Hill."
 # model prediction
 question_answer = model.generate_qa(context)
 # the output is a list of tuple (question, answer)
