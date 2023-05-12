@@ -17,11 +17,10 @@ question and answer pairs on the context. With `lmqg`, you can do following thin
 - ***QAG & QG Model Training:*** On a dataset containing triples of *paragraph*, *question*, and *answer*, fine-tune LMs to achieve your own QAG or QG model.
 - ***QAG & QG Model Evaluation:*** Evaluate QAG or QG model.
 - ***QAG & QG Model Hosting:*** Host your QAG or QG model on a web application or a restAPI server.
- 
-All the models are available at [https://autoqg.net](https://autoqg.net), an online demo service to play around with QAG models.
 
-***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)).
-
+Please also check [https://autoqg.net](https://autoqg.net), an online demo service to play around with QAG models.
+  
+***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
 
 ### A bit more about QAG models 📝
