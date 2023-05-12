@@ -37,7 +37,7 @@ To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com
 
 <p align="left">
   <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/example.png" width="700">
-  <em> Figure 2: An example of QAG (a) and QG (b). </em>
+  <br><em> Figure 2: An example of QAG (a) and QG (b). </em>
 </p>
 
 ### Is QAG different from Question Generation (QG)? 🤔 
