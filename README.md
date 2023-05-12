@@ -29,7 +29,7 @@ The **Multitask** follows same architecture as the **Pipeline**, but the QG and 
 Finally, **End2end** model will generate a list of question and answer pairs in an end-to-end manner.
 In practice, **Pipeline** and **Multitask** generate more question and answer pairs, while **End2end** generates less but a few times faster, 
 and the quality of the generated question and answer pairs depend on language.
-All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md#qag)).
+All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md)).
 To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com/files/paper_2023_acl_qag.pdf) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
 
 ### Is QAG different from Question Generation (QG)? 🤔
@@ -106,7 +106,8 @@ pprint(question_answer)
 ]
 ```
 
-- ***QG only:*** The QG model can be used as following. The `model` is the QG model.
+- ***QG only:*** The QG model can be used as following. The `model` is the QG model. See the [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md), 
+a multilingual QG benchmark, for the list of available QG models.
   
 ```python
 from pprint import pprint

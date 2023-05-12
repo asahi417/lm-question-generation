@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open('README.md', 'r') as f:
     readme = f.read()
-VERSION = '0.0.9'
+VERSION = '0.1.0'
 NAME = 'lmqg'
 LICENSE = 'MIT License'
 setup(
