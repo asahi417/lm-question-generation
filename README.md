@@ -42,7 +42,7 @@ To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com
 </p>
 
 All the functionalities support question generation as well. Our QG model assumes user to specify an answer in addition to a context,
-and the QG model will generate a question that is answerable by the answer given the context (see Figure 2).
+and the QG model will generate a question that is answerable by the answer given the context (see Figure 2 for a comparison of QAG and QG).
 To know more about QG, please check [our EMNLP 2022 paper](https://aclanthology.org/2022.emnlp-main.42/) that describes the QG models more in detail.
 
 
@@ -55,6 +55,8 @@ pip install lmqg
 ```
 
 ## Generate Question & Answer
+The main functionality of `lmqg` is to generate question and answer pairs on a given context with a handy api.
+The available models for each QAG class can be found at [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md#qag).
 
 - ***QAG with End2end or Multitask Models:*** The end2end QAG models are fine-tuned to generate a list of QA pairs with a single inference, 
   so it is the fastest class among our QAG models. Meanwhile, multitask QAG models breakdown the QAG task into QG and AE, where they 
@@ -147,9 +149,60 @@ pprint(answer)
 ['William Turner']
 ```
 
+## Model Development
+The `lmqg` also provides a command line interface to fine-tune and evaluate QG, AE, and QAG models.
+
+### Model Training
+<p align="center">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/grid_search.png" width="650">
+</p>
+
+To fine-tune QG (or AE, QAG) model, we employ a two-stage hyper-parameter optimization, described as above diagram.
+Following command is to run the fine-tuning with parameter optimization.
+```shell
+lmqg-train-search -c "tmp_ckpt" -d "lmqg/qg_squad" -m "t5-small" -b 64 --epoch-partial 5 -e 15 --language "en" --n-max-config 1 \
+  -g 2 4 --lr 1e-04 5e-04 1e-03 --label-smoothing 0 0.15
+```
+Check `lmqg-train-search -h` to display all the options.
+
+Fine-tuning models in python follows below.  
+```python
+from lmqg import GridSearcher
+trainer = GridSearcher(
+    checkpoint_dir='tmp_ckpt',
+    dataset_path='lmqg/qg_squad',
+    model='t5-small',
+    epoch=15,
+    epoch_partial=5,
+    batch=64,
+    n_max_config=5,
+    gradient_accumulation_steps=[2, 4], 
+    lr=[1e-04, 5e-04, 1e-03],
+    label_smoothing=[0, 0.15]
+)
+trainer.run()
+```
+
+
+### Model Evaluation
+The evaluation tool reports `BLEU4`, `ROUGE-L`, `METEOR`, `BERTScore`, and `MoverScore` following [QG-Bench](https://github.com/asahi417/lm-question-generation/blob/master/QG_BENCH.md).
+From command line, run following command 
+```shell
+lmqg-eval -m "lmqg/t5-large-squad-qg" -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
+```
+where `-m` is a model alias on huggingface or path to local checkpoint, `-e` is the directly to export the metric file, `-d` is the dataset to evaluate, and `-l` is the language of the test set.
+Instead of running model prediction, you can provide a prediction file instead to avoid computing it each time.
+```shell
+lmqg-eval --hyp-test '{your prediction file}' -e "./eval_metrics" -d "lmqg/qg_squad" -l "en"
+```
+The prediction file should be a text file of model generation in each line in the order of `test` split in the target dataset
+([sample](https://huggingface.co/lmqg/t5-large-squad/raw/main/eval/samples.validation.hyp.paragraph_sentence.question.lmqg_qg_squad.default.txt)).
+Check `lmqg-eval -h` to display all the options.
+
+
 ## Rest API with huggingface inference API
 
-We provide a rest API which hosts the model inference through huggingface inference API. You need huggingface API token to run your own API and install dependencies as below.
+Finally, `lmqg` provides a rest API which hosts the model inference through huggingface inference API. You need huggingface API token to run your own API and install dependencies as below.
 ```shell
 pip install lmqg[api]
 ```
@@ -193,7 +246,7 @@ and return a list of dictionaries with `question` and `answer`.
 ## Misc
 To reproduce the models used in our papers, please see the links.
 
-- [***TBA, ACL 2022 Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): [https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)
+- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2022 Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): [https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)
 - [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): [https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)
 - [***Generative Language Models for Paragraph-Level Question Generation, EMNLP 2022 Main***](https://aclanthology.org/2022.emnlp-main.42/):  [https://github.com/asahi417/lm-question-generation/tree/master/misc/2022_emnlp_qg](https://github.com/asahi417/lm-question-generation/tree/master/misc/2022_emnlp_qg)
 
@@ -215,7 +268,7 @@ Please cite following paper if you use any resource.
 }
 ```
 
-- [***TBA, ACL 2022 Finding***](tba): The QAG models.
+- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2022 Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models.
 ```
 @inproceedings{ushio-etal-2023-tba,
     title = "TBA",
@@ -230,7 +283,7 @@ Please cite following paper if you use any resource.
 }
 ```
 
-- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](tba): The library and demo.
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo.
 
 ```
 @inproceedings{ushio-etal-2023-a-practical-toolkit
