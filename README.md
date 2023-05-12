@@ -16,9 +16,8 @@ question and answer pairs on the context. With `lmqg`, you can do following thin
 - [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *8* languages (en/fr/ja/ko/ru/it/es/de).
 - [***Model Training/Evaluation:***](https://github.com/asahi417/lm-question-generation#model-development) Train & evaluate your own QG/QAG models.
 - [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
-
-Please also check [https://autoqg.net](https://autoqg.net), an online demo service to play around with QAG models.
-  
+- [***AutoQG:***]()
+ 
 ***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
 
@@ -46,7 +45,6 @@ To know more about QG, please check [our EMNLP 2022 paper](https://aclanthology.
 
 
 ## Get Started 🚀
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13izkdp2l7G2oeh_fwL7xJdR_67HMK_hQ?usp=sharing)
 
 Let's install `lmqg` via pip first.
 ```shell
@@ -54,6 +52,8 @@ pip install lmqg
 ```
 
 ## Generate Question & Answer
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13izkdp2l7G2oeh_fwL7xJdR_67HMK_hQ?usp=sharing)
+
 The main functionality of `lmqg` is to generate question and answer pairs on a given context with a handy api.
 The available models for each QAG class can be found at [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md#qag).
 
@@ -147,6 +147,14 @@ answer = model.generate_a("William Turner was an English painter who specialised
 pprint(answer)
 ['William Turner']
 ```
+
+## AutoQG
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/asahi417/lm-question-generation/master/assets/autoqg.gif" width="500">
+</p>
+
+***AutoQG ([https://autoqg.net](https://autoqg.net/))*** is a free web application hosting our QAG models.
 
 ## Model Development
 The `lmqg` also provides a command line interface to fine-tune and evaluate QG, AE, and QAG models.
