@@ -14,9 +14,8 @@ The `lmqg` is a python library for question and answer generation (QAG) with lan
 paragraph-level QAG, where user will provide a context (paragraph or document), and the model will generate a list of 
 question and answer pairs on the context. With `lmqg`, you can do following things:
 - [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *8* languages (en/fr/ja/ko/ru/it/es/de).
-- ***QAG & QG Model Training:*** On a dataset containing triples of *paragraph*, *question*, and *answer*, fine-tune LMs to achieve your own QAG or QG model.
-- ***QAG & QG Model Evaluation:*** Evaluate QAG or QG model.
-- ***QAG & QG Model Hosting:*** Host your QAG or QG model on a web application or a restAPI server.
+- [***Model Training/Evaluation:***](https://github.com/asahi417/lm-question-generation#model-development) Train & evaluate your own QG/QAG models.
+- [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
 
 Please also check [https://autoqg.net](https://autoqg.net), an online demo service to play around with QAG models.
   
