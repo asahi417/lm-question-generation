@@ -275,7 +275,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 }
 ```
 
-- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2022 Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
+- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2023, Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 ```
 @inproceedings{ushio-etal-2023-tba,
     title = "TBA",
@@ -290,7 +290,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 }
 ```
 
-- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2023, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 
 ```
 @inproceedings{ushio-etal-2023-a-practical-toolkit
