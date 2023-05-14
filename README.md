@@ -294,7 +294,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 
 ```
 @inproceedings{ushio-etal-2023-a-practical-toolkit
-    title = "A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2022, System Demonstration",
+    title = "A Practical Toolkit for Multilingual Question and Answer Generation",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
