@@ -293,7 +293,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 - [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2023, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 
 ```
-@inproceedings{ushio-etal-2023-a-practical-toolkit
+@inproceedings{ushio-etal-2023-a-practical-toolkit,
     title = "A Practical Toolkit for Multilingual Question and Answer Generation",
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
