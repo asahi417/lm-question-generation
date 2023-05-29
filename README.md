@@ -18,7 +18,7 @@ question and answer pairs on the context. With `lmqg`, you can do following thin
 - [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
 - [***AutoQG:***](https://github.com/asahi417/lm-question-generation/tree/master#autoqg) Online web service to generate questions and answers with our models.
  
-***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://asahiushio.com/files/paper_2023_acl_qag.pdf), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
+***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://arxiv.org/abs/2305.17002), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
 
 ### A bit more about QAG models 📝
@@ -30,7 +30,7 @@ Finally, **End2end** model will generate a list of question and answer pairs in 
 In practice, **Pipeline** and **Multitask** generate more question and answer pairs, while **End2end** generates less but a few times faster, 
 and the quality of the generated question and answer pairs depend on language.
 All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md)).
-To know more about QAG, please check [our ACL 2023 paper](https://asahiushio.com/files/paper_2023_acl_qag.pdf) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
+To know more about QAG, please check [our ACL 2023 paper](https://arxiv.org/abs/2305.17002) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
 
 ### Is QAG different from Question Generation (QG)? 🤔
 
@@ -275,7 +275,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 }
 ```
 
-- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2023, Finding***](https://asahiushio.com/files/paper_2023_acl_qag.pdf): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
+- [***An Empirical Comparison of LM-based Question and Answer Generation Methods, ACL 2023, Finding***](https://arxiv.org/abs/2305.17002): The QAG models ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 ```
 @inproceedings{ushio-etal-2023-an-empirical,
     title = "An Empirical Comparison of LM-based Question and Answer Generation Methods",
