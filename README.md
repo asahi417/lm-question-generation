@@ -18,7 +18,7 @@ question and answer pairs on the context. With `lmqg`, you can do following thin
 - [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
 - [***AutoQG:***](https://github.com/asahi417/lm-question-generation/tree/master#autoqg) Online web service to generate questions and answers with our models.
  
-***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://arxiv.org/abs/2305.17002), [LMQG at system demonstration](https://asahiushio.com/files/paper_2023_acl_demo.pdf)). \
+***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://arxiv.org/abs/2305.17002), [LMQG at system demonstration](https://arxiv.org/abs/2305.17416)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
 
 ### A bit more about QAG models 📝
@@ -290,7 +290,7 @@ Please cite following paper if you use any resource and see the code to reproduc
 }
 ```
 
-- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2023, System Demonstration***](https://asahiushio.com/files/paper_2023_acl_demo.pdf): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
+- [***A Practical Toolkit for Multilingual Question and Answer Generation, ACL 2023, System Demonstration***](https://arxiv.org/abs/2305.17416): The library and demo ([code to reproduce experiments](https://github.com/asahi417/lm-question-generation/tree/master/misc/2023_acl_qag)).
 
 ```
 @inproceedings{ushio-etal-2023-a-practical-toolkit,
