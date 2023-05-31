@@ -282,7 +282,7 @@ Please cite following paper if you use any resource and see the code to reproduc
     author = "Ushio, Asahi  and
         Alva-Manchego, Fernando  and
         Camacho-Collados, Jose",
-    booktitle = "Proceedings of the 61th Annual Meeting of the Association for Computational Linguistics",
+    booktitle = "Proceedings of the 61th Annual Meeting of the Association for Computational Linguistics: Findings",
     month = Jul,
     year = "2023",
     address = "Toronto, Canada",
