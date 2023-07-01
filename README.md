@@ -226,7 +226,6 @@ Swagger UI is available at [`http://127.0.0.1:8088/docs`](http://127.0.0.1:8088/
 - Build/Run Local (command line):
 ```shell
 export API_TOKEN={Your Huggingface API Token}
-uvicorn app:app --reload --port 8088
 uvicorn app:app --host 0.0.0.0 --port 8088
 ```
 
@@ -234,6 +233,11 @@ uvicorn app:app --host 0.0.0.0 --port 8088
 ```shell
 docker build -t lmqg/app:latest . --build-arg api_token={Your Huggingface API Token}
 docker run -p 8080:8080 lmqg/app:latest
+```
+
+- Run API with loading model locally (instead of HuggingFace):
+```shell
+uvicorn app_local:app --host 0.0.0.0 --port 8088
 ```
 
 ### API Description
