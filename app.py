@@ -19,9 +19,6 @@ from lmqg.spacy_module import SpacyPipeline
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 
 API_TOKEN = os.getenv("API_TOKEN")
-# local model for qa pair scoring
-SCORER_MODEL = os.getenv("SCORER_MODEL", "lmqg/t5-small-squad-qag")
-SCORER = EncoderDecoderLM(SCORER_MODEL, max_length_decoder=32, max_length_encoder=256)
 
 ##########
 # CONFIG #
@@ -54,7 +51,11 @@ DEFAULT_MODELS_PIPELINE = {
     "ko": ["lmqg/mt5-small-koquad-qg", "lmqg/mt5-small-koquad-ae"],
     "fr": ["lmqg/mt5-small-frquad-qg", "lmqg/mt5-small-frquad-ae"],
     "ru": ["lmqg/mt5-small-ruquad-qg", "lmqg/mt5-small-ruquad-qg"]}
-DEFAULT_MODELS = {"End2End": DEFAULT_MODELS_E2E, "Pipeline": DEFAULT_MODELS_PIPELINE, "Multitask": DEFAULT_MODELS_MULTITASK}
+DEFAULT_MODELS = {
+    "End2End": DEFAULT_MODELS_E2E,
+    "Pipeline": DEFAULT_MODELS_PIPELINE,
+    "Multitask": DEFAULT_MODELS_MULTITASK
+}
 # Other configs
 LANGUAGE_MAP = {
     "English": "en",
@@ -174,20 +175,11 @@ async def process(model_input: ModelInput):
             add_prefix_answer=PREFIX_INFO_QAG[model_ae] if model_ae is not None and model_ae in PREFIX_INFO_QAG else None,
             split_level=model_input.split.lower()
         )
-        if model_input.language == 'en':
-            score = SCORER.get_perplexity(
-                input_texts=[model_input.input_text] * len(qa_list),
-                output_texts=[f"question: {x['question']}, answer: {x['answer']}" for x in qa_list]
-            )
-            # perplexity is positive value, so we transform it into unit interval with reverse order (higher is better)
-            for s, qa in zip(score, qa_list):
-                qa['score'] = 1 / (1 + s)
-        else:
-            for qa in qa_list:
-                q = qa['question']
-                c = model_input.input_text
-                match = SequenceMatcher(None, c, q).find_longest_match(0, len(c), 0, len(q))
-                qa['score'] = 1 - match.size / len(q)
+        for qa in qa_list:
+            q = qa['question']
+            c = model_input.input_text
+            match = SequenceMatcher(None, c, q).find_longest_match(0, len(c), 0, len(q))
+            qa['score'] = 1 - match.size / len(q)
         qa_list = sorted(qa_list, key=lambda x: x['score'], reverse=True)
         return {'qa': qa_list}
     except Exception:
