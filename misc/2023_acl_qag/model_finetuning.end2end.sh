@@ -1,6 +1,7 @@
 ############
 # ML SQuAD #
 ############
+LA='zh'
 LA='fr'
 LA='ja'
 LA='es'
