@@ -23,6 +23,7 @@ RUN python -m spacy download it_core_news_sm
 RUN python -m spacy download ko_core_news_sm
 RUN python -m spacy download ru_core_news_sm
 RUN python -m spacy download fr_core_news_sm
+RUN python -m spacy download zh_core_web_sm
 
 ENV PORT 8080
 EXPOSE 8080

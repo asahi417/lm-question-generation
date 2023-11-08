@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open('README.md', 'rb') as f:
     readme = f.read().decode("UTF-8")
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 NAME = 'lmqg'
 LICENSE = 'MIT License'
 setup(
@@ -41,12 +41,12 @@ setup(
     install_requires=[
         'psutil',
         'pytextrank',
-        "torch",
+        "torch==1.13.0",
         "tqdm",
         "requests",
         "pandas",
         "numpy",
-        "transformers>=4.26.1",
+        "transformers==4.26.1",
         "huggingface-hub>=0.12.0",
         # "transformers<=4.21.2",  # push-to-model is not working for latest version
         # "huggingface-hub<=0.9.1",
