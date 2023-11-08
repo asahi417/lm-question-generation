@@ -40,6 +40,7 @@ def get_options():
     parser.add_argument('--use-reference-answer', action='store_true')
     parser.add_argument('--is-qa', help='', action='store_true')
     parser.add_argument('--is-ae', help='', action='store_true')
+    parser.add_argument('--is-qg', help='', action='store_true')
     parser.add_argument('--is-qag', help='', action='store_true')
     return parser.parse_args()
 

@@ -31,7 +31,8 @@ DEFAULT_MODELS_E2E = {
     "ja": ["lmqg/mt5-small-jaquad-qag-trimmed-50000", None],
     "de": ["lmqg/mt5-small-dequad-qag-trimmed-50000", None],
     "ko": ["lmqg/mt5-small-koquad-qag-trimmed-50000", None],
-    "ru": ["lmqg/mt5-small-ruquad-qag-trimmed-50000", None]
+    "ru": ["lmqg/mt5-small-ruquad-qag-trimmed-50000", None],
+    "zh": ["lmqg/mt5-small-zhquad-qag-trimmed-50000", None]
 }
 DEFAULT_MODELS_PIPELINE = {
     "en": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
@@ -41,7 +42,8 @@ DEFAULT_MODELS_PIPELINE = {
     "ja": ["lmqg/mt5-small-jaquad-qg-trimmed-50000", "lmqg/mt5-small-jaquad-ae-trimmed-50000"],
     "de": ["lmqg/mt5-small-dequad-qg-trimmed-50000", "lmqg/mt5-small-dequad-ae-trimmed-50000"],
     "ko": ["lmqg/mt5-small-koquad-qg-trimmed-50000", "lmqg/mt5-small-koquad-ae-trimmed-50000"],
-    "ru": ["lmqg/mt5-small-ruquad-qg-trimmed-50000", "lmqg/mt5-small-ruquad-qg-trimmed-50000"]
+    "ru": ["lmqg/mt5-small-ruquad-qg-trimmed-50000", "lmqg/mt5-small-ruquad-qg-trimmed-50000"],
+    "zh": ["lmqg/mt5-small-zhquad-qg-trimmed-50000", "lmqg/mt5-small-zhquad-qg-trimmed-50000"]
 }
 DEFAULT_MODELS = {
     "End2End": DEFAULT_MODELS_E2E,
@@ -56,7 +58,8 @@ LANGUAGE_MAP = {
     'Italian': 'it',
     'Korean': 'ko',
     'Russian': "ru",
-    'French': "fr"
+    'French': "fr",
+    'Chinese': "zh"
 }
 SPACY_PIPELINE = {i: SpacyPipeline(i) for i in LANGUAGE_MAP.values()}  # spacy for sentence splitting
 # QAG model pretty names used in frontend
