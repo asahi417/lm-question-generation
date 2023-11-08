@@ -11,7 +11,6 @@ from transformers import AutoConfig
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from lmppl import EncoderDecoderLM
 
 from lmqg.inference_api import generate_qa
 from lmqg.spacy_module import SpacyPipeline
