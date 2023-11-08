@@ -31,12 +31,12 @@ NUM_WORKERS = int(os.getenv('NUM_WORKERS', '0'))
 PARALLEL_PROCESSING = bool(int(os.getenv('PARALLEL_PROCESSING', '0')))
 DEFAULT_MODELS = {
     'en': 'lmqg/t5-small-squad-qag',
-    'ja': 'lmqg/mt5-small-jaquad-qg-ae',
-    'de': 'lmqg/mt5-small-dequad-qg-ae',
+    'ja': 'lmqg/mt5-small-jaquad-qg-ae-trimmed-50000',
+    'de': 'lmqg/mt5-small-dequad-qg-ae-trimmed-50000',
     'es': 'lmqg/mt5-small-esquad-qag-trimmed-50000',
-    'ko': 'lmqg/mt5-small-koquad-qg-ae',
-    'ru': 'lmqg/mt5-small-ruquad-qg-ae',
-    'it': 'lmqg/mt5-small-itquad-qg-ae',
+    'ko': 'lmqg/mt5-small-koquad-qg-ae-trimmed-50000',
+    'ru': 'lmqg/mt5-small-ruquad-qg-ae-trimmed-50000',
+    'it': 'lmqg/mt5-small-itquad-qg-ae-trimmed-50000',
     'fr': 'lmqg/mt5-small-frquad-qag-trimmed-50000',
     'zh': 'lmqg/mt5-small-zhquad-qag-trimmed-50000',
 }
@@ -286,7 +286,7 @@ class TransformersQG:
             assert language in DEFAULT_MODELS.keys(),\
                 f"Model with language '{language}' is not available. Please choose language from " \
                 f"'{DEFAULT_MODELS.keys()}' or specify 'model'."
-            model, model_ae = DEFAULT_MODELS[language]
+            model = DEFAULT_MODELS[language]
 
         # classify model type
         self.is_qg = 'qg' in model.split('-') if is_qg is None else is_qg

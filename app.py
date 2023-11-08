@@ -22,6 +22,17 @@ API_TOKEN = os.getenv("API_TOKEN")
 ##########
 # CONFIG #
 ##########
+LANGUAGE_MAP = {
+    "English": "en",
+    "Japanese": "ja",
+    'German': "de",
+    'Spanish': 'es',
+    'Italian': 'it',
+    'Korean': 'ko',
+    'Russian': "ru",
+    'French': "fr",
+    'Chinese': "zh"
+}
 # Default models for each qag type
 DEFAULT_MODELS_E2E = {
     "en": ["lmqg/t5-small-squad-qag", None],
@@ -33,6 +44,17 @@ DEFAULT_MODELS_E2E = {
     "ko": ["lmqg/mt5-small-koquad-qag-trimmed-50000", None],
     "ru": ["lmqg/mt5-small-ruquad-qag-trimmed-50000", None],
     "zh": ["lmqg/mt5-small-zhquad-qag-trimmed-50000", None]
+}
+DEFAULT_MODELS_MULTITASK = {
+    "en": ["lmqg/t5-small-squad-qg-ae", "lmqg/t5-small-squad-qg-ae"],
+    "fr": ["lmqg/mt5-small-frquad-qg-ae-trimmed-50000", "lmqg/mt5-small-frquad-qg-ae-trimmed-50000"],
+    "es": ["lmqg/mt5-small-esquad-qg-ae-trimmed-50000", "lmqg/mt5-small-esquad-qg-ae-trimmed-50000"],
+    "it": ["lmqg/mt5-small-itquad-qg-ae-trimmed-50000", "lmqg/mt5-small-itquad-qg-ae-trimmed-50000"],
+    "ja": ["lmqg/mt5-small-jaquad-qg-ae-trimmed-50000", "lmqg/mt5-small-jaquad-qg-ae-trimmed-50000"],
+    "de": ["lmqg/mt5-small-dequad-qg-ae-trimmed-50000", "lmqg/mt5-small-dequad-qg-ae-trimmed-50000"],
+    "ko": ["lmqg/mt5-small-koquad-qg-ae-trimmed-50000", "lmqg/mt5-small-koquad-qg-ae-trimmed-50000"],
+    "ru": ["lmqg/mt5-small-ruquad-qg-ae-trimmed-50000", "lmqg/mt5-small-ruquad-qg-ae-trimmed-50000"],
+    "zh": ["lmqg/mt5-small-zhquad-qg-ae-trimmed-50000", "lmqg/mt5-small-zhquad-qg-ae-trimmed-50000"]
 }
 DEFAULT_MODELS_PIPELINE = {
     "en": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
@@ -47,38 +69,35 @@ DEFAULT_MODELS_PIPELINE = {
 }
 DEFAULT_MODELS = {
     "End2End": DEFAULT_MODELS_E2E,
+    "Multitask": DEFAULT_MODELS_PIPELINE,
     "Pipeline": DEFAULT_MODELS_PIPELINE,
 }
-# Other configs
-LANGUAGE_MAP = {
-    "English": "en",
-    "Japanese": "ja",
-    'German': "de",
-    'Spanish': 'es',
-    'Italian': 'it',
-    'Korean': 'ko',
-    'Russian': "ru",
-    'French': "fr",
-    'Chinese': "zh"
-}
 SPACY_PIPELINE = {i: SpacyPipeline(i) for i in LANGUAGE_MAP.values()}  # spacy for sentence splitting
-# QAG model pretty names used in frontend
-PRETTY_NAME = {}
-PRETTY_NAME["End2End"] = {
-    "T5 SMALL": ["lmqg/t5-small-squad-qag", None],
-    "T5 BASE": ["lmqg/t5-base-squad-qag", None],
-    "T5 LARGE": ["lmqg/t5-large-squad-qag", None],
-    "Flan-T5 SMALL": ["lmqg/flan-t5-small-squad-qag", None],
-    "Flan-T5 BASE": ["lmqg/flan-t5-base-squad-qag", None],
-    "Flan-T5 LARGE": ["lmqg/flan-t5-large-squad-qag", None],
-}
-PRETTY_NAME["Pipeline"] = {
-    "T5 SMALL": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
-    "T5 BASE": ["lmqg/t5-base-squad-qg", "lmqg/t5-base-squad-ae"],
-    "T5 LARGE": ["lmqg/t5-large-squad-qg", "lmqg/t5-large-squad-ae"],
-    "Flan-T5 SMALL": ["lmqg/flan-t5-small-squad-qg", "lmqg/flan-t5-small-squad-ae"],
-    "Flan-T5 BASE": ["lmqg/flan-t5-base-squad-qg", "lmqg/flan-t5-base-squad-ae"],
-    "Flan-T5 LARGE": ["lmqg/flan-t5-large-squad-qg", "lmqg/flan-t5-large-squad-ae"],
+PRETTY_NAME = {
+    "End2End": {
+        "T5 SMALL": ["lmqg/t5-small-squad-qag", None],
+        "T5 BASE": ["lmqg/t5-base-squad-qag", None],
+        "T5 LARGE": ["lmqg/t5-large-squad-qag", None],
+        "Flan-T5 SMALL": ["lmqg/flan-t5-small-squad-qag", None],
+        "Flan-T5 BASE": ["lmqg/flan-t5-base-squad-qag", None],
+        "Flan-T5 LARGE": ["lmqg/flan-t5-large-squad-qag", None]
+    },
+    "Multitask": {
+        "T5 SMALL": ["lmqg/t5-small-squad-qg-ae", "lmqg/t5-small-squad-qg-ae"],
+        "T5 BASE": ["lmqg/t5-base-squad-qg-ae", "lmqg/t5-base-squad-qg-ae"],
+        "T5 LARGE": ["lmqg/t5-large-squad-qg-ae", "lmqg/t5-large-squad-qg-ae"],
+        "Flan-T5 SMALL": ["lmqg/flan-t5-small-squad-qg-ae", "lmqg/flan-t5-small-squad-qg-ae"],
+        "Flan-T5 BASE": ["lmqg/flan-t5-base-squad-qg-ae", "lmqg/flan-t5-base-squad-qg-ae"],
+        "Flan-T5 LARGE": ["lmqg/flan-t5-large-squad-qg-ae", "lmqg/flan-t5-large-squad-qg-ae"],
+    },
+    "Pipeline": {
+        "T5 SMALL": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
+        "T5 BASE": ["lmqg/t5-base-squad-qg", "lmqg/t5-base-squad-ae"],
+        "T5 LARGE": ["lmqg/t5-large-squad-qg", "lmqg/t5-large-squad-ae"],
+        "Flan-T5 SMALL": ["lmqg/flan-t5-small-squad-qg", "lmqg/flan-t5-small-squad-ae"],
+        "Flan-T5 BASE": ["lmqg/flan-t5-base-squad-qg", "lmqg/flan-t5-base-squad-ae"],
+        "Flan-T5 LARGE": ["lmqg/flan-t5-large-squad-qg", "lmqg/flan-t5-large-squad-ae"],
+    }
 }
 PRETTY_NAME["End2End"].update({
     f'mT5 SMALL ({i.upper()})': [f'lmqg/mt5-small-{i}quad-qag-trimmed-50000', None]
@@ -88,15 +107,30 @@ PRETTY_NAME["End2End"].update({
     f'mT5 BASE ({i.upper()})': [f'lmqg/mt5-base-{i}quad-qag-trimmed-50000', None]
     for i in LANGUAGE_MAP.values() if i != 'en'
 })
-PRETTY_NAME["Pipeline"].update({
-    f'mT5 SMALL ({i.upper()})': [f'lmqg/mt5-small-{i}quad-qg-trimmed-50000', f'lmqg/mt5-small-{i}quad-ae-trimmed-50000']
-    for i in LANGUAGE_MAP.values() if i != 'en'
+PRETTY_NAME["Multitask"].update({
+    f'mT5 SMALL ({i.upper()})': [
+        f'lmqg/mt5-small-{i}quad-qg-ae-trimmed-50000',
+        f'lmqg/mt5-small-{i}quad-qg-ae-trimmed-50000'
+    ] for i in LANGUAGE_MAP.values() if i != 'en'
+})
+PRETTY_NAME["Multitask"].update({
+    f'mT5 BASE ({i.upper()})': [
+        f'lmqg/mt5-base-{i}quad-qg-ae-trimmed-50000',
+        f'lmqg/mt5-base-{i}quad-qg-ae-trimmed-50000'
+    ] for i in LANGUAGE_MAP.values() if i != 'en'
 })
 PRETTY_NAME["Pipeline"].update({
-    f'mT5 BASE ({i.upper()})': [f'lmqg/mt5-base-{i}quad-qg-trimmed-50000', f'lmqg/mt5-base-{i}quad-ae-trimmed-50000']
-    for i in LANGUAGE_MAP.values() if i != 'en'
+    f'mT5 SMALL ({i.upper()})': [
+        f'lmqg/mt5-small-{i}quad-qg-trimmed-50000',
+        f'lmqg/mt5-small-{i}quad-ae-trimmed-50000'
+    ] for i in LANGUAGE_MAP.values() if i != 'en'
 })
-
+PRETTY_NAME["Pipeline"].update({
+    f'mT5 BASE ({i.upper()})': [
+        f'lmqg/mt5-base-{i}quad-qg-trimmed-50000',
+        f'lmqg/mt5-base-{i}quad-ae-trimmed-50000'
+    ] for i in LANGUAGE_MAP.values() if i != 'en'
+})
 # Prefix information for each model
 PREFIX_INFO_QAG = {
     v: AutoConfig.from_pretrained(v).add_prefix
@@ -160,7 +194,7 @@ async def process(model_input: ModelInput):
         model_input.highlight = validate_default(model_input.highlight, default=None)
         model_input.qag_type = validate_default(
             model_input.qag_type,
-            default='Pipeline'
+            default='Multitask'
         )
         model_input.model = validate_default(model_input.model, default=None)
 

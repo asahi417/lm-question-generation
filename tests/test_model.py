@@ -1,4 +1,3 @@
-import os
 import unittest
 from lmqg import TransformersQG
 
