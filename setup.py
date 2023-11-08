@@ -35,8 +35,7 @@ setup(
             'pydantic',
             'spacy_ke',
             'pydantic',
-            'protobuf',
-            'lmppl'
+            'protobuf'
         ]
     },
     install_requires=[
