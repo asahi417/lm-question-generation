@@ -13,11 +13,12 @@
 The `lmqg` is a python library for question and answer generation (QAG) with language models (LMs). Here, we consider 
 paragraph-level QAG, where user will provide a context (paragraph or document), and the model will generate a list of 
 question and answer pairs on the context. With `lmqg`, you can do following things:
-- [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *8* languages (en/fr/ja/ko/ru/it/es/de).
+- [***Generation in One Line of Code:***](https://github.com/asahi417/lm-question-generation#generate-question--answer) Generate questions and answers in *9* languages (en/fr/ja/ko/ru/it/es/de/zh).
 - [***Model Training/Evaluation:***](https://github.com/asahi417/lm-question-generation#model-development) Train & evaluate your own QG/QAG models.
 - [***QAG & QG Model Hosting:***](https://github.com/asahi417/lm-question-generation#rest-api-with-huggingface-inference-api) Host your QAG models on a web application or a restAPI server.
 - [***AutoQG:***](https://github.com/asahi417/lm-question-generation/tree/master#autoqg) Online web service to generate questions and answers with our models.
  
+***Update Nov 2023:*** *Chinese QAG* models are now availble on both of `lmqg` and [AutoQG](https://autoqg.net)! \
 ***Update May 2023:*** Two papers got accepted by ACL 2023 ([QAG at finding](https://arxiv.org/abs/2305.17002), [LMQG at system demonstration](https://arxiv.org/abs/2305.17416)). \
 ***Update Oct 2022:*** Our [QG paper](https://aclanthology.org/2022.emnlp-main.42/) got accepted by EMNLP main 2022.
 
@@ -29,7 +30,7 @@ The **Multitask** follows same architecture as the **Pipeline**, but the QG and 
 Finally, **End2end** model will generate a list of question and answer pairs in an end-to-end manner.
 In practice, **Pipeline** and **Multitask** generate more question and answer pairs, while **End2end** generates less but a few times faster, 
 and the quality of the generated question and answer pairs depend on language.
-All types are available in the *8* diverse languages (en/fr/ja/ko/ru/it/es/de) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md)).
+All types are available in the *9* diverse languages (en/fr/ja/ko/ru/it/es/de/zh) via `lmqg`, and the models are all shared on HuggingFace (see the [model card](https://github.com/asahi417/lm-question-generation/blob/master/MODEL_CARD.md)).
 To know more about QAG, please check [our ACL 2023 paper](https://arxiv.org/abs/2305.17002) that describes the QAG models and reports a complete performance comparison of each QAG models in every language.
 
 ### Is QAG different from Question Generation (QG)? 🤔
@@ -50,6 +51,28 @@ Let's install `lmqg` via pip first.
 ```shell
 pip install lmqg
 ```
+
+Generate question & answer pairs in a few lines.
+
+```python
+from lmqg import TransformersQG
+
+model = TransformersQG(language="en")
+context = "William Turner was an English painter who specialised in watercolour landscapes. He is often known " \
+          "as William Turner of Oxford or just Turner of Oxford to distinguish him from his contemporary, " \
+          "J. M. W. Turner. Many of Turner's paintings depicted the countryside around Oxford. One of his " \
+          "best known pictures is a view of the city of Oxford from Hinksey Hill."
+qa = model.generate_qa(context)
+print(qa)
+[
+    ('Who was an English painter who specialised in watercolour landscapes?', 'William Turner'),
+    ('What is William Turner often known as?', 'William Turner of Oxford or just Turner of Oxford'),
+    ("What did many of Turner's paintings depict?", 'the countryside around Oxford'),
+    ("What is one of Turner's best known pictures?", 'a view of the city of Oxford from Hinksey Hill')
+]
+```
+
+In addition to English `en`, we support Italian `it`, Spanish `es`, Russian `ru`, Korean `ko`, Japanese `ja`, German `de`, French `fr`, and Chinese `zh`. You can switch the language by specifying the language id at loading model (eg. `TransformersQG(language="es")` for Spanish). For more detailed usage, please read next section.
 
 ## Generate Question & Answer
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13izkdp2l7G2oeh_fwL7xJdR_67HMK_hQ?usp=sharing)
