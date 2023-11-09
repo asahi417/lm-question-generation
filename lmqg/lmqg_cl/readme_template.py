@@ -56,6 +56,9 @@ sample_qa_dict = {
     ],
     "it": [
         "question: Quale batterio ha il nome del paese che colpisce di più nel suo nome?, context: Il complesso M. tubercolosi (MTBC) comprende altri quattro micobatteri causa di tubercolosi: M. bovis, M. africanum, M. canetti e M. microti. M. africanum non è molto diffuso, ma è una causa significativa di tubercolosi in alcune parti dell' Africa. M. bovis era una volta una causa comune della tubercolosi, ma l' introduzione del latte pastorizzato ha quasi completamente eliminato questo problema di salute pubblica nei paesi sviluppati. M. canetti è raro e sembra essere limitato al Corno d' Africa, anche se alcuni casi sono stati osservati negli emigranti africani. M. microti è anche raro ed è visto quasi solo in persone immunodeficienti, anche se la sua prevalenza può essere significativamente sottovalutata.",
+    ],
+    "zh": [
+        "question: 哪个火车站离警察局大楼很近？, context: 南安普敦的警察服务由汉普郡警察提供。南安普敦行动的主要基地是一座新的八层专用建筑，造价3000万英镑。该建筑位于南路，2011年启用，靠近南安普敦中央火车站。此前，南安普顿市中心的行动位于市民中心西翼，但由于设施老化，加上计划在旧警察局和地方法院建造一座新博物馆，因此必须搬迁。在Portswood、Banister Park、Hille和Shirley还有其他警察局，在南安普顿中央火车站还有一个英国交通警察局。",
     ]
 }
 sample_qg_dict = {
@@ -98,6 +101,10 @@ sample_qg_dict = {
         "<hl> Dopo il 1971 <hl> , l' OPEC ha tardato ad adeguare i prezzi per riflettere tale deprezzamento.",
         "L' individuazione del petrolio e lo sviluppo di nuovi giacimenti richiedeva in genere <hl> da cinque a dieci anni <hl> prima di una produzione significativa.",
         "il <hl> Giappone <hl> è stato il paese più dipendente dal petrolio arabo."
+    ],
+    "zh": [
+        '南安普敦的警察服务由汉普郡警察提供。南安普敦行动的主要基地是一座新的八层专用建筑，造价3000万英镑。该建筑位于南路，2011年启用，靠近<hl> 南安普敦中央 <hl>火车站。此前，南安普顿市中心的行动位于市民中心西翼，但由于设施老化，加上计划在旧警察局和地方法院建造一座新博物馆，因此必须搬迁。在Portswood、Banister Park、Hille和Shirley还有其他警察局，在南安普顿中央火车站还有一个英国交通警察局。',
+        '芝加哥大学的<hl> 1960—61 <hl>集团理论年汇集了Daniel Gorenstein、John G. Thompson和Walter Feit等团体理论家，奠定了一个合作的基础，借助于其他众多数学家的输入，1982中对所有有限的简单群进行了分类。这个项目的规模超过了以往的数学研究，无论是证明的长度还是研究人员的数量。目前正在进行研究，以简化这一分类的证明。如今，群论仍然是一个非常活跃的数学分支，影响着许多其他领域'
     ]
 }
 sample_ae_dict = {
@@ -132,6 +139,9 @@ sample_ae_dict = {
     "it": [
         "<hl> Il 6 ottobre 1973 , la Siria e l' Egitto, con il sostegno di altre nazioni arabe, lanciarono un attacco a sorpresa su Israele, su Yom Kippur. <hl> Questo rinnovo delle ostilità nel conflitto arabo-israeliano ha liberato la pressione economica sottostante sui prezzi del petrolio. All' epoca, l' Iran era il secondo esportatore mondiale di petrolio e un vicino alleato degli Stati Uniti. Settimane più tardi, lo scià d' Iran ha detto in un' intervista: Naturalmente[il prezzo del petrolio] sta andando a salire Certamente! E come! Avete[Paesi occidentali] aumentato il prezzo del grano che ci vendete del 300 per cento, e lo stesso per zucchero e cemento.",
         "<hl> Furono introdotti autocarri compatti, come la Toyota Hilux e il Datsun Truck, seguiti dal camion Mazda (venduto come il Ford Courier), e l' Isuzu costruito Chevrolet LUV. <hl> Mitsubishi rebranded il suo Forte come Dodge D-50 pochi anni dopo la crisi petrolifera. Mazda, Mitsubishi e Isuzu avevano partnership congiunte rispettivamente con Ford, Chrysler e GM. In seguito i produttori americani introdussero le loro sostituzioni nazionali (Ford Ranger, Dodge Dakota e la Chevrolet S10/GMC S-15), ponendo fine alla loro politica di importazione vincolata."
+    ],
+    "zh": [
+        '南安普敦的警察服务由汉普郡警察提供。 南安普敦行动的主要基地是一座新的八层专用建筑，造价3000万英镑。 <hl> 该建筑位于南路，2011年启用，靠近 南安普敦中央 火车站。 <hl> 此前，南安普顿市中心的行动位于市民中心西翼，但由于设施老化，加上计划在旧警察局和地方法院建造一座新博物馆，因此必须搬迁。 在Portswood、Banister Park、Hille和Shirley还有其他警察局，在南安普顿中央火车站还有一个英国交通警察局。'
     ]
 }
 sample_lmqg_dict = {
@@ -142,7 +152,8 @@ sample_lmqg_dict = {
     "es": ["a noviembre , que es también la estación lluviosa.", "noviembre"],
     "fr": ["Créateur » (Maker), lui aussi au singulier, « le Suprême Berger » (The Great Shepherd) ; de l'autre, des réminiscences de la théologie de l'Antiquité : le tonnerre, voix de Jupiter, « Et souvent ta voix gronde en un tonnerre terrifiant », etc.", "le Suprême Berger"],
     "de": ["das erste weltweit errichtete Hermann Brehmer 1855 im niederschlesischen ''Görbersdorf'' (heute Sokołowsko, Polen).", "1855"],
-    "it": ["Dopo il 1971 , l' OPEC ha tardato ad adeguare i prezzi per riflettere tale deprezzamento.", "Dopo il 1971"]
+    "it": ["Dopo il 1971 , l' OPEC ha tardato ad adeguare i prezzi per riflettere tale deprezzamento.", "Dopo il 1971"],
+    "zh": ['南安普敦的警察服务由汉普郡警察提供。南安普敦行动的主要基地是一座新的八层专用建筑，造价3000万英镑。该建筑位于南路，2011年启用，靠近南安普敦中央火车站。此前，南安普顿市中心的行动位于市民中心西翼，但由于设施老化，加上计划在旧警察局和地方法院建造一座新博物馆，因此必须搬迁。在Portswood、Banister Park、Hille和Shirley还有其他警察局，在南安普顿中央火车站还有一个英国交通警察局。', '南安普敦中央']
 }
 language_dict = {
     "qg_frquad": 'fr',
@@ -152,13 +163,15 @@ language_dict = {
     "qg_jaquad": 'ja',
     "qg_ruquad": 'ru',
     "qg_esquad": 'es',
+    "qg_zhquad": 'zh',
     "qag_frquad": 'fr',
     "qag_itquad": 'it',
     "qag_koquad": 'ko',
     "qag_dequad": 'de',
     "qag_jaquad": 'ja',
     "qag_ruquad": 'ru',
-    "qag_esquad": 'es'
+    "qag_esquad": 'es',
+    "qag_zhquad": 'zh',
 }
 
 

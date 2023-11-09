@@ -135,18 +135,25 @@ mlqg_ae () {
   MODEL_ALIAS=${2}
   BATCH=${3}
   GRAD=${4}
-  for LA in "ja" "es" "ko" "it" "de" "ru" "fr" "zh"
-  do
-    lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --language "${LA}" --n-max-config 1 -i 'paragraph_sentence' -o 'answer'
-    lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i 'paragraph_sentence' -o 'answer'
-    lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
-    lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -a "${MODEL_NAME}-${LA}quad-ae" -o "lmqg"
-    rm -rf "lmqg_output/${MODEL_NAME}-${LA}quad-ae"
-  done
+  LA="zh"
+  lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --language "${LA}" --n-max-config 1 -i 'paragraph_sentence' -o 'answer'
+  lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i 'paragraph_sentence' -o 'answer'
+  lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
+  lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -a "${MODEL_NAME}-${LA}quad-ae" -o "lmqg"
+  rm -rf "lmqg_output/${MODEL_NAME}-${LA}quad-ae"
+
+#  for LA in "ja" "es" "ko" "it" "de" "ru" "fr" "zh"
+#  do
+#    lmqg-train-search --use-auth-token -c "lmqg_output/${MODEL_NAME}-${LA}quad-ae" -d "lmqg/qg_${LA}quad" -m "${MODEL_ALIAS}" -b ${BATCH} -g ${GRAD} --lr 1e-04 5e-04 1e-03 --epoch-partial 5 -e 15 --language "${LA}" --n-max-config 1 -i 'paragraph_sentence' -o 'answer'
+#    lmqg-eval --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i 'paragraph_sentence' -o 'answer'
+#    lmqg-eval-qa --use-auth-token -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -e "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model/eval" --language "${LA}" -d "lmqg/qg_${LA}quad" -i "paragraph_sentence" -o 'answer'
+#    lmqg-push-to-hf -m "lmqg_output/${MODEL_NAME}-${LA}quad-ae/best_model" -a "${MODEL_NAME}-${LA}quad-ae" -o "lmqg"
+#    rm -rf "lmqg_output/${MODEL_NAME}-${LA}quad-ae"
+#  done
 }
 
 mlqg_ae "mt5-small" "google/mt5-small" "32" "2"
-mlqg_ae "mt5-base" "google/mt5-base" "8" "8"
+mlqg_ae "mt5-base" "google/mt5-base" "4" "16"
 mlqg_ae "mbart-large-cc25" "facebook/mbart-large-cc25" "8" "8"
 
 # Evaluate pipeline QAG: QG + QA models
