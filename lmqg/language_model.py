@@ -38,7 +38,7 @@ DEFAULT_MODELS = {
     'ru': 'lmqg/mt5-small-ruquad-qg-ae-trimmed-50000',
     'it': 'lmqg/mt5-small-itquad-qg-ae-trimmed-50000',
     'fr': 'lmqg/mt5-small-frquad-qag-trimmed-50000',
-    'zh': 'lmqg/mt5-small-zhquad-qag-trimmed-50000',
+    'zh': 'lmqg/mt5-small-zhquad-qg-ae-trimmed-50000',
 }
 
 

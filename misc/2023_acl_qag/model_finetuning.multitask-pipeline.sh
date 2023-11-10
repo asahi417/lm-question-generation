@@ -180,12 +180,16 @@ lmqg-push-to-hf -m "bart-large-squad-qg" -a "bart-large-squad-qg" -o "lmqg"
 
 mlqg_pipeline_qag () {
   MODEL_NAME=${1}
-  for LA in "ja" "es" "ko" "it" "de" "ru" "fr" "zh"
-  do
-    git clone "https://huggingface.co/lmqg/${MODEL_NAME}-${LA}quad-qg"
-    lmqg-eval-qag --use-auth-token -m "${MODEL_NAME}-${LA}quad-qg" --model-ae "lmqg/${MODEL_NAME}-${LA}quad-ae" -e "${MODEL_NAME}-${LA}quad-qg/eval_pipeline" -d "lmqg/qg_${LA}quad" --language "${LA}"
-    lmqg-push-to-hf -m "${MODEL_NAME}-${LA}quad-qg" -a "${MODEL_NAME}-${LA}quad-qg" -o "lmqg"
-  done
+  LA="zh"
+  git clone "https://huggingface.co/lmqg/${MODEL_NAME}-${LA}quad-qg"
+  lmqg-eval-qag --use-auth-token -m "${MODEL_NAME}-${LA}quad-qg" --model-ae "lmqg/${MODEL_NAME}-${LA}quad-ae" -e "${MODEL_NAME}-${LA}quad-qg/eval_pipeline" -d "lmqg/qg_${LA}quad" --language "${LA}"
+  lmqg-push-to-hf -m "${MODEL_NAME}-${LA}quad-qg" -a "${MODEL_NAME}-${LA}quad-qg" -o "lmqg"
+#  for LA in "ja" "es" "ko" "it" "de" "ru" "fr" "zh"
+#  do
+#    git clone "https://huggingface.co/lmqg/${MODEL_NAME}-${LA}quad-qg"
+#    lmqg-eval-qag --use-auth-token -m "${MODEL_NAME}-${LA}quad-qg" --model-ae "lmqg/${MODEL_NAME}-${LA}quad-ae" -e "${MODEL_NAME}-${LA}quad-qg/eval_pipeline" -d "lmqg/qg_${LA}quad" --language "${LA}"
+#    lmqg-push-to-hf -m "${MODEL_NAME}-${LA}quad-qg" -a "${MODEL_NAME}-${LA}quad-qg" -o "lmqg"
+#  done
 }
 
 mlqg_pipeline_qag "mt5-small"
