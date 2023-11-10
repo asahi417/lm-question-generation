@@ -42,7 +42,7 @@ def main():
     # upload remaining files
     for i in glob(pj(opt.model_checkpoint, "eval*")):
         copy_tree(i, pj(opt.model_alias, os.path.basename(i)))
-    copy_tree(pj(opt.model_checkpoint, "trainer_config.json"), pj(opt.model_alias, "trainer_config.json"))
+    shutil.copyfile(pj(opt.model_checkpoint, "trainer_config.json"), pj(opt.model_alias, "trainer_config.json"))
     repo.push_to_hub()
 
     # os.system(f"cd {opt.model_alias} && git lfs install && git add . && git commit -m 'model update' && git push && cd ../")

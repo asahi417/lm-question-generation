@@ -153,7 +153,7 @@ mlqg_ae () {
 }
 
 mlqg_ae "mt5-small" "google/mt5-small" "32" "2"
-mlqg_ae "mt5-base" "google/mt5-base" "4" "16"
+mlqg_ae "mt5-base" "google/mt5-base" "16" "4"
 mlqg_ae "mbart-large-cc25" "facebook/mbart-large-cc25" "8" "8"
 
 # Evaluate pipeline QAG: QG + QA models
