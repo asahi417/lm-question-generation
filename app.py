@@ -43,7 +43,7 @@ DEFAULT_MODELS_E2E = {
     "de": ["lmqg/mt5-small-dequad-qag-trimmed-50000", None],
     "ko": ["lmqg/mt5-small-koquad-qag-trimmed-50000", None],
     "ru": ["lmqg/mt5-small-ruquad-qag-trimmed-50000", None],
-    # "zh": ["lmqg/mt5-small-zhquad-qag-trimmed-50000", None]
+    "zh": ["lmqg/mt5-small-zhquad-qag-trimmed-50000", None]
 }
 DEFAULT_MODELS_MULTITASK = {
     "en": ["lmqg/t5-small-squad-qg-ae", "lmqg/t5-small-squad-qg-ae"],
@@ -54,7 +54,7 @@ DEFAULT_MODELS_MULTITASK = {
     "de": ["lmqg/mt5-small-dequad-qg-ae-trimmed-50000", "lmqg/mt5-small-dequad-qg-ae-trimmed-50000"],
     "ko": ["lmqg/mt5-small-koquad-qg-ae-trimmed-50000", "lmqg/mt5-small-koquad-qg-ae-trimmed-50000"],
     "ru": ["lmqg/mt5-small-ruquad-qg-ae-trimmed-50000", "lmqg/mt5-small-ruquad-qg-ae-trimmed-50000"],
-    # "zh": ["lmqg/mt5-small-zhquad-qg-ae-trimmed-50000", "lmqg/mt5-small-zhquad-qg-ae-trimmed-50000"]
+    "zh": ["lmqg/mt5-small-zhquad-qg-ae-trimmed-50000", "lmqg/mt5-small-zhquad-qg-ae-trimmed-50000"]
 }
 DEFAULT_MODELS_PIPELINE = {
     "en": ["lmqg/t5-small-squad-qg", "lmqg/t5-small-squad-ae"],
@@ -65,7 +65,7 @@ DEFAULT_MODELS_PIPELINE = {
     "de": ["lmqg/mt5-small-dequad-qg-trimmed-50000", "lmqg/mt5-small-dequad-ae-trimmed-50000"],
     "ko": ["lmqg/mt5-small-koquad-qg-trimmed-50000", "lmqg/mt5-small-koquad-ae-trimmed-50000"],
     "ru": ["lmqg/mt5-small-ruquad-qg-trimmed-50000", "lmqg/mt5-small-ruquad-qg-trimmed-50000"],
-    # "zh": ["lmqg/mt5-small-zhquad-qg-trimmed-50000", "lmqg/mt5-small-zhquad-qg-trimmed-50000"]
+    "zh": ["lmqg/mt5-small-zhquad-qg-trimmed-50000", "lmqg/mt5-small-zhquad-qg-trimmed-50000"]
 }
 DEFAULT_MODELS = {
     "End2End": DEFAULT_MODELS_E2E,
