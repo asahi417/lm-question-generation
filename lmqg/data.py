@@ -2,7 +2,7 @@
 import os
 import requests
 from os.path import join as pj
-
+import pandas as pd
 from datasets import load_dataset
 from .language_model import internet_connection
 
@@ -14,18 +14,50 @@ DEFAULT_CACHE_DIR = pj(os.path.expanduser('~'), '.cache', 'lmqg')
 DATA_NEED_CUSTOM_REFERENCE = ['lmqg/qg_squad']
 
 
-def get_dataset(path: str = 'lmqg/qg_squad',
-                name: str = 'default',
+# def get_dataset(path: str = 'lmqg/qg_squad',
+#                 name: str = 'default',
+#                 split: str = 'train',
+#                 input_type: str = 'paragraph_answer',
+#                 output_type: str = 'question',
+#                 use_auth_token: bool = False):
+#     """ Get question generation input/output list of texts. """
+#     name = None if name == 'default' else name
+#     dataset = load_dataset(path, name, split=split, use_auth_token=use_auth_token)
+#     return dataset[input_type], dataset[output_type]
+
+def get_dataset(path: str,
+                name:str = "default",
                 split: str = 'train',
-                input_type: str = 'paragraph_answer',
-                output_type: str = 'question',
+                input_type: str = 'context',
+                output_type: str = "qag",
                 use_auth_token: bool = False):
-    """ Get question generation input/output list of texts. """
-    name = None if name == 'default' else name
-    dataset = load_dataset(path, name, split=split, use_auth_token=use_auth_token)
-    return dataset[input_type], dataset[output_type]
+    """
+    Get question generation input/output list of texts from a local CSV dataset,
+    grouping questions and answers by context.
 
+    Args:
+    - path (str): Path to the local CSV file.
+    - split (str): Dataset split to load ('train', 'test', etc.).
+    - context_column (str): Column name for context.
+    - question_column (str): Column name for question.
+    - answer_column (str): Column name for answer.
+    - use_auth_token (bool): Whether to use an authentication token for private datasets on Hugging Face Hub.
 
+    Returns:
+    - Tuple of two lists: (formatted input list, output list)
+    """
+
+    # Group by context and format input data
+    input_list = []
+    output_list = []
+    grouped_dataset = pd.read_csv(path).groupby(input_type)
+
+    for context, group in grouped_dataset:
+        qa_pairs = [f"question: {row['question']}, answer: {row['answer']}" for index, row in group.iterrows()]
+        input_list.append(" | ".join(qa_pairs))
+        output_list.append(context)
+
+    return output_list, input_list
 def get_reference_files(path: str = 'lmqg/qg_squad', name: str = 'default', cache_dir: str = None):
     """ Get reference files for automatic evaluation """
     name = None if name == 'default' else name

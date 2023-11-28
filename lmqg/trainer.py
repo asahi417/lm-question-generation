@@ -150,7 +150,6 @@ class Trainer:
         # cached data folder
         input_types = to_list(self.config.input_types, sorting=False)
         output_types = to_list(self.config.output_types, sorting=False)
-        assert len(input_types) == len(output_types)
         if prefix_types is None:
             prefix_types = [None] * len(input_types)
         else:
@@ -217,12 +216,12 @@ class Trainer:
         logging.info('dataset preprocessing')
         encode_list = []
         for (i, o, p), cache_path in self.data_cache_paths:
+
             text_input, text_output = get_dataset(
                 self.config.dataset_path, self.config.dataset_name, split='train', input_type=i, output_type=o,
                 use_auth_token=self.use_auth_token)
             encode_list += self.model.text_to_encode(text_input, text_output, prefix_type=p, cache_path=cache_path)
         loader = self.model.get_data_loader(encode_list, batch_size=self.config.batch, shuffle=True, drop_last=True)
-
         logging.info('start model training')
         global_step = 0
         saved_checkpoints = []

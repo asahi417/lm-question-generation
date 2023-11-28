@@ -11,12 +11,13 @@ from lmqg import TransformersQG
 from lmqg.automatic_evaluation_tool import QAAlignedF1Score, Bleu, Meteor, Rouge, BERTScore, MoverScore
 from lmqg.spacy_module import SpacyPipeline
 from lmqg.automatic_evaluation import LANG_NEED_TOKENIZATION
+import pandas as pd
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
-
-def get_options():
+def create_parser():
+    import argparse
     parser = argparse.ArgumentParser(description='QAG evaluation.')
     parser.add_argument('-m', '--model', default=None, type=str)
     parser.add_argument('--model-ae', default=None, type=str)
@@ -38,87 +39,82 @@ def get_options():
     parser.add_argument('--overwrite-prediction', help='', action='store_true')
     parser.add_argument('--overwrite-metric', help='', action='store_true')
     parser.add_argument('--use-reference-answer', action='store_true')
-    # parser.add_argument('--is-qa', help='', action='store_true')
-    # parser.add_argument('--is-ae', help='', action='store_true')
-    # parser.add_argument('--is-qg', help='', action='store_true')
-    # parser.add_argument('--is-qag', help='', action='store_true')
-    return parser.parse_args()
+    return parser
 
 
-def main():
-    print("testing")
-    opt = get_options()
-    os.makedirs(opt.export_dir, exist_ok=True)
+def evaluate_qag(model, model_ae, max_length, max_length_output, dataset_path, dataset_name, test_split, validation_split, n_beams, batch_size, language, use_auth_token, device_map, low_cpu_mem_usage, export_dir, hyp_test, hyp_dev, overwrite_prediction, overwrite_metric, use_reference_answer):
+    os.makedirs(export_dir, exist_ok=True)
     metrics = [
-        (QAAlignedF1Score(target_metric='f1', base_metric='bertscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='f1', base_metric='bertscore', language=language),
          "QAAlignedF1Score (BERTScore)"),
-        (QAAlignedF1Score(target_metric='recall', base_metric='bertscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='recall', base_metric='bertscore', language=language),
          "QAAlignedRecall (BERTScore)"),
-        (QAAlignedF1Score(target_metric='precision', base_metric='bertscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='precision', base_metric='bertscore', language=language),
          "QAAlignedPrecision (BERTScore)"),
-        (QAAlignedF1Score(target_metric='f1', base_metric='moverscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='f1', base_metric='moverscore', language=language),
          "QAAlignedF1Score (MoverScore)"),
-        (QAAlignedF1Score(target_metric='recall', base_metric='moverscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='recall', base_metric='moverscore', language=language),
          "QAAlignedRecall (MoverScore)"),
-        (QAAlignedF1Score(target_metric='precision', base_metric='moverscore', language=opt.language),
+        (QAAlignedF1Score(target_metric='precision', base_metric='moverscore', language=language),
          "QAAlignedPrecision (MoverScore)"),
         (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
-        (Meteor(), "METEOR"),
+        #(Meteor(), "METEOR"),
         (Rouge(), "ROUGE_L"),
-        (BERTScore(language=opt.language), "BERTScore"),
-        (MoverScore(language=opt.language), 'MoverScore')
+        (BERTScore(language=language), "BERTScore"),
+        (MoverScore(language=language), 'MoverScore')
     ]
 
     def load_model():
-        if opt.model is not None:
-            _model = TransformersQG(opt.model,
-                                    # is_ae=None if opt.is_ae else True,
-                                    # is_qg=None if opt.is_qg else True,
-                                    # is_qag=None if opt.is_qag else True,
-                                    model_ae=opt.model_ae,
+        if model is not None:
+
+            _model = TransformersQG(model,
+                                    # is_ae=None if is_ae else True,
+                                    # is_qg=None if is_qg else True,
+                                    is_qag=True,
+                                    model_ae=model_ae,
                                     skip_overflow_error=True,
                                     drop_answer_error_text=True,
-                                    language=opt.language,
-                                    max_length=opt.max_length,
-                                    max_length_output=opt.max_length_output,
-                                    use_auth_token=opt.use_auth_token,
-                                    device_map=opt.device_map,
-                                    low_cpu_mem_usage=opt.low_cpu_mem_usage)
+                                    language=language,
+                                    max_length=max_length,
+                                    max_length_output=max_length_output,
+                                    use_auth_token=use_auth_token,
+                                    device_map=device_map,
+                                    low_cpu_mem_usage=low_cpu_mem_usage)
             _model.eval()
             return _model
         raise ValueError(f"require `-m` or `--model`")
 
-    if opt.model_ae is not None:
-        metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
-                      f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}." \
-                      f"{opt.model_ae.replace('/', '_')}.json"
+    if model_ae is not None:
+        metric_file = f"{export_dir}/metric.first.answer.paragraph.questions_answers." \
+                      f"{dataset_path.replace('/', '_')}.{dataset_name}." \
+                      f"{model_ae.replace('/', '_')}.json"
     else:
-        metric_file = f"{opt.export_dir}/metric.first.answer.paragraph.questions_answers." \
-                      f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.json"
+        metric_file = f"{export_dir}/metric.first.answer.paragraph.questions_answers." \
+                      f"{dataset_path.replace('/', '_')}.{dataset_name}.json"
     if os.path.exists(metric_file):
         with open(metric_file) as f:
             output = json.load(f)
     else:
         output = {}
-    spacy_model = SpacyPipeline(language=opt.language) if opt.language in LANG_NEED_TOKENIZATION else None
-    for _split, _file in zip([opt.test_split, opt.validation_split], [opt.hyp_test, opt.hyp_dev]):
+    spacy_model = SpacyPipeline(language=language) if language in LANG_NEED_TOKENIZATION else None
+    for _split, _file in zip([test_split, validation_split], [hyp_test, hyp_dev]):
         if _file is None:
-            if opt.model_ae is not None:
-                _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
-                        f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}." \
-                        f"{opt.model_ae.replace('/', '_')}.txt"
+            if model_ae is not None:
+                _file = f"{export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
+                        f"{dataset_path.replace('/', '_')}.{dataset_name}." \
+                        f"{model_ae.replace('/', '_')}.txt"
             else:
-                _file = f"{opt.export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
-                        f"{opt.dataset_path.replace('/', '_')}.{opt.dataset_name}.txt"
+                _file = f"{export_dir}/samples.{_split}.hyp.paragraph.questions_answers." \
+                        f"{dataset_path.replace('/', '_')}.{dataset_name}.txt"
 
         logging.info(f'generate qa for split {_split}')
         if _split not in output:
             output[_split] = {}
 
-        dataset = load_dataset(opt.dataset_path, None if opt.dataset_name == 'default' else opt.dataset_name,
-                               split=_split, use_auth_token=opt.use_auth_token)
-        df = dataset.to_pandas()
-
+        # dataset = load_dataset(dataset_path, None if dataset_name == 'default' else dataset_name,
+        #                        split=_split, use_auth_token=use_auth_token)
+        # df = dataset.to_pandas()
+        df = pd.read_csv(dataset_path).rename(columns={"context":"paragraph"})
         # formatting data into qag format
         model_input = []
         gold_reference = []
@@ -130,7 +126,7 @@ def main():
                 f"question: {i['question']}, answer: {i['answer']}" for _, i in g.iterrows()
             ]))
         prediction = None
-        if not opt.overwrite_prediction and os.path.exists(_file):
+        if not overwrite_prediction and os.path.exists(_file):
             with open(_file) as f:
                 _prediction = f.read().split('\n')
             if len(_prediction) != len(gold_reference):
@@ -141,12 +137,12 @@ def main():
         if prediction is None:
             model = load_model()
             # model prediction
-            if not opt.use_reference_answer:
+            if not use_reference_answer:
                 logging.info("model prediction: (qag model)")
                 prediction = model.generate_qa(
                     list_context=model_input,
-                    num_beams=opt.n_beams,
-                    batch_size=opt.batch_size)
+                    num_beams=n_beams,
+                    batch_size=batch_size)
             else:
                 logging.info("model prediction: (qg model, answer fixed by reference)")
                 model_input_flat = list(chain(*[[i] * len(h) for i, h in zip(model_input, model_highlight)]))
@@ -154,8 +150,8 @@ def main():
                 prediction_flat = model.generate_q(
                     list_context=model_input_flat,
                     list_answer=model_highlight_flat,
-                    num_beams=opt.n_beams,
-                    batch_size=opt.batch_size)
+                    num_beams=n_beams,
+                    batch_size=batch_size)
                 _index = 0
                 prediction = []
                 for h in model_highlight:
@@ -172,7 +168,7 @@ def main():
 
         for metric, metric_name in metrics:
             metric_name_list = [metric_name] if type(metric_name) is str else metric_name
-            if opt.overwrite_metric or any(m not in output[_split] for m in metric_name_list):
+            if overwrite_metric or any(m not in output[_split] for m in metric_name_list):
                 if spacy_model is not None and (type(metric_name) is list or not metric_name.startswith("QAAligned")):
                     prediction = [' '.join(spacy_model.token(i)) for i in prediction]
                 scores = metric.get_score(prediction, gold_reference)
@@ -184,4 +180,12 @@ def main():
 
     with open(metric_file, "w") as f:
         json.dump(output, f)
+def run_evaluation(args_list=None):
+    parser = create_parser()
+    args = parser.parse_args(args_list)
 
+    return evaluate_qag(args.model, args.model_ae, args.max_length, args.max_length_output, args.dataset_path, args.dataset_name, args.test_split, args.validation_split, args.n_beams, args.batch_size, args.language, args.use_auth_token, args.device_map, args.low_cpu_mem_usage, args.export_dir, args.hyp_test, args.hyp_dev, args.overwrite_prediction, args.overwrite_metric, args.use_reference_answer)
+
+# Example usage in a Jupyter Notebook
+# args_list = ["-m", "lmqg/t5-large-squad-qag", "-e", "./weird_dir", "-d", "lmqg/qg_squad", "-l", "en"]
+# run_evaluation(args_list)

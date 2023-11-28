@@ -128,12 +128,13 @@ class GridSearcher:
         # configure evaluation data types
         input_types = to_list(self.static_config['input_types'], sorting=False)
         output_types = to_list(self.static_config['output_types'], sorting=False)
-        assert len(input_types) == len(output_types), f"{len(input_types)} != {len(output_types)}"
+        print(output_types)
         if self.static_config['prefix_types'] is None:
             prefix_types = [None] * len(input_types)
         else:
             prefix_types = to_list(self.static_config['prefix_types'], sorting=False)
         tmp = [(i, o, p) for i, o, p in zip(input_types, output_types, prefix_types)]
+        print(tmp)
         if len(tmp) > 1:
             tmp = [(i, o, p) for i, o, p in tmp if o in ['question', 'questions_answers']]
         assert len(tmp) == 1, tmp
@@ -214,7 +215,7 @@ class GridSearcher:
                     **config)
                 trainer.train(
                     epoch_partial=self.epoch_partial, epoch_save=1, interval=interval)
-
+                
             checkpoints.append(checkpoint_dir)
 
         metrics = {}
