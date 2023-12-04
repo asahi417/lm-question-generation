@@ -184,7 +184,7 @@ def run_evaluation(args_list=None):
     parser = create_parser()
     args = parser.parse_args(args_list)
 
-    return evaluate_qag(args.model, args.model_ae, args.max_length, args.max_length_output, args.dataset_path, args.dataset_name, args.test_split, args.validation_split, args.n_beams, args.batch_size, args.language, args.use_auth_token, args.device_map, args.low_cpu_mem_usage, args.export_dir, args.hyp_test, args.hyp_dev, args.overwrite_prediction, args.overwrite_metric, args.use_reference_answer)
+    evaluate_qag(args.model, args.model_ae, args.max_length, args.max_length_output, args.dataset_path, args.dataset_name, args.test_split, args.validation_split, args.n_beams, args.batch_size, args.language, args.use_auth_token, args.device_map, args.low_cpu_mem_usage, args.export_dir, args.hyp_test, args.hyp_dev, args.overwrite_prediction, args.overwrite_metric, args.use_reference_answer)
 
 # Example usage in a Jupyter Notebook
 # args_list = ["-m", "lmqg/t5-large-squad-qag", "-e", "./weird_dir", "-d", "lmqg/qg_squad", "-l", "en"]

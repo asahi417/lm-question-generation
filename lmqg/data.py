@@ -53,7 +53,7 @@ def get_dataset(path: str,
     grouped_dataset = pd.read_csv(path).groupby(input_type)
 
     for context, group in grouped_dataset:
-        qa_pairs = [f"question: {row['question']}, answer: {row['answer']}" for index, row in group.iterrows()]
+        qa_pairs = [f"question: {row['question']}, answer: {row['answers_text']}" for index, row in group.iterrows()]
         input_list.append(" | ".join(qa_pairs))
         output_list.append(context)
 
