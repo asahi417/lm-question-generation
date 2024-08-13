@@ -1,5 +1,5 @@
 import pandas as pd
-from huggingface_hub import ModelFilter, HfApi
+from huggingface_hub import HfApi
 
 header = 'https://huggingface.co'
 
@@ -71,7 +71,7 @@ def parse(alias):
 
 api = HfApi()
 
-models = sorted([i.modelId for i in api.list_models(filter=ModelFilter(author='lmqg')) if 'tweetqa' not in i.modelId])
+models = sorted([model.id for model in api.list_models(author='lmqg') if 'tweetqa' not in model.id])
 ablation_models = pd.DataFrame([parse(i) for i in models if 'subjqa' in i or 'squadshifts' in i])
 ablation_models.pop("Task")
 ablation_models = ablation_models.to_markdown(index=False)
